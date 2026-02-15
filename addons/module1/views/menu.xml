@@ -1,0 +1,10 @@
+<odoo>
+  <record id="action_my_model" model="ir.actions.act_window">
+    <field name="name">My Records</field>
+    <field name="res_model">my.model</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+
+  <menuitem id="menu_my_root" name="My App" sequence="10"/>
+  <menuitem id="menu_my_model" name="My Records" parent="menu_my_root" action="action_my_model" sequence="10"/>
+</odoo>
