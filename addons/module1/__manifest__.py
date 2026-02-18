@@ -5,6 +5,7 @@
     "data": [
         "security/ir.model.access.csv",
         "views/menu.xml",
+        "views/my_model_views.xml",
     ],
     "application": True,
 }
