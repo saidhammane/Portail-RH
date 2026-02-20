@@ -1,0 +1,112 @@
+<odoo>
+  <record id="view_portail_rh_travel_request_tree" model="ir.ui.view">
+    <field name="name">portail.rh.travel.request.tree</field>
+    <field name="model">portail.rh.travel.request</field>
+    <field name="arch" type="xml">
+      <tree string="Travel Requests">
+        <field name="name"/>
+        <field name="employee_id"/>
+        <field name="destination"/>
+        <field name="date_start"/>
+        <field name="date_end"/>
+        <field name="state" widget="badge"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_portail_rh_travel_request_form" model="ir.ui.view">
+    <field name="name">portail.rh.travel.request.form</field>
+    <field name="model">portail.rh.travel.request</field>
+    <field name="arch" type="xml">
+      <form string="Travel Request">
+        <header>
+          <button
+            name="action_submit"
+            type="object"
+            string="Submit"
+            class="btn-primary"
+            invisible="state != 'draft'"
+          />
+          <button
+            name="action_approve"
+            type="object"
+            string="Approve"
+            class="btn-primary"
+            groups="portail_rh_travel_request.group_travel_request_manager"
+            invisible="state != 'submitted'"
+          />
+          <button
+            name="action_reject"
+            type="object"
+            string="Reject"
+            groups="portail_rh_travel_request.group_travel_request_manager"
+            invisible="state != 'submitted'"
+          />
+          <button
+            name="action_done"
+            type="object"
+            string="Mark Done"
+            class="btn-primary"
+            groups="portail_rh_travel_request.group_travel_request_manager"
+            invisible="state != 'approved'"
+          />
+          <button
+            name="action_set_draft"
+            type="object"
+            string="Set Draft"
+            invisible="state == 'draft'"
+          />
+          <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected,done"/>
+        </header>
+        <sheet>
+          <group>
+            <group>
+              <field name="name" readonly="1"/>
+              <field name="employee_id"/>
+              <field name="department_id" readonly="1"/>
+              <field name="manager_user_id"/>
+            </group>
+            <group>
+              <field name="destination"/>
+              <field name="transport_mode"/>
+              <field name="date_start"/>
+              <field name="date_end"/>
+              <field name="estimated_cost"/>
+            </group>
+          </group>
+          <group>
+            <field name="purpose"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_portail_rh_travel_request_search" model="ir.ui.view">
+    <field name="name">portail.rh.travel.request.search</field>
+    <field name="model">portail.rh.travel.request</field>
+    <field name="arch" type="xml">
+      <search string="Travel Requests">
+        <field name="name"/>
+        <field name="employee_id"/>
+        <field name="destination"/>
+        <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+        <filter name="filter_submitted" string="Submitted" domain="[('state', '=', 'submitted')]"/>
+        <filter name="filter_approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+        <filter name="filter_done" string="Done" domain="[('state', '=', 'done')]"/>
+        <group expand="0" string="Group By">
+          <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+          <filter name="group_by_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+        </group>
+      </search>
+    </field>
+  </record>
+
+  <record id="action_portail_rh_travel_request" model="ir.actions.act_window">
+    <field name="name">Travel Requests</field>
+    <field name="res_model">portail.rh.travel.request</field>
+    <field name="view_mode">tree,form</field>
+    <field name="search_view_id" ref="view_portail_rh_travel_request_search"/>
+  </record>
+</odoo>
