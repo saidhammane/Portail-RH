@@ -1,17 +1,17 @@
-from odoo import models, fields
+from odoo import fields, models
 
 
 class MyModel(models.Model):
     _name = "my.model"
-    _description = "My Model"
+    _description = "Mon modele"
 
     name = fields.Char(required=True)
     note = fields.Text()
     state = fields.Selection(
         [
             ("draft", "Brouillon"),
-            ("confirmed", "Confirmé"),
-            ("done", "Validé"),
+            ("confirmed", "Confirme"),
+            ("done", "Valide"),
         ],
         default="draft",
     )

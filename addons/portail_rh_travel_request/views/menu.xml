@@ -1,14 +1,14 @@
 <odoo>
   <menuitem
     id="menu_portail_rh_travel_root"
-    name="Travel Requests"
+    name="Demandes de deplacement"
     sequence="10"
     groups="base.group_user"
   />
 
   <menuitem
     id="menu_portail_rh_travel_request"
-    name="Requests"
+    name="Demandes"
     parent="menu_portail_rh_travel_root"
     action="action_portail_rh_travel_request"
     sequence="10"

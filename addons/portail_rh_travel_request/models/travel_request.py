@@ -4,7 +4,7 @@ from odoo.exceptions import UserError, ValidationError
 
 class PortailRhTravelRequest(models.Model):
     _name = "portail.rh.travel.request"
-    _description = "Travel Request"
+    _description = "Demande de deplacement"
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _order = "id desc"
 
@@ -13,75 +13,75 @@ class PortailRhTravelRequest(models.Model):
         required=True,
         copy=False,
         readonly=True,
-        default="New",
+        default="Nouveau",
         tracking=True,
     )
     employee_id = fields.Many2one(
         "hr.employee",
-        string="Employee",
+        string="Employe",
         required=True,
         default=lambda self: self._default_employee_id(),
         tracking=True,
     )
     requester_user_id = fields.Many2one(
         "res.users",
-        string="Requester",
+        string="Demandeur",
         related="employee_id.user_id",
         store=True,
         readonly=True,
     )
     department_id = fields.Many2one(
         "hr.department",
-        string="Department",
+        string="Departement",
         related="employee_id.department_id",
         store=True,
         readonly=True,
     )
     manager_user_id = fields.Many2one(
         "res.users",
-        string="Approver",
+        string="Validateur",
         compute="_compute_manager_user_id",
         store=True,
         readonly=False,
     )
     company_id = fields.Many2one(
         "res.company",
-        string="Company",
+        string="Societe",
         required=True,
         default=lambda self: self.env.company,
     )
     currency_id = fields.Many2one(
         "res.currency",
-        string="Currency",
+        string="Devise",
         related="company_id.currency_id",
         store=True,
         readonly=True,
     )
     destination = fields.Char(string="Destination", required=True, tracking=True)
-    date_start = fields.Date(string="Start Date", required=True, tracking=True)
-    date_end = fields.Date(string="End Date", required=True, tracking=True)
-    purpose = fields.Text(string="Purpose")
+    date_start = fields.Date(string="Date de debut", required=True, tracking=True)
+    date_end = fields.Date(string="Date de fin", required=True, tracking=True)
+    purpose = fields.Text(string="Objet")
     transport_mode = fields.Selection(
         [
-            ("car", "Car"),
+            ("car", "Voiture"),
             ("train", "Train"),
-            ("plane", "Plane"),
-            ("other", "Other"),
+            ("plane", "Avion"),
+            ("other", "Autre"),
         ],
-        string="Transport Mode",
+        string="Mode de transport",
         default="car",
         tracking=True,
     )
-    estimated_cost = fields.Monetary(string="Estimated Cost", tracking=True)
+    estimated_cost = fields.Monetary(string="Cout estime", tracking=True)
     state = fields.Selection(
         [
-            ("draft", "Draft"),
-            ("submitted", "Submitted"),
-            ("approved", "Approved"),
-            ("rejected", "Rejected"),
-            ("done", "Done"),
+            ("draft", "Brouillon"),
+            ("submitted", "Soumise"),
+            ("approved", "Approuvee"),
+            ("rejected", "Refusee"),
+            ("done", "Terminee"),
         ],
-        string="Status",
+        string="Statut",
         default="draft",
         required=True,
         tracking=True,
@@ -101,48 +101,48 @@ class PortailRhTravelRequest(models.Model):
     def create(self, vals_list):
         sequence = self.env["ir.sequence"]
         for vals in vals_list:
-            if vals.get("name", "New") == "New":
-                vals["name"] = sequence.next_by_code("portail.rh.travel.request") or "New"
+            if vals.get("name", "Nouveau") == "Nouveau":
+                vals["name"] = sequence.next_by_code("portail.rh.travel.request") or "Nouveau"
         return super().create(vals_list)
 
     @api.constrains("date_start", "date_end")
     def _check_date_range(self):
         for record in self:
             if record.date_start and record.date_end and record.date_end < record.date_start:
-                raise ValidationError(_("End Date must be greater than or equal to Start Date."))
+                raise ValidationError(_("La date de fin doit etre superieure ou egale a la date de debut."))
 
     def action_submit(self):
         self.ensure_one()
         if self.state != "draft":
-            raise UserError(_("Only draft requests can be submitted."))
+            raise UserError(_("Seules les demandes en brouillon peuvent etre soumises."))
         self.write({"state": "submitted"})
 
     def action_approve(self):
         self.ensure_one()
         if self.state != "submitted":
-            raise UserError(_("Only submitted requests can be approved."))
+            raise UserError(_("Seules les demandes soumises peuvent etre approuvees."))
         if not self.env.user.has_group("portail_rh_travel_request.group_travel_request_manager"):
             if self.manager_user_id != self.env.user:
-                raise UserError(_("Only the assigned approver can approve this request."))
+                raise UserError(_("Seul le validateur assigne peut approuver cette demande."))
         self.write({"state": "approved"})
 
     def action_reject(self):
         self.ensure_one()
         if self.state != "submitted":
-            raise UserError(_("Only submitted requests can be rejected."))
+            raise UserError(_("Seules les demandes soumises peuvent etre refusees."))
         if not self.env.user.has_group("portail_rh_travel_request.group_travel_request_manager"):
             if self.manager_user_id != self.env.user:
-                raise UserError(_("Only the assigned approver can reject this request."))
+                raise UserError(_("Seul le validateur assigne peut refuser cette demande."))
         self.write({"state": "rejected"})
 
     def action_set_draft(self):
         self.ensure_one()
         if self.state not in ("submitted", "approved", "rejected", "done"):
-            raise UserError(_("Only non-draft requests can be reset to draft."))
+            raise UserError(_("Seules les demandes hors brouillon peuvent revenir en brouillon."))
         self.write({"state": "draft"})
 
     def action_done(self):
         self.ensure_one()
         if self.state != "approved":
-            raise UserError(_("Only approved requests can be marked as done."))
+            raise UserError(_("Seules les demandes approuvees peuvent etre marquees comme terminees."))
         self.write({"state": "done"})

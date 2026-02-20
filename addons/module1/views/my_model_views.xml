@@ -3,7 +3,7 @@
     <field name="name">module1.my.model.tree</field>
     <field name="model">my.model</field>
     <field name="arch" type="xml">
-      <tree string="My Records">
+      <tree string="Mes enregistrements">
         <field name="name"/>
         <field name="state" widget="badge"/>
       </tree>
@@ -14,7 +14,7 @@
     <field name="name">module1.my.model.form</field>
     <field name="model">my.model</field>
     <field name="arch" type="xml">
-      <form string="My Record">
+      <form string="Mon enregistrement">
         <header>
           <button
             name="action_confirm"
@@ -53,7 +53,7 @@
     <field name="name">module1.my.model.search</field>
     <field name="model">my.model</field>
     <field name="arch" type="xml">
-      <search string="My Records">
+      <search string="Mes enregistrements">
         <field name="name"/>
         <filter
           name="group_by_state"

@@ -3,7 +3,7 @@
     <field name="name">portail.rh.travel.request.tree</field>
     <field name="model">portail.rh.travel.request</field>
     <field name="arch" type="xml">
-      <tree string="Travel Requests">
+      <tree string="Demandes de deplacement">
         <field name="name"/>
         <field name="employee_id"/>
         <field name="destination"/>
@@ -18,19 +18,19 @@
     <field name="name">portail.rh.travel.request.form</field>
     <field name="model">portail.rh.travel.request</field>
     <field name="arch" type="xml">
-      <form string="Travel Request">
+      <form string="Demande de deplacement">
         <header>
           <button
             name="action_submit"
             type="object"
-            string="Submit"
+            string="Soumettre"
             class="btn-primary"
             invisible="state != 'draft'"
           />
           <button
             name="action_approve"
             type="object"
-            string="Approve"
+            string="Approuver"
             class="btn-primary"
             groups="portail_rh_travel_request.group_travel_request_manager"
             invisible="state != 'submitted'"
@@ -38,14 +38,14 @@
           <button
             name="action_reject"
             type="object"
-            string="Reject"
+            string="Refuser"
             groups="portail_rh_travel_request.group_travel_request_manager"
             invisible="state != 'submitted'"
           />
           <button
             name="action_done"
             type="object"
-            string="Mark Done"
+            string="Marquer comme terminee"
             class="btn-primary"
             groups="portail_rh_travel_request.group_travel_request_manager"
             invisible="state != 'approved'"
@@ -53,7 +53,7 @@
           <button
             name="action_set_draft"
             type="object"
-            string="Set Draft"
+            string="Remettre en brouillon"
             invisible="state == 'draft'"
           />
           <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected,done"/>
@@ -87,24 +87,24 @@
     <field name="name">portail.rh.travel.request.search</field>
     <field name="model">portail.rh.travel.request</field>
     <field name="arch" type="xml">
-      <search string="Travel Requests">
+      <search string="Demandes de deplacement">
         <field name="name"/>
         <field name="employee_id"/>
         <field name="destination"/>
-        <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
-        <filter name="filter_submitted" string="Submitted" domain="[('state', '=', 'submitted')]"/>
-        <filter name="filter_approved" string="Approved" domain="[('state', '=', 'approved')]"/>
-        <filter name="filter_done" string="Done" domain="[('state', '=', 'done')]"/>
-        <group expand="0" string="Group By">
-          <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
-          <filter name="group_by_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+        <filter name="filter_draft" string="Brouillon" domain="[('state', '=', 'draft')]"/>
+        <filter name="filter_submitted" string="Soumise" domain="[('state', '=', 'submitted')]"/>
+        <filter name="filter_approved" string="Approuvee" domain="[('state', '=', 'approved')]"/>
+        <filter name="filter_done" string="Terminee" domain="[('state', '=', 'done')]"/>
+        <group expand="0" string="Grouper par">
+          <filter name="group_by_state" string="Statut" context="{'group_by': 'state'}"/>
+          <filter name="group_by_employee" string="Employe" context="{'group_by': 'employee_id'}"/>
         </group>
       </search>
     </field>
   </record>
 
   <record id="action_portail_rh_travel_request" model="ir.actions.act_window">
-    <field name="name">Travel Requests</field>
+    <field name="name">Demandes de deplacement</field>
     <field name="res_model">portail.rh.travel.request</field>
     <field name="view_mode">tree,form</field>
     <field name="search_view_id" ref="view_portail_rh_travel_request_search"/>

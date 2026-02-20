@@ -1,6 +1,6 @@
 <odoo>
   <record id="seq_portail_rh_travel_request" model="ir.sequence">
-    <field name="name">Travel Request</field>
+    <field name="name">Demande de deplacement</field>
     <field name="code">portail.rh.travel.request</field>
     <field name="prefix">TR/%(year)s/</field>
     <field name="padding">4</field>
