@@ -1,22 +1,22 @@
 <odoo>
-  <record id="view_portail_rh_travel_request_tree" model="ir.ui.view">
-    <field name="name">portail.rh.travel.request.tree</field>
-    <field name="model">portail.rh.travel.request</field>
+  <record id="view_hr_travel_request_tree" model="ir.ui.view">
+    <field name="name">hr.travel.request.tree</field>
+    <field name="model">hr.travel.request</field>
     <field name="arch" type="xml">
       <tree string="Demandes de deplacement">
         <field name="name"/>
         <field name="employee_id"/>
         <field name="destination"/>
-        <field name="date_start"/>
-        <field name="date_end"/>
+        <field name="date_from"/>
+        <field name="date_to"/>
         <field name="state" widget="badge"/>
       </tree>
     </field>
   </record>
 
-  <record id="view_portail_rh_travel_request_form" model="ir.ui.view">
-    <field name="name">portail.rh.travel.request.form</field>
-    <field name="model">portail.rh.travel.request</field>
+  <record id="view_hr_travel_request_form" model="ir.ui.view">
+    <field name="name">hr.travel.request.form</field>
+    <field name="model">hr.travel.request</field>
     <field name="arch" type="xml">
       <form string="Demande de deplacement">
         <header>
@@ -32,28 +32,28 @@
             type="object"
             string="Approuver"
             class="btn-primary"
-            groups="portail_rh_travel_request.group_travel_request_manager"
             invisible="state != 'submitted'"
+            groups="portail_rh_core.group_rh_portal_manager,portail_rh_core.group_rh_portal_hr"
           />
           <button
             name="action_reject"
             type="object"
-            string="Refuser"
-            groups="portail_rh_travel_request.group_travel_request_manager"
+            string="Rejeter"
             invisible="state != 'submitted'"
+            groups="portail_rh_core.group_rh_portal_manager,portail_rh_core.group_rh_portal_hr"
           />
           <button
             name="action_done"
             type="object"
-            string="Marquer comme terminee"
+            string="Terminer"
             class="btn-primary"
-            groups="portail_rh_travel_request.group_travel_request_manager"
             invisible="state != 'approved'"
+            groups="portail_rh_core.group_rh_portal_manager,portail_rh_core.group_rh_portal_hr"
           />
           <button
-            name="action_set_draft"
+            name="action_reset_to_draft"
             type="object"
-            string="Remettre en brouillon"
+            string="Revenir en brouillon"
             invisible="state == 'draft'"
           />
           <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected,done"/>
@@ -63,19 +63,24 @@
             <group>
               <field name="name" readonly="1"/>
               <field name="employee_id"/>
+              <field name="user_id" readonly="1"/>
               <field name="department_id" readonly="1"/>
-              <field name="manager_user_id"/>
+              <field name="manager_id" readonly="1"/>
             </group>
             <group>
+              <field name="mission_type"/>
               <field name="destination"/>
-              <field name="transport_mode"/>
-              <field name="date_start"/>
-              <field name="date_end"/>
-              <field name="estimated_cost"/>
+              <field name="date_from"/>
+              <field name="date_to"/>
+              <field name="duration_days" readonly="1"/>
             </group>
           </group>
           <group>
             <field name="purpose"/>
+          </group>
+          <group>
+            <field name="estimated_cost"/>
+            <field name="currency_id"/>
           </group>
         </sheet>
         <chatter/>
@@ -83,30 +88,9 @@
     </field>
   </record>
 
-  <record id="view_portail_rh_travel_request_search" model="ir.ui.view">
-    <field name="name">portail.rh.travel.request.search</field>
-    <field name="model">portail.rh.travel.request</field>
-    <field name="arch" type="xml">
-      <search string="Demandes de deplacement">
-        <field name="name"/>
-        <field name="employee_id"/>
-        <field name="destination"/>
-        <filter name="filter_draft" string="Brouillon" domain="[('state', '=', 'draft')]"/>
-        <filter name="filter_submitted" string="Soumise" domain="[('state', '=', 'submitted')]"/>
-        <filter name="filter_approved" string="Approuvee" domain="[('state', '=', 'approved')]"/>
-        <filter name="filter_done" string="Terminee" domain="[('state', '=', 'done')]"/>
-        <group expand="0" string="Grouper par">
-          <filter name="group_by_state" string="Statut" context="{'group_by': 'state'}"/>
-          <filter name="group_by_employee" string="Employe" context="{'group_by': 'employee_id'}"/>
-        </group>
-      </search>
-    </field>
-  </record>
-
-  <record id="action_portail_rh_travel_request" model="ir.actions.act_window">
-    <field name="name">Demandes de deplacement</field>
-    <field name="res_model">portail.rh.travel.request</field>
+  <record id="action_hr_travel_request" model="ir.actions.act_window">
+    <field name="name">Demandes</field>
+    <field name="res_model">hr.travel.request</field>
     <field name="view_mode">tree,form</field>
-    <field name="search_view_id" ref="view_portail_rh_travel_request_search"/>
   </record>
 </odoo>

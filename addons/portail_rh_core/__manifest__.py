@@ -1,15 +1,13 @@
 {
-    "name": "Portail RH Travel Request",
+    "name": "Portail RH Core",
     "version": "17.0.1.0.0",
-    "summary": "Gestion des demandes de deplacement et mission",
+    "summary": "Socle Portail RH",
     "category": "Human Resources",
-    "depends": ["portail_rh_core", "mail", "hr"],
+    "depends": ["base", "hr"],
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
         "security/rules.xml",
-        "data/sequence.xml",
-        "views/travel_request_views.xml",
         "views/menu.xml",
     ],
     "application": True,

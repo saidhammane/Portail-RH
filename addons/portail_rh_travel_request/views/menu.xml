@@ -1,17 +1,18 @@
 <odoo>
   <menuitem
     id="menu_portail_rh_travel_root"
-    name="Demandes de deplacement"
-    sequence="10"
-    groups="base.group_user"
+    name="Déplacements"
+    parent="portail_rh_core.menu_portail_rh_root"
+    sequence="20"
+    groups="portail_rh_core.group_rh_portal_employee,portail_rh_core.group_rh_portal_manager,portail_rh_core.group_rh_portal_hr"
   />
 
   <menuitem
-    id="menu_portail_rh_travel_request"
+    id="menu_hr_travel_request"
     name="Demandes"
     parent="menu_portail_rh_travel_root"
-    action="action_portail_rh_travel_request"
+    action="action_hr_travel_request"
     sequence="10"
-    groups="base.group_user"
+    groups="portail_rh_core.group_rh_portal_employee,portail_rh_core.group_rh_portal_manager,portail_rh_core.group_rh_portal_hr"
   />
 </odoo>

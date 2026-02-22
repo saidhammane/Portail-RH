@@ -1,10 +1,12 @@
+from datetime import timedelta
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 
-class PortailRhTravelRequest(models.Model):
-    _name = "portail.rh.travel.request"
-    _description = "Demande de deplacement"
+class HrTravelRequest(models.Model):
+    _name = "hr.travel.request"
+    _description = "HR Travel Request"
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _order = "id desc"
 
@@ -13,75 +15,69 @@ class PortailRhTravelRequest(models.Model):
         required=True,
         copy=False,
         readonly=True,
-        default="Nouveau",
+        default="New",
         tracking=True,
     )
     employee_id = fields.Many2one(
         "hr.employee",
-        string="Employe",
+        string="Employee",
         required=True,
         default=lambda self: self._default_employee_id(),
         tracking=True,
     )
-    requester_user_id = fields.Many2one(
+    user_id = fields.Many2one(
         "res.users",
-        string="Demandeur",
+        string="User",
         related="employee_id.user_id",
         store=True,
         readonly=True,
     )
     department_id = fields.Many2one(
         "hr.department",
-        string="Departement",
+        string="Department",
         related="employee_id.department_id",
         store=True,
         readonly=True,
     )
-    manager_user_id = fields.Many2one(
-        "res.users",
-        string="Validateur",
-        compute="_compute_manager_user_id",
-        store=True,
-        readonly=False,
-    )
-    company_id = fields.Many2one(
-        "res.company",
-        string="Societe",
-        required=True,
-        default=lambda self: self.env.company,
-    )
-    currency_id = fields.Many2one(
-        "res.currency",
-        string="Devise",
-        related="company_id.currency_id",
+    manager_id = fields.Many2one(
+        "hr.employee",
+        string="Manager",
+        related="employee_id.parent_id",
         store=True,
         readonly=True,
     )
-    destination = fields.Char(string="Destination", required=True, tracking=True)
-    date_start = fields.Date(string="Date de debut", required=True, tracking=True)
-    date_end = fields.Date(string="Date de fin", required=True, tracking=True)
-    purpose = fields.Text(string="Objet")
-    transport_mode = fields.Selection(
-        [
-            ("car", "Voiture"),
-            ("train", "Train"),
-            ("plane", "Avion"),
-            ("other", "Autre"),
-        ],
-        string="Mode de transport",
-        default="car",
+    mission_type = fields.Selection(
+        [("internal", "Internal"), ("external", "External")],
+        string="Mission Type",
+        default="internal",
+        required=True,
         tracking=True,
     )
-    estimated_cost = fields.Monetary(string="Cout estime", tracking=True)
+    destination = fields.Char(string="Destination", required=True, tracking=True)
+    purpose = fields.Text(string="Purpose")
+    date_from = fields.Date(string="Date From", required=True, tracking=True)
+    date_to = fields.Date(string="Date To", required=True, tracking=True)
+    duration_days = fields.Float(
+        string="Duration (Days)",
+        compute="_compute_duration_days",
+        store=True,
+    )
+    currency_id = fields.Many2one(
+        "res.currency",
+        string="Currency",
+        required=True,
+        default=lambda self: self.env.company.currency_id,
+    )
+    estimated_cost = fields.Monetary(string="Estimated Cost", currency_field="currency_id")
     state = fields.Selection(
         [
-            ("draft", "Brouillon"),
-            ("submitted", "Soumise"),
-            ("approved", "Approuvee"),
-            ("rejected", "Refusee"),
-            ("done", "Terminee"),
+            ("draft", "Draft"),
+            ("submitted", "Submitted"),
+            ("approved", "Approved"),
+            ("rejected", "Rejected"),
+            ("done", "Done"),
         ],
-        string="Statut",
+        string="Status",
         default="draft",
         required=True,
         tracking=True,
@@ -89,60 +85,56 @@ class PortailRhTravelRequest(models.Model):
 
     @api.model
     def _default_employee_id(self):
-        employee = self.env["hr.employee"].search([("user_id", "=", self.env.uid)], limit=1)
-        return employee.id
+        return self.env["hr.employee"].search([("user_id", "=", self.env.uid)], limit=1)
 
-    @api.depends("employee_id", "employee_id.parent_id.user_id")
-    def _compute_manager_user_id(self):
+    @api.depends("date_from", "date_to")
+    def _compute_duration_days(self):
         for record in self:
-            record.manager_user_id = record.employee_id.parent_id.user_id
+            if record.date_from and record.date_to:
+                record.duration_days = (record.date_to - record.date_from + timedelta(days=1)).days
+            else:
+                record.duration_days = 0.0
+
+    @api.constrains("date_from", "date_to")
+    def _check_dates(self):
+        for record in self:
+            if record.date_from and record.date_to and record.date_to < record.date_from:
+                raise ValidationError(_("Date To must be greater than or equal to Date From."))
 
     @api.model_create_multi
     def create(self, vals_list):
         sequence = self.env["ir.sequence"]
         for vals in vals_list:
-            if vals.get("name", "Nouveau") == "Nouveau":
-                vals["name"] = sequence.next_by_code("portail.rh.travel.request") or "Nouveau"
+            if vals.get("name", "New") == "New":
+                vals["name"] = sequence.next_by_code("hr.travel.request") or "New"
         return super().create(vals_list)
-
-    @api.constrains("date_start", "date_end")
-    def _check_date_range(self):
-        for record in self:
-            if record.date_start and record.date_end and record.date_end < record.date_start:
-                raise ValidationError(_("La date de fin doit etre superieure ou egale a la date de debut."))
 
     def action_submit(self):
         self.ensure_one()
         if self.state != "draft":
-            raise UserError(_("Seules les demandes en brouillon peuvent etre soumises."))
+            raise UserError(_("Only draft requests can be submitted."))
         self.write({"state": "submitted"})
 
     def action_approve(self):
         self.ensure_one()
         if self.state != "submitted":
-            raise UserError(_("Seules les demandes soumises peuvent etre approuvees."))
-        if not self.env.user.has_group("portail_rh_travel_request.group_travel_request_manager"):
-            if self.manager_user_id != self.env.user:
-                raise UserError(_("Seul le validateur assigne peut approuver cette demande."))
+            raise UserError(_("Only submitted requests can be approved."))
         self.write({"state": "approved"})
 
     def action_reject(self):
         self.ensure_one()
         if self.state != "submitted":
-            raise UserError(_("Seules les demandes soumises peuvent etre refusees."))
-        if not self.env.user.has_group("portail_rh_travel_request.group_travel_request_manager"):
-            if self.manager_user_id != self.env.user:
-                raise UserError(_("Seul le validateur assigne peut refuser cette demande."))
+            raise UserError(_("Only submitted requests can be rejected."))
         self.write({"state": "rejected"})
-
-    def action_set_draft(self):
-        self.ensure_one()
-        if self.state not in ("submitted", "approved", "rejected", "done"):
-            raise UserError(_("Seules les demandes hors brouillon peuvent revenir en brouillon."))
-        self.write({"state": "draft"})
 
     def action_done(self):
         self.ensure_one()
         if self.state != "approved":
-            raise UserError(_("Seules les demandes approuvees peuvent etre marquees comme terminees."))
+            raise UserError(_("Only approved requests can be marked as done."))
         self.write({"state": "done"})
+
+    def action_reset_to_draft(self):
+        self.ensure_one()
+        if self.state == "draft":
+            raise UserError(_("Request is already in draft state."))
+        self.write({"state": "draft"})

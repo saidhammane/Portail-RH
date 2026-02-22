@@ -1,0 +1,8 @@
+<odoo>
+  <menuitem
+    id="menu_portail_rh_root"
+    name="Portail RH"
+    sequence="5"
+    groups="base.group_user"
+  />
+</odoo>

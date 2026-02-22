@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_portail_rh_travel_request_user,portail.rh.travel.request.user,model_portail_rh_travel_request,base.group_user,1,1,1,0
-access_portail_rh_travel_request_manager,portail.rh.travel.request.manager,model_portail_rh_travel_request,portail_rh_travel_request.group_travel_request_manager,1,1,1,1
+access_hr_travel_request_employee,hr.travel.request.employee,model_hr_travel_request,portail_rh_core.group_rh_portal_employee,1,1,1,0
+access_hr_travel_request_manager,hr.travel.request.manager,model_hr_travel_request,portail_rh_core.group_rh_portal_manager,1,1,1,1
+access_hr_travel_request_hr,hr.travel.request.hr,model_hr_travel_request,portail_rh_core.group_rh_portal_hr,1,1,1,1
