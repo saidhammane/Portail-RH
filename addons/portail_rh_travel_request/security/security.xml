@@ -1,6 +1,0 @@
-<odoo>
-  <!-- This module relies on security groups from portail_rh_core:
-       - portail_rh_core.group_rh_portal_employee
-       - portail_rh_core.group_rh_portal_manager
-       - portail_rh_core.group_rh_portal_hr -->
-</odoo>

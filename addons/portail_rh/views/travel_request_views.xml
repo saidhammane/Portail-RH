@@ -1,9 +1,9 @@
-<odoo>
+﻿<odoo>
   <record id="view_hr_travel_request_tree" model="ir.ui.view">
     <field name="name">hr.travel.request.tree</field>
     <field name="model">hr.travel.request</field>
     <field name="arch" type="xml">
-      <tree string="Demandes de deplacement">
+      <tree string="Demandes de déplacement">
         <field name="name"/>
         <field name="employee_id"/>
         <field name="destination"/>
@@ -19,7 +19,7 @@
     <field name="name">hr.travel.request.form</field>
     <field name="model">hr.travel.request</field>
     <field name="arch" type="xml">
-      <form string="Demande de deplacement">
+      <form string="Demande de déplacement">
         <header>
           <button
             name="action_submit"
@@ -34,14 +34,12 @@
             string="Approuver"
             class="btn-primary"
             invisible="state != 'submitted'"
-            groups="portail_rh_core.group_rh_portal_manager,portail_rh_core.group_rh_portal_hr"
           />
           <button
             name="action_reject"
             type="object"
-            string="Rejeter"
+            string="Refuser"
             invisible="state != 'submitted'"
-            groups="portail_rh_core.group_rh_portal_manager,portail_rh_core.group_rh_portal_hr"
           />
           <button
             name="action_done"
@@ -49,55 +47,34 @@
             string="Terminer"
             class="btn-primary"
             invisible="state != 'approved'"
-            groups="portail_rh_core.group_rh_portal_manager,portail_rh_core.group_rh_portal_hr"
           />
           <button
             name="action_set_draft"
             type="object"
-            string="Revenir en brouillon"
+            string="Remettre en brouillon"
             invisible="state == 'draft'"
           />
           <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected,done"/>
         </header>
         <sheet>
-          <group string="Employe">
-            <group>
-              <field name="name" readonly="1"/>
-              <field name="employee_id"/>
-              <field name="user_id" readonly="1"/>
-              <field name="department_id" readonly="1"/>
-              <field name="manager_id" readonly="1"/>
-            </group>
+          <group string="Employé">
+            <field name="employee_id"/>
+            <field name="department_id" readonly="1"/>
+            <field name="manager_id" readonly="1"/>
           </group>
-          <group string="Mission">
-            <group>
-              <field name="mission_type"/>
-              <field name="destination"/>
-              <field name="purpose"/>
-            </group>
+          <group string="Mission et dates">
+            <field name="name"/>
+            <field name="destination"/>
+            <field name="date_from"/>
+            <field name="date_to"/>
+            <field name="duration_days" readonly="1"/>
           </group>
-          <group string="Dates">
-            <group>
-              <field name="date_from"/>
-              <field name="date_to"/>
-              <field name="duration_days" readonly="1"/>
-            </group>
-          </group>
-          <group string="Cout">
-            <group>
-              <field name="estimated_cost"/>
-              <field name="currency_id"/>
-            </group>
+          <group string="Coût et motif">
+            <field name="estimated_cost"/>
+            <field name="purpose"/>
           </group>
         </sheet>
-        <chatter/>
       </form>
     </field>
-  </record>
-
-  <record id="action_hr_travel_request" model="ir.actions.act_window">
-    <field name="name">Demandes</field>
-    <field name="res_model">hr.travel.request</field>
-    <field name="view_mode">tree,form</field>
   </record>
 </odoo>
