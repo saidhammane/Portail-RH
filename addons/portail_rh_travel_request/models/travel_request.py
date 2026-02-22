@@ -114,27 +114,44 @@ class HrTravelRequest(models.Model):
         if self.state != "draft":
             raise UserError(_("Only draft requests can be submitted."))
         self.write({"state": "submitted"})
+        if self.manager_id.user_id:
+            self.activity_schedule(
+                "mail.mail_activity_data_todo",
+                user_id=self.manager_id.user_id.id,
+                summary=_("Valider la demande de déplacement"),
+            )
 
     def action_approve(self):
         self.ensure_one()
         if self.state != "submitted":
             raise UserError(_("Only submitted requests can be approved."))
+        if not self.env.user.has_group("portail_rh_core.group_rh_portal_hr"):
+            if self.manager_id.user_id != self.env.user:
+                raise UserError(_("Only the assigned manager can approve this request."))
         self.write({"state": "approved"})
 
     def action_reject(self):
         self.ensure_one()
         if self.state != "submitted":
             raise UserError(_("Only submitted requests can be rejected."))
+        if not self.env.user.has_group("portail_rh_core.group_rh_portal_hr"):
+            if self.manager_id.user_id != self.env.user:
+                raise UserError(_("Only the assigned manager can reject this request."))
         self.write({"state": "rejected"})
 
     def action_done(self):
         self.ensure_one()
         if self.state != "approved":
             raise UserError(_("Only approved requests can be marked as done."))
+        if not self.env.user.has_group("portail_rh_core.group_rh_portal_hr"):
+            if self.manager_id.user_id != self.env.user:
+                raise UserError(_("Only the assigned manager can mark this request as done."))
         self.write({"state": "done"})
 
-    def action_reset_to_draft(self):
+    def action_set_draft(self):
         self.ensure_one()
         if self.state == "draft":
             raise UserError(_("Request is already in draft state."))
+        if self.state not in ("submitted", "approved", "rejected", "done"):
+            raise UserError(_("Request can only be reset from submitted, approved, rejected or done."))
         self.write({"state": "draft"})

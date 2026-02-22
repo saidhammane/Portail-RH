@@ -9,6 +9,7 @@
         <field name="destination"/>
         <field name="date_from"/>
         <field name="date_to"/>
+        <field name="estimated_cost"/>
         <field name="state" widget="badge"/>
       </tree>
     </field>
@@ -51,7 +52,7 @@
             groups="portail_rh_core.group_rh_portal_manager,portail_rh_core.group_rh_portal_hr"
           />
           <button
-            name="action_reset_to_draft"
+            name="action_set_draft"
             type="object"
             string="Revenir en brouillon"
             invisible="state == 'draft'"
@@ -59,7 +60,7 @@
           <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected,done"/>
         </header>
         <sheet>
-          <group>
+          <group string="Employe">
             <group>
               <field name="name" readonly="1"/>
               <field name="employee_id"/>
@@ -67,20 +68,26 @@
               <field name="department_id" readonly="1"/>
               <field name="manager_id" readonly="1"/>
             </group>
+          </group>
+          <group string="Mission">
             <group>
               <field name="mission_type"/>
               <field name="destination"/>
+              <field name="purpose"/>
+            </group>
+          </group>
+          <group string="Dates">
+            <group>
               <field name="date_from"/>
               <field name="date_to"/>
               <field name="duration_days" readonly="1"/>
             </group>
           </group>
-          <group>
-            <field name="purpose"/>
-          </group>
-          <group>
-            <field name="estimated_cost"/>
-            <field name="currency_id"/>
+          <group string="Cout">
+            <group>
+              <field name="estimated_cost"/>
+              <field name="currency_id"/>
+            </group>
           </group>
         </sheet>
         <chatter/>
