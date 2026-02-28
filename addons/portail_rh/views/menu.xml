@@ -8,6 +8,7 @@
   <menuitem
     id="menu_portail_rh_root"
     name="Portail RH"
+    action="action_hr_travel_request"
     sequence="5"
     web_icon="portail_rh,static/description/icon.png"
     groups="base.group_user"

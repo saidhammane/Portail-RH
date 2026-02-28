@@ -6,6 +6,7 @@
         "security/security.xml",
         "security/ir.model.access.csv",
         "security/rules.xml",
+        "data/hr_seed_data.xml",
         "views/menu.xml",
         "views/travel_request_views.xml",
     ],

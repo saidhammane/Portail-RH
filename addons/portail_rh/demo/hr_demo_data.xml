@@ -1,0 +1,213 @@
+<odoo>
+  <data noupdate="1">
+    <record id="dept_portail_rh_hr" model="hr.department">
+      <field name="name">Ressources Humaines</field>
+    </record>
+
+    <record id="dept_portail_rh_it" model="hr.department">
+      <field name="name">Informatique</field>
+    </record>
+
+    <record id="dept_portail_rh_finance" model="hr.department">
+      <field name="name">Finance &amp; Comptabilité</field>
+    </record>
+
+    <record id="user_manager_hr" model="res.users">
+      <field name="name">Ahmed El Mansouri</field>
+      <field name="login">ahmed.elmansouri@local.test</field>
+      <field name="email">ahmed.elmansouri@local.test</field>
+      <field name="password">odoo</field>
+      <field name="company_id" ref="base.main_company"/>
+      <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+      <field
+        name="groups_id"
+        eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_hr')])]"
+      />
+    </record>
+
+    <record id="user_manager_it" model="res.users">
+      <field name="name">Salma El Alaoui</field>
+      <field name="login">salma.elalaoui@local.test</field>
+      <field name="email">salma.elalaoui@local.test</field>
+      <field name="password">odoo</field>
+      <field name="company_id" ref="base.main_company"/>
+      <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+      <field
+        name="groups_id"
+        eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_manager')])]"
+      />
+    </record>
+
+    <record id="user_manager_finance" model="res.users">
+      <field name="name">Youssef Benali</field>
+      <field name="login">youssef.benali@local.test</field>
+      <field name="email">youssef.benali@local.test</field>
+      <field name="password">odoo</field>
+      <field name="company_id" ref="base.main_company"/>
+      <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+      <field
+        name="groups_id"
+        eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_manager')])]"
+      />
+    </record>
+
+    <record id="employee_manager_hr" model="hr.employee">
+      <field name="name">أحمد المنصوري</field>
+      <field name="work_email">ahmed.elmansouri@local.test</field>
+      <field name="user_id" ref="portail_rh.user_manager_hr"/>
+      <field name="department_id" ref="portail_rh.dept_portail_rh_hr"/>
+    </record>
+
+    <record id="employee_manager_it" model="hr.employee">
+      <field name="name">سلمى العلوي</field>
+      <field name="work_email">salma.elalaoui@local.test</field>
+      <field name="user_id" ref="portail_rh.user_manager_it"/>
+      <field name="department_id" ref="portail_rh.dept_portail_rh_it"/>
+    </record>
+
+    <record id="employee_manager_finance" model="hr.employee">
+      <field name="name">يوسف بنعلي</field>
+      <field name="work_email">youssef.benali@local.test</field>
+      <field name="user_id" ref="portail_rh.user_manager_finance"/>
+      <field name="department_id" ref="portail_rh.dept_portail_rh_finance"/>
+    </record>
+
+    <record id="dept_portail_rh_hr" model="hr.department">
+      <field name="manager_id" ref="portail_rh.employee_manager_hr"/>
+    </record>
+
+    <record id="dept_portail_rh_it" model="hr.department">
+      <field name="manager_id" ref="portail_rh.employee_manager_it"/>
+    </record>
+
+    <record id="dept_portail_rh_finance" model="hr.department">
+      <field name="manager_id" ref="portail_rh.employee_manager_finance"/>
+    </record>
+
+    <record id="user_employee_hr_1" model="res.users">
+      <field name="name">Maryam Zahra</field>
+      <field name="login">maryam.zahra@local.test</field>
+      <field name="email">maryam.zahra@local.test</field>
+      <field name="password">odoo</field>
+      <field name="company_id" ref="base.main_company"/>
+      <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+      <field
+        name="groups_id"
+        eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+      />
+    </record>
+
+    <record id="user_employee_hr_2" model="res.users">
+      <field name="name">Khalid Rachidi</field>
+      <field name="login">khalid.rachidi@local.test</field>
+      <field name="email">khalid.rachidi@local.test</field>
+      <field name="password">odoo</field>
+      <field name="company_id" ref="base.main_company"/>
+      <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+      <field
+        name="groups_id"
+        eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+      />
+    </record>
+
+    <record id="user_employee_it_1" model="res.users">
+      <field name="name">Hicham Kettani</field>
+      <field name="login">hicham.kettani@local.test</field>
+      <field name="email">hicham.kettani@local.test</field>
+      <field name="password">odoo</field>
+      <field name="company_id" ref="base.main_company"/>
+      <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+      <field
+        name="groups_id"
+        eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+      />
+    </record>
+
+    <record id="user_employee_it_2" model="res.users">
+      <field name="name">Leila Fassi</field>
+      <field name="login">leila.fassi@local.test</field>
+      <field name="email">leila.fassi@local.test</field>
+      <field name="password">odoo</field>
+      <field name="company_id" ref="base.main_company"/>
+      <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+      <field
+        name="groups_id"
+        eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+      />
+    </record>
+
+    <record id="user_employee_fin_1" model="res.users">
+      <field name="name">Souad Idrissi</field>
+      <field name="login">souad.idrissi@local.test</field>
+      <field name="email">souad.idrissi@local.test</field>
+      <field name="password">odoo</field>
+      <field name="company_id" ref="base.main_company"/>
+      <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+      <field
+        name="groups_id"
+        eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+      />
+    </record>
+
+    <record id="user_employee_fin_2" model="res.users">
+      <field name="name">Reda Soussi</field>
+      <field name="login">reda.soussi@local.test</field>
+      <field name="email">reda.soussi@local.test</field>
+      <field name="password">odoo</field>
+      <field name="company_id" ref="base.main_company"/>
+      <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+      <field
+        name="groups_id"
+        eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+      />
+    </record>
+
+    <record id="employee_hr_1" model="hr.employee">
+      <field name="name">مريم الزهراء</field>
+      <field name="work_email">maryam.zahra@local.test</field>
+      <field name="user_id" ref="portail_rh.user_employee_hr_1"/>
+      <field name="department_id" ref="portail_rh.dept_portail_rh_hr"/>
+      <field name="parent_id" ref="portail_rh.employee_manager_hr"/>
+    </record>
+
+    <record id="employee_hr_2" model="hr.employee">
+      <field name="name">خالد الراشدي</field>
+      <field name="work_email">khalid.rachidi@local.test</field>
+      <field name="user_id" ref="portail_rh.user_employee_hr_2"/>
+      <field name="department_id" ref="portail_rh.dept_portail_rh_hr"/>
+      <field name="parent_id" ref="portail_rh.employee_manager_hr"/>
+    </record>
+
+    <record id="employee_it_1" model="hr.employee">
+      <field name="name">هشام الكتاني</field>
+      <field name="work_email">hicham.kettani@local.test</field>
+      <field name="user_id" ref="portail_rh.user_employee_it_1"/>
+      <field name="department_id" ref="portail_rh.dept_portail_rh_it"/>
+      <field name="parent_id" ref="portail_rh.employee_manager_it"/>
+    </record>
+
+    <record id="employee_it_2" model="hr.employee">
+      <field name="name">ليلى الفاسي</field>
+      <field name="work_email">leila.fassi@local.test</field>
+      <field name="user_id" ref="portail_rh.user_employee_it_2"/>
+      <field name="department_id" ref="portail_rh.dept_portail_rh_it"/>
+      <field name="parent_id" ref="portail_rh.employee_manager_it"/>
+    </record>
+
+    <record id="employee_fin_1" model="hr.employee">
+      <field name="name">سعاد الإدريسي</field>
+      <field name="work_email">souad.idrissi@local.test</field>
+      <field name="user_id" ref="portail_rh.user_employee_fin_1"/>
+      <field name="department_id" ref="portail_rh.dept_portail_rh_finance"/>
+      <field name="parent_id" ref="portail_rh.employee_manager_finance"/>
+    </record>
+
+    <record id="employee_fin_2" model="hr.employee">
+      <field name="name">رضا السوسي</field>
+      <field name="work_email">reda.soussi@local.test</field>
+      <field name="user_id" ref="portail_rh.user_employee_fin_2"/>
+      <field name="department_id" ref="portail_rh.dept_portail_rh_finance"/>
+      <field name="parent_id" ref="portail_rh.employee_manager_finance"/>
+    </record>
+  </data>
+</odoo>

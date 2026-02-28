@@ -1,0 +1,229 @@
+<odoo noupdate="0">
+  <record id="dept_rh" model="hr.department">
+    <field name="name">Ressources Humaines</field>
+  </record>
+
+  <record id="dept_it" model="hr.department">
+    <field name="name">Informatique</field>
+  </record>
+
+  <record id="dept_fin" model="hr.department">
+    <field name="name">Finance &amp; Comptabilite</field>
+  </record>
+
+  <record id="user_mgr_rh" model="res.users">
+    <field name="name">Ahmed El Mansouri</field>
+    <field name="login">ahmed.elmansouri@local.test</field>
+    <field name="email">ahmed.elmansouri@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/ahmed_elmansouri.png"/>
+    <field name="password">odoo123</field>
+    <field name="company_id" ref="base.main_company"/>
+    <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_hr')])]"
+    />
+  </record>
+
+  <record id="user_mgr_it" model="res.users">
+    <field name="name">Salma Alaoui</field>
+    <field name="login">salma.alaoui@local.test</field>
+    <field name="email">salma.alaoui@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/salma_alaoui.png"/>
+    <field name="password">odoo123</field>
+    <field name="company_id" ref="base.main_company"/>
+    <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_manager')])]"
+    />
+  </record>
+
+  <record id="user_mgr_fin" model="res.users">
+    <field name="name">Youssef Benali</field>
+    <field name="login">youssef.benali@local.test</field>
+    <field name="email">youssef.benali@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/youssef_benali.png"/>
+    <field name="password">odoo123</field>
+    <field name="company_id" ref="base.main_company"/>
+    <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_manager')])]"
+    />
+  </record>
+
+  <record id="emp_mgr_rh" model="hr.employee">
+    <field name="name">Ahmed El Mansouri</field>
+    <field name="work_email">ahmed.elmansouri@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/ahmed_elmansouri.png"/>
+    <field name="user_id" ref="portail_rh.user_mgr_rh"/>
+    <field name="department_id" ref="portail_rh.dept_rh"/>
+  </record>
+
+  <record id="emp_mgr_it" model="hr.employee">
+    <field name="name">Salma Alaoui</field>
+    <field name="work_email">salma.alaoui@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/salma_alaoui.png"/>
+    <field name="user_id" ref="portail_rh.user_mgr_it"/>
+    <field name="department_id" ref="portail_rh.dept_it"/>
+  </record>
+
+  <record id="emp_mgr_fin" model="hr.employee">
+    <field name="name">Youssef Benali</field>
+    <field name="work_email">youssef.benali@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/youssef_benali.png"/>
+    <field name="user_id" ref="portail_rh.user_mgr_fin"/>
+    <field name="department_id" ref="portail_rh.dept_fin"/>
+  </record>
+
+  <record id="dept_rh" model="hr.department">
+    <field name="manager_id" ref="portail_rh.emp_mgr_rh"/>
+  </record>
+
+  <record id="dept_it" model="hr.department">
+    <field name="manager_id" ref="portail_rh.emp_mgr_it"/>
+  </record>
+
+  <record id="dept_fin" model="hr.department">
+    <field name="manager_id" ref="portail_rh.emp_mgr_fin"/>
+  </record>
+
+  <record id="user_emp_rh_1" model="res.users">
+    <field name="name">Mariam Zahra</field>
+    <field name="login">mariam.zahra@local.test</field>
+    <field name="email">mariam.zahra@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/mariam_zahra.png"/>
+    <field name="password">odoo123</field>
+    <field name="company_id" ref="base.main_company"/>
+    <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+    />
+  </record>
+
+  <record id="user_emp_rh_2" model="res.users">
+    <field name="name">Khalid Rachidi</field>
+    <field name="login">khalid.rachidi@local.test</field>
+    <field name="email">khalid.rachidi@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/khalid_rachidi.png"/>
+    <field name="password">odoo123</field>
+    <field name="company_id" ref="base.main_company"/>
+    <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+    />
+  </record>
+
+  <record id="user_emp_it_1" model="res.users">
+    <field name="name">Hicham Kettani</field>
+    <field name="login">hicham.kettani@local.test</field>
+    <field name="email">hicham.kettani@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/hicham_kettani.png"/>
+    <field name="password">odoo123</field>
+    <field name="company_id" ref="base.main_company"/>
+    <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+    />
+  </record>
+
+  <record id="user_emp_it_2" model="res.users">
+    <field name="name">Leila Fassi</field>
+    <field name="login">leila.fassi@local.test</field>
+    <field name="email">leila.fassi@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/leila_fassi.png"/>
+    <field name="password">odoo123</field>
+    <field name="company_id" ref="base.main_company"/>
+    <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+    />
+  </record>
+
+  <record id="user_emp_fin_1" model="res.users">
+    <field name="name">Souad Idrissi</field>
+    <field name="login">souad.idrissi@local.test</field>
+    <field name="email">souad.idrissi@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/souad_idrissi.png"/>
+    <field name="password">odoo123</field>
+    <field name="company_id" ref="base.main_company"/>
+    <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+    />
+  </record>
+
+  <record id="user_emp_fin_2" model="res.users">
+    <field name="name">Reda Soussi</field>
+    <field name="login">reda.soussi@local.test</field>
+    <field name="email">reda.soussi@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/reda_soussi.png"/>
+    <field name="password">odoo123</field>
+    <field name="company_id" ref="base.main_company"/>
+    <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('base.group_user'), ref('portail_rh.group_portail_rh_employee')])]"
+    />
+  </record>
+
+  <record id="emp_rh_1" model="hr.employee">
+    <field name="name">Mariam Zahra</field>
+    <field name="work_email">mariam.zahra@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/mariam_zahra.png"/>
+    <field name="user_id" ref="portail_rh.user_emp_rh_1"/>
+    <field name="department_id" ref="portail_rh.dept_rh"/>
+    <field name="parent_id" ref="portail_rh.emp_mgr_rh"/>
+  </record>
+
+  <record id="emp_rh_2" model="hr.employee">
+    <field name="name">Khalid Rachidi</field>
+    <field name="work_email">khalid.rachidi@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/khalid_rachidi.png"/>
+    <field name="user_id" ref="portail_rh.user_emp_rh_2"/>
+    <field name="department_id" ref="portail_rh.dept_rh"/>
+    <field name="parent_id" ref="portail_rh.emp_mgr_rh"/>
+  </record>
+
+  <record id="emp_it_1" model="hr.employee">
+    <field name="name">Hicham Kettani</field>
+    <field name="work_email">hicham.kettani@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/hicham_kettani.png"/>
+    <field name="user_id" ref="portail_rh.user_emp_it_1"/>
+    <field name="department_id" ref="portail_rh.dept_it"/>
+    <field name="parent_id" ref="portail_rh.emp_mgr_it"/>
+  </record>
+
+  <record id="emp_it_2" model="hr.employee">
+    <field name="name">Leila Fassi</field>
+    <field name="work_email">leila.fassi@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/leila_fassi.png"/>
+    <field name="user_id" ref="portail_rh.user_emp_it_2"/>
+    <field name="department_id" ref="portail_rh.dept_it"/>
+    <field name="parent_id" ref="portail_rh.emp_mgr_it"/>
+  </record>
+
+  <record id="emp_fin_1" model="hr.employee">
+    <field name="name">Souad Idrissi</field>
+    <field name="work_email">souad.idrissi@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/souad_idrissi.png"/>
+    <field name="user_id" ref="portail_rh.user_emp_fin_1"/>
+    <field name="department_id" ref="portail_rh.dept_fin"/>
+    <field name="parent_id" ref="portail_rh.emp_mgr_fin"/>
+  </record>
+
+  <record id="emp_fin_2" model="hr.employee">
+    <field name="name">Reda Soussi</field>
+    <field name="work_email">reda.soussi@local.test</field>
+    <field name="image_1920" type="base64" file="portail_rh/static/src/img/people/reda_soussi.png"/>
+    <field name="user_id" ref="portail_rh.user_emp_fin_2"/>
+    <field name="department_id" ref="portail_rh.dept_fin"/>
+    <field name="parent_id" ref="portail_rh.emp_mgr_fin"/>
+  </record>
+</odoo>
