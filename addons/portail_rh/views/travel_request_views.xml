@@ -58,7 +58,7 @@
         </header>
         <sheet>
           <group string="Employé">
-            <field name="employee_id"/>
+            <field name="employee_id" domain="[('user_id','=',uid)]"/>
             <field name="department_id" readonly="1"/>
             <field name="manager_id" readonly="1"/>
           </group>

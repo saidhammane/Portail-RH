@@ -1,4 +1,4 @@
-﻿from odoo import _, api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -7,7 +7,17 @@ class HrTravelRequest(models.Model):
     _description = "Demande de déplacement"
 
     name = fields.Char(required=True)
-    employee_id = fields.Many2one("hr.employee", string="Employé", required=True)
+    @api.model
+    def _default_employee_id(self):
+        employee = self.env["hr.employee"].search([("user_id", "=", self.env.uid)], limit=1)
+        return employee.id or False
+
+    employee_id = fields.Many2one(
+        "hr.employee",
+        string="Employé",
+        required=True,
+        default=_default_employee_id,
+    )
     department_id = fields.Many2one(
         "hr.department",
         string="Département",
@@ -89,3 +99,11 @@ class HrTravelRequest(models.Model):
         if self.state == "draft":
             raise UserError(_("La demande est déjà en brouillon."))
         self.write({"state": "draft"})
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        default_employee_id = self._default_employee_id()
+        for vals in vals_list:
+            if not vals.get("employee_id") and default_employee_id:
+                vals["employee_id"] = default_employee_id
+        return super().create(vals_list)
