@@ -52,7 +52,7 @@
             name="action_set_draft"
             type="object"
             string="Remettre en brouillon"
-            invisible="state == 'draft'"
+            invisible="state == 'draft' or (state != 'submitted' and not can_approve)"
           />
           <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected,done"/>
         </header>

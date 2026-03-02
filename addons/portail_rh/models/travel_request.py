@@ -4,7 +4,7 @@ from odoo.exceptions import UserError, ValidationError
 
 class HrTravelRequest(models.Model):
     _name = "hr.travel.request"
-    _description = "Demande de déplacement"
+    _description = "Demande de dÃ©placement"
     _inherit = ["mail.thread", "mail.activity.mixin"]
 
     name = fields.Char(required=True)
@@ -16,14 +16,14 @@ class HrTravelRequest(models.Model):
 
     employee_id = fields.Many2one(
         "hr.employee",
-        string="Employé",
+        string="EmployÃ©",
         required=True,
         default=_default_employee_id,
     )
     can_approve = fields.Boolean(compute="_compute_can_approve", store=False)
     department_id = fields.Many2one(
         "hr.department",
-        string="Département",
+        string="DÃ©partement",
         related="employee_id.department_id",
         store=True,
         readonly=True,
@@ -36,22 +36,22 @@ class HrTravelRequest(models.Model):
         readonly=True,
     )
     destination = fields.Char(required=True)
-    date_from = fields.Date(string="Date début", required=True)
+    date_from = fields.Date(string="Date dÃ©but", required=True)
     date_to = fields.Date(string="Date fin", required=True)
     duration_days = fields.Float(
-        string="Durée (jours)",
+        string="DurÃ©e (jours)",
         compute="_compute_duration_days",
         store=True,
     )
     purpose = fields.Text(string="Motif")
-    estimated_cost = fields.Float(string="Coût estimé")
+    estimated_cost = fields.Float(string="CoÃ»t estimÃ©")
     state = fields.Selection(
         [
             ("draft", "Brouillon"),
             ("submitted", "Soumis"),
-            ("approved", "Approuvé"),
-            ("rejected", "Refusé"),
-            ("done", "Terminé"),
+            ("approved", "ApprouvÃ©"),
+            ("rejected", "RefusÃ©"),
+            ("done", "TerminÃ©"),
         ],
         default="draft",
         required=True,
@@ -97,7 +97,7 @@ class HrTravelRequest(models.Model):
                 "res_id": self.id,
                 "user_id": manager_user.id,
                 "activity_type_id": todo_type.id,
-                "summary": _("Valider la demande de déplacement"),
+                "summary": _("Valider la demande de dÃ©placement"),
                 "note": _("Merci d'approuver ou refuser cette demande."),
             }
         )
@@ -119,7 +119,7 @@ class HrTravelRequest(models.Model):
             ]
         )
         if activities:
-            activities.action_feedback(feedback=_("Demande traitée."))
+            activities.action_feedback(feedback=_("Demande traitÃ©e."))
 
     @api.depends("date_from", "date_to")
     def _compute_duration_days(self):
@@ -134,47 +134,58 @@ class HrTravelRequest(models.Model):
         for record in self:
             if record.date_from and record.date_to and record.date_to < record.date_from:
                 raise ValidationError(
-                    _("La date de fin doit être supérieure ou égale à la date de début.")
+                    _("La date de fin doit Ãªtre supÃ©rieure ou Ã©gale Ã  la date de dÃ©but.")
                 )
 
     def action_submit(self):
         self.ensure_one()
         if self.state != "draft":
-            raise UserError(_("Seules les demandes en brouillon peuvent être soumises."))
+            raise UserError(_("Seules les demandes en brouillon peuvent Ãªtre soumises."))
         self.write({"state": "submitted"})
         self._create_manager_todo_activity()
 
     def action_approve(self):
         self.ensure_one()
         if not self.can_approve:
-            raise UserError(_("Vous n'êtes pas autorisé à valider cette demande."))
+            raise UserError(_("Vous n'Ãªtes pas autorisÃ© Ã  valider cette demande."))
         if self.state != "submitted":
-            raise UserError(_("Seules les demandes soumises peuvent être approuvées."))
+            raise UserError(_("Seules les demandes soumises peuvent Ãªtre approuvÃ©es."))
         self.write({"state": "approved"})
         self._close_manager_todo_activity()
 
     def action_reject(self):
         self.ensure_one()
         if not self.can_approve:
-            raise UserError(_("Vous n'êtes pas autorisé à valider cette demande."))
+            raise UserError(_("Vous n'Ãªtes pas autorisÃ© Ã  valider cette demande."))
         if self.state != "submitted":
-            raise UserError(_("Seules les demandes soumises peuvent être refusées."))
+            raise UserError(_("Seules les demandes soumises peuvent Ãªtre refusÃ©es."))
         self.write({"state": "rejected"})
         self._close_manager_todo_activity()
 
     def action_done(self):
         self.ensure_one()
         if not self.can_approve:
-            raise UserError(_("Vous n'êtes pas autorisé à valider cette demande."))
+            raise UserError(_("Vous n'Ãªtes pas autorisÃ© Ã  valider cette demande."))
         if self.state != "approved":
-            raise UserError(_("Seules les demandes approuvées peuvent être terminées."))
+            raise UserError(_("Seules les demandes approuvÃ©es peuvent Ãªtre terminÃ©es."))
         self.write({"state": "done"})
         self._close_manager_todo_activity()
 
     def action_set_draft(self):
         self.ensure_one()
         if self.state == "draft":
-            raise UserError(_("La demande est déjà en brouillon."))
+            raise UserError(_("La demande est deja en brouillon."))
+        current_user = self.env.user
+        is_employee_owner = bool(self.employee_id.user_id and current_user == self.employee_id.user_id)
+        is_manager = bool(self.manager_id.user_id and current_user == self.manager_id.user_id)
+        is_rh_user = self._is_rh_user()
+
+        if is_employee_owner:
+            if self.state != "submitted":
+                raise UserError(_("Impossible de remettre en brouillon apres validation."))
+        elif not (is_manager or is_rh_user):
+            raise UserError(_("Vous n'etes pas autorise."))
+
         self.write({"state": "draft"})
 
     def write(self, vals):
@@ -195,7 +206,7 @@ class HrTravelRequest(models.Model):
                 is_manager = bool(record.manager_id.user_id and record.manager_id.user_id == current_user)
                 if record.state != "draft" and not (is_manager or is_rh_user):
                     raise UserError(
-                        _("Modification interdite après soumission. Contactez votre manager/RH.")
+                        _("Modification interdite aprÃ¨s soumission. Contactez votre manager/RH.")
                     )
 
         return super().write(vals)
