@@ -33,20 +33,20 @@
             type="object"
             string="Approuver"
             class="btn-primary"
-            invisible="state != 'submitted'"
+            invisible="state != 'submitted' or not can_approve"
           />
           <button
             name="action_reject"
             type="object"
             string="Refuser"
-            invisible="state != 'submitted'"
+            invisible="state != 'submitted' or not can_approve"
           />
           <button
             name="action_done"
             type="object"
             string="Terminer"
             class="btn-primary"
-            invisible="state != 'approved'"
+            invisible="state != 'approved' or not can_approve"
           />
           <button
             name="action_set_draft"
@@ -57,21 +57,22 @@
           <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected,done"/>
         </header>
         <sheet>
+          <field name="can_approve" invisible="1"/>
           <group string="Employé">
-            <field name="employee_id" domain="[('user_id','=',uid)]"/>
+            <field name="employee_id" domain="[('user_id','=',uid)]" readonly="state != 'draft'"/>
             <field name="department_id" readonly="1"/>
             <field name="manager_id" readonly="1"/>
           </group>
           <group string="Mission et dates">
-            <field name="name"/>
-            <field name="destination"/>
-            <field name="date_from"/>
-            <field name="date_to"/>
+            <field name="name" readonly="state != 'draft'"/>
+            <field name="destination" readonly="state != 'draft'"/>
+            <field name="date_from" readonly="state != 'draft'"/>
+            <field name="date_to" readonly="state != 'draft'"/>
             <field name="duration_days" readonly="1"/>
           </group>
           <group string="Coût et motif">
-            <field name="estimated_cost"/>
-            <field name="purpose"/>
+            <field name="estimated_cost" readonly="state != 'draft'"/>
+            <field name="purpose" readonly="state != 'draft'"/>
           </group>
         </sheet>
       </form>
