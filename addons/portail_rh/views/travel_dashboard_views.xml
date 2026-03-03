@@ -1,0 +1,82 @@
+<odoo>
+  <record id="view_hr_travel_request_report_search" model="ir.ui.view">
+    <field name="name">hr.travel.request.report.search</field>
+    <field name="model">hr.travel.request.report</field>
+    <field name="arch" type="xml">
+      <search string="Recherche tableau de bord">
+        <filter
+          name="filter_current_month"
+          string="Ce mois"
+          domain="[
+            ('month_start', '&gt;=', context_today().replace(day=1)),
+            ('month_start', '&lt;=', context_today())
+          ]"
+        />
+        <filter
+          name="filter_last_3_months"
+          string="3 derniers mois"
+          domain="[('month_start', '&gt;=', (context_today() - relativedelta(months=2)).replace(day=1))]"
+        />
+        <filter
+          name="filter_current_year"
+          string="Cette année"
+          domain="[
+            ('month_start', '&gt;=', context_today().replace(month=1, day=1)),
+            ('month_start', '&lt;=', context_today().replace(month=12, day=31))
+          ]"
+        />
+        <separator/>
+        <filter name="filter_state_draft" string="Brouillon" domain="[('state', '=', 'draft')]"/>
+        <filter name="filter_state_submitted" string="Soumis" domain="[('state', '=', 'submitted')]"/>
+        <filter name="filter_state_approved" string="Approuvé" domain="[('state', '=', 'approved')]"/>
+        <filter name="filter_state_rejected" string="Refusé" domain="[('state', '=', 'rejected')]"/>
+        <filter name="filter_state_done" string="Terminé" domain="[('state', '=', 'done')]"/>
+        <separator/>
+        <filter name="group_by_month_start" string="Grouper par mois" context="{'group_by': 'month_start'}"/>
+        <filter name="group_by_state" string="Grouper par état" context="{'group_by': 'state'}"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_hr_travel_request_report_graph" model="ir.ui.view">
+    <field name="name">hr.travel.request.report.graph</field>
+    <field name="model">hr.travel.request.report</field>
+    <field name="arch" type="xml">
+      <graph string="Tableau de bord deplacements" type="bar">
+        <field name="month_start" interval="month"/>
+        <field name="total_estimated_cost" type="measure"/>
+      </graph>
+    </field>
+  </record>
+
+  <record id="view_hr_travel_request_report_pivot" model="ir.ui.view">
+    <field name="name">hr.travel.request.report.pivot</field>
+    <field name="model">hr.travel.request.report</field>
+    <field name="arch" type="xml">
+      <pivot string="Tableau de bord deplacements">
+        <field name="month_start" type="row" interval="month"/>
+        <field name="state" type="col"/>
+        <field name="request_count" type="measure"/>
+        <field name="total_estimated_cost" type="measure"/>
+      </pivot>
+    </field>
+  </record>
+
+  <record id="action_hr_travel_request_dashboard" model="ir.actions.act_window">
+    <field name="name">Tableau de bord</field>
+    <field name="res_model">hr.travel.request.report</field>
+    <field name="view_mode">pivot,graph</field>
+    <field name="view_id" ref="view_hr_travel_request_report_graph"/>
+    <field name="search_view_id" ref="view_hr_travel_request_report_search"/>
+    <field name="context">{'graph_measure': 'total_estimated_cost', 'group_by': 'month_start'}</field>
+  </record>
+
+  <menuitem
+    id="menu_hr_travel_request_dashboard"
+    name="Tableau de bord"
+    parent="portail_rh.menu_portail_rh_travel_root"
+    action="action_hr_travel_request_dashboard"
+    sequence="5"
+    groups="base.group_user"
+  />
+</odoo>
