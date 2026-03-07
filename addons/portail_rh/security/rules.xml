@@ -19,4 +19,25 @@
     <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_hr'))]"/>
     <field name="domain_force">[(1, '=', 1)]</field>
   </record>
+
+  <record id="rule_hr_travel_request_report_employee_own" model="ir.rule">
+    <field name="name">hr.travel.request.report - employe: ses donnees</field>
+    <field name="model_id" ref="model_hr_travel_request_report"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_employee'))]"/>
+    <field name="domain_force">[('employee_user_id', '=', user.id)]</field>
+  </record>
+
+  <record id="rule_hr_travel_request_report_manager_department" model="ir.rule">
+    <field name="name">hr.travel.request.report - manager: son departement</field>
+    <field name="model_id" ref="model_hr_travel_request_report"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_manager'))]"/>
+    <field name="domain_force">[('department_manager_user_id', '=', user.id)]</field>
+  </record>
+
+  <record id="rule_hr_travel_request_report_hr_all" model="ir.rule">
+    <field name="name">hr.travel.request.report - RH: tout voir</field>
+    <field name="model_id" ref="model_hr_travel_request_report"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_hr'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+  </record>
 </odoo>

@@ -3,6 +3,18 @@
     <field name="name">Demandes</field>
     <field name="res_model">hr.travel.request</field>
     <field name="view_mode">tree,form</field>
+    <field name="domain">[]</field>
+    <field name="context">{}</field>
+    <field name="search_view_id" eval="False"/>
+  </record>
+
+  <record id="action_hr_travel_request_my_requests" model="ir.actions.act_window">
+    <field name="name">Mes demandes</field>
+    <field name="res_model">hr.travel.request</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+    <field name="context">{}</field>
+    <field name="search_view_id" eval="False"/>
   </record>
 
   <menuitem
@@ -29,5 +41,14 @@
     action="action_hr_travel_request"
     sequence="10"
     groups="base.group_user"
+  />
+
+  <menuitem
+    id="menu_hr_travel_request_my_requests"
+    name="Mes demandes"
+    parent="menu_portail_rh_travel_root"
+    action="action_hr_travel_request_my_requests"
+    sequence="15"
+    groups="portail_rh.group_portail_rh_employee"
   />
 </odoo>
