@@ -40,4 +40,25 @@
     <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_hr'))]"/>
     <field name="domain_force">[(1, '=', 1)]</field>
   </record>
+
+  <record id="rule_hr_supply_request_employee_own" model="ir.rule">
+    <field name="name">hr.supply.request - employe: ses demandes</field>
+    <field name="model_id" ref="model_hr_supply_request"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_employee'))]"/>
+    <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+  </record>
+
+  <record id="rule_hr_supply_request_manager_department" model="ir.rule">
+    <field name="name">hr.supply.request - manager: son departement</field>
+    <field name="model_id" ref="model_hr_supply_request"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_manager'))]"/>
+    <field name="domain_force">[('department_id.manager_id.user_id', '=', user.id)]</field>
+  </record>
+
+  <record id="rule_hr_supply_request_hr_all" model="ir.rule">
+    <field name="name">hr.supply.request - RH: tout voir</field>
+    <field name="model_id" ref="model_hr_supply_request"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_hr'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+  </record>
 </odoo>

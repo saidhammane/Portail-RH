@@ -17,6 +17,24 @@
     <field name="search_view_id" eval="False"/>
   </record>
 
+  <record id="action_all_supply_requests" model="ir.actions.act_window">
+    <field name="name">Demandes fournitures</field>
+    <field name="res_model">hr.supply.request</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[]</field>
+    <field name="context">{}</field>
+    <field name="search_view_id" ref="view_hr_supply_request_search"/>
+  </record>
+
+  <record id="action_my_supply_requests" model="ir.actions.act_window">
+    <field name="name">Mes demandes fournitures</field>
+    <field name="res_model">hr.supply.request</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+    <field name="context">{'search_default_my_requests': 1}</field>
+    <field name="search_view_id" ref="view_hr_supply_request_search"/>
+  </record>
+
   <menuitem
     id="menu_portail_rh_root"
     name="Portail RH"
@@ -49,6 +67,32 @@
     parent="menu_portail_rh_travel_root"
     action="action_hr_travel_request_my_requests"
     sequence="15"
+    groups="portail_rh.group_portail_rh_employee"
+  />
+
+  <menuitem
+    id="menu_portail_rh_supply_root"
+    name="Fournitures"
+    parent="menu_portail_rh_root"
+    sequence="30"
+    groups="portail_rh.group_portail_rh_employee,portail_rh.group_portail_rh_manager,portail_rh.group_portail_rh_hr"
+  />
+
+  <menuitem
+    id="menu_hr_supply_request"
+    name="Demandes"
+    parent="menu_portail_rh_supply_root"
+    action="action_all_supply_requests"
+    sequence="10"
+    groups="portail_rh.group_portail_rh_manager,portail_rh.group_portail_rh_hr"
+  />
+
+  <menuitem
+    id="menu_hr_supply_request_my_requests"
+    name="Mes demandes"
+    parent="menu_portail_rh_supply_root"
+    action="action_my_supply_requests"
+    sequence="20"
     groups="portail_rh.group_portail_rh_employee"
   />
 </odoo>

@@ -1,0 +1,109 @@
+<odoo>
+  <record id="view_hr_supply_request_search" model="ir.ui.view">
+    <field name="name">hr.supply.request.search</field>
+    <field name="model">hr.supply.request</field>
+    <field name="arch" type="xml">
+      <search string="Recherche demandes fournitures">
+        <field name="name"/>
+        <field name="employee_id"/>
+        <field name="department_id"/>
+        <field name="item_name"/>
+        <field name="state"/>
+        <filter name="my_requests" string="Mes demandes" domain="[('employee_id.user_id', '=', uid)]"/>
+        <separator/>
+        <filter name="state_submitted" string="Soumis" domain="[('state', '=', 'submitted')]"/>
+        <filter name="state_approved" string="Approuves" domain="[('state', '=', 'approved')]"/>
+        <filter name="state_rejected" string="Refuses" domain="[('state', '=', 'rejected')]"/>
+        <filter name="state_done" string="Termines" domain="[('state', '=', 'done')]"/>
+        <separator/>
+        <filter name="group_by_employee" string="Employe" context="{'group_by': 'employee_id'}"/>
+        <filter name="group_by_department" string="Departement" context="{'group_by': 'department_id'}"/>
+        <filter name="group_by_state" string="Etat" context="{'group_by': 'state'}"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_hr_supply_request_tree" model="ir.ui.view">
+    <field name="name">hr.supply.request.tree</field>
+    <field name="model">hr.supply.request</field>
+    <field name="arch" type="xml">
+      <tree string="Demandes de fournitures">
+        <field name="name"/>
+        <field name="employee_id"/>
+        <field name="department_id"/>
+        <field name="item_name"/>
+        <field name="quantity"/>
+        <field name="estimated_cost"/>
+        <field name="state" widget="badge"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_hr_supply_request_form" model="ir.ui.view">
+    <field name="name">hr.supply.request.form</field>
+    <field name="model">hr.supply.request</field>
+    <field name="arch" type="xml">
+      <form string="Demande de fournitures">
+        <header>
+          <button
+            name="action_submit"
+            type="object"
+            string="Soumettre"
+            class="btn-primary"
+            invisible="state != 'draft'"
+          />
+          <button
+            name="action_approve"
+            type="object"
+            string="Approuver"
+            class="btn-primary"
+            invisible="state != 'submitted' or not can_approve"
+          />
+          <button
+            name="action_reject"
+            type="object"
+            string="Refuser"
+            invisible="state != 'submitted' or not can_approve"
+          />
+          <button
+            name="action_set_draft"
+            type="object"
+            string="Remettre en brouillon"
+            invisible="state not in ('submitted', 'rejected')"
+          />
+          <button
+            name="action_done"
+            type="object"
+            string="Terminer"
+            class="btn-primary"
+            invisible="state != 'approved' or not can_approve"
+          />
+          <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected,done"/>
+        </header>
+        <sheet>
+          <field name="can_approve" invisible="1"/>
+          <group string="Demande">
+            <field name="name" readonly="state != 'draft'"/>
+            <field name="employee_id" readonly="state != 'draft'" domain="[('user_id', '=', uid)]"/>
+            <field name="department_id" readonly="1"/>
+            <field name="manager_id" readonly="1"/>
+            <field name="company_id" readonly="1"/>
+          </group>
+          <group string="Fourniture">
+            <field name="item_name" readonly="state != 'draft'"/>
+            <field name="description" readonly="state != 'draft'"/>
+            <field name="quantity" readonly="state != 'draft'"/>
+            <field name="estimated_cost" readonly="state != 'draft'"/>
+            <field name="reason" readonly="state != 'draft'"/>
+          </group>
+        </sheet>
+        <div class="oe_chatter">
+          <field name="message_follower_ids"/>
+          <field name="activity_ids"/>
+          <field name="message_ids"/>
+        </div>
+      </form>
+    </field>
+  </record>
+</odoo>
+
