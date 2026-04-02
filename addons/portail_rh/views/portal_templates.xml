@@ -1,0 +1,308 @@
+<odoo>
+  <template id="portal_breadcrumbs_portail_rh" inherit_id="portal.portal_breadcrumbs" priority="40">
+    <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+      <li
+        t-if="page_name in ('travel_requests', 'travel_request_detail', 'travel_request_new')"
+        t-attf-class="breadcrumb-item #{'active' if page_name == 'travel_requests' else ''}"
+      >
+        <a t-if="page_name != 'travel_requests'" href="/my/travel_requests">Mes deplacements</a>
+        <t t-else="">Mes deplacements</t>
+      </li>
+      <li t-if="page_name == 'travel_request_new'" class="breadcrumb-item active">Nouvelle demande</li>
+      <li t-if="page_name == 'travel_request_detail'" class="breadcrumb-item active">
+        <t t-out="travel_request.name"/>
+      </li>
+      <li
+        t-if="page_name in ('supply_requests', 'supply_request_detail', 'supply_request_new')"
+        t-attf-class="breadcrumb-item #{'active' if page_name == 'supply_requests' else ''}"
+      >
+        <a t-if="page_name != 'supply_requests'" href="/my/supply_requests">Mes fournitures</a>
+        <t t-else="">Mes fournitures</t>
+      </li>
+      <li t-if="page_name == 'supply_request_new'" class="breadcrumb-item active">Nouvelle demande</li>
+      <li t-if="page_name == 'supply_request_detail'" class="breadcrumb-item active">
+        <t t-out="supply_request.name"/>
+      </li>
+    </xpath>
+  </template>
+
+  <template id="portal_my_home_portail_rh" inherit_id="portal.portal_my_home" priority="40">
+    <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+      <t t-set="portal_service_category_enable" t-value="True"/>
+    </xpath>
+    <xpath expr="//div[@id='portal_service_category']" position="inside">
+      <t t-call="portal.portal_docs_entry">
+        <t t-set="title">Mes deplacements</t>
+        <t t-set="url" t-value="'/my/travel_requests'"/>
+        <t t-set="text">Consulter et creer vos demandes de deplacement</t>
+        <t t-set="placeholder_count" t-value="'travel_request_count'"/>
+      </t>
+      <t t-call="portal.portal_docs_entry">
+        <t t-set="title">Mes fournitures</t>
+        <t t-set="url" t-value="'/my/supply_requests'"/>
+        <t t-set="text">Consulter et creer vos demandes de fournitures</t>
+        <t t-set="placeholder_count" t-value="'supply_request_count'"/>
+      </t>
+    </xpath>
+  </template>
+
+  <template id="portal_my_travel_requests" name="Mes deplacements">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs_searchbar" t-value="True"/>
+      <t t-call="portal.portal_searchbar">
+        <t t-set="title">Mes deplacements</t>
+      </t>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Mes deplacements</h3>
+        <a class="btn btn-primary" href="/my/travel_requests/new">Nouvelle demande</a>
+      </div>
+
+      <div t-if="success_message" class="alert alert-success" role="alert">
+        <t t-out="success_message"/>
+      </div>
+      <t t-if="not travel_requests">
+        <div class="alert alert-info" role="alert">Aucune demande de deplacement pour le moment.</div>
+      </t>
+      <t t-else="">
+        <t t-set="state_labels" t-value="{'draft': 'Brouillon', 'submitted': 'Soumis', 'approved': 'Approuve', 'rejected': 'Refuse', 'done': 'Termine'}"/>
+        <t t-call="portal.portal_table">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Destination</th>
+              <th>Date debut</th>
+              <th>Date fin</th>
+              <th>Etat</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr t-foreach="travel_requests" t-as="travel_request">
+              <td><a t-att-href="'/my/travel_requests/%s' % travel_request.id"><t t-out="travel_request.name"/></a></td>
+              <td><t t-out="travel_request.destination"/></td>
+              <td><t t-out="travel_request.date_from"/></td>
+              <td><t t-out="travel_request.date_to"/></td>
+              <td><span class="badge text-bg-light"><t t-out="state_labels.get(travel_request.state, travel_request.state)"/></span></td>
+            </tr>
+          </tbody>
+        </t>
+      </t>
+    </t>
+  </template>
+
+  <template id="portal_travel_request_detail" name="Detail demande deplacement">
+    <t t-call="portal.portal_layout">
+      <t t-set="state_labels" t-value="{'draft': 'Brouillon', 'submitted': 'Soumis', 'approved': 'Approuve', 'rejected': 'Refuse', 'done': 'Termine'}"/>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0"><t t-out="travel_request.name"/></h3>
+        <span class="badge text-bg-light"><t t-out="state_labels.get(travel_request.state, travel_request.state)"/></span>
+      </div>
+      <div t-if="success_message" class="alert alert-success" role="alert">
+        <t t-out="success_message"/>
+      </div>
+      <div t-if="error_message" class="alert alert-danger" role="alert">
+        <t t-out="error_message"/>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <dl class="row mb-0">
+            <dt class="col-sm-3">Employe</dt>
+            <dd class="col-sm-9"><t t-out="travel_request.employee_id.name"/></dd>
+            <dt class="col-sm-3">Destination</dt>
+            <dd class="col-sm-9"><t t-out="travel_request.destination"/></dd>
+            <dt class="col-sm-3">Date debut</dt>
+            <dd class="col-sm-9"><t t-out="travel_request.date_from"/></dd>
+            <dt class="col-sm-3">Date fin</dt>
+            <dd class="col-sm-9"><t t-out="travel_request.date_to"/></dd>
+            <dt class="col-sm-3">Cout estime</dt>
+            <dd class="col-sm-9"><t t-out="travel_request.estimated_cost"/></dd>
+            <dt class="col-sm-3">Motif</dt>
+            <dd class="col-sm-9"><t t-out="travel_request.purpose or '-'"/></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="mt-3 d-flex gap-2">
+        <a class="btn btn-secondary" href="/my/travel_requests">Retour a la liste</a>
+        <t t-if="travel_request.state == 'draft'">
+          <form action="" t-att-action="'/my/travel_requests/%s/submit' % travel_request.id" method="post" class="d-inline">
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <button type="submit" class="btn btn-primary">Soumettre</button>
+          </form>
+        </t>
+      </div>
+    </t>
+  </template>
+
+  <template id="portal_new_travel_request" name="Nouvelle demande deplacement">
+    <t t-call="portal.portal_layout">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Nouvelle demande de deplacement</h3>
+        <a class="btn btn-secondary" href="/my/travel_requests">Retour</a>
+      </div>
+      <div t-if="error_message" class="alert alert-danger" role="alert">
+        <t t-out="error_message"/>
+      </div>
+      <form action="/my/travel_requests/create" method="post" class="card">
+        <div class="card-body">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <div class="mb-3">
+            <label class="form-label" for="travel_destination">Destination</label>
+            <input id="travel_destination" type="text" name="destination" class="form-control" required="required" t-att-value="form_values.get('destination', '')"/>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="travel_date_from">Date debut</label>
+              <input id="travel_date_from" type="date" name="date_from" class="form-control" required="required" t-att-value="form_values.get('date_from', '')"/>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="travel_date_to">Date fin</label>
+              <input id="travel_date_to" type="date" name="date_to" class="form-control" required="required" t-att-value="form_values.get('date_to', '')"/>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="travel_purpose">Motif</label>
+            <textarea id="travel_purpose" name="purpose" class="form-control" rows="4"><t t-out="form_values.get('purpose', '')"/></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="travel_estimated_cost">Cout estime</label>
+            <input id="travel_estimated_cost" type="number" step="0.01" min="0" name="estimated_cost" class="form-control" t-att-value="form_values.get('estimated_cost', '')"/>
+          </div>
+        </div>
+        <div class="card-footer text-end">
+          <button type="submit" class="btn btn-primary">Creer</button>
+        </div>
+      </form>
+    </t>
+  </template>
+
+  <template id="portal_my_supply_requests" name="Mes fournitures">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs_searchbar" t-value="True"/>
+      <t t-call="portal.portal_searchbar">
+        <t t-set="title">Mes fournitures</t>
+      </t>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Mes fournitures</h3>
+        <a class="btn btn-primary" href="/my/supply_requests/new">Nouvelle demande</a>
+      </div>
+
+      <div t-if="success_message" class="alert alert-success" role="alert">
+        <t t-out="success_message"/>
+      </div>
+      <t t-if="not supply_requests">
+        <div class="alert alert-info" role="alert">Aucune demande de fournitures pour le moment.</div>
+      </t>
+      <t t-else="">
+        <t t-set="state_labels" t-value="{'draft': 'Brouillon', 'submitted': 'Soumis', 'approved': 'Approuve', 'rejected': 'Refuse', 'done': 'Termine'}"/>
+        <t t-call="portal.portal_table">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Article</th>
+              <th>Quantite</th>
+              <th>Cout estime</th>
+              <th>Date creation</th>
+              <th>Etat</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr t-foreach="supply_requests" t-as="supply_request">
+              <td><a t-att-href="'/my/supply_requests/%s' % supply_request.id"><t t-out="supply_request.name"/></a></td>
+              <td><t t-out="supply_request.item_name"/></td>
+              <td><t t-out="supply_request.quantity"/></td>
+              <td><t t-out="supply_request.estimated_cost"/></td>
+              <td><t t-out="supply_request.create_date.date() if supply_request.create_date else ''"/></td>
+              <td><span class="badge text-bg-light"><t t-out="state_labels.get(supply_request.state, supply_request.state)"/></span></td>
+            </tr>
+          </tbody>
+        </t>
+      </t>
+    </t>
+  </template>
+
+  <template id="portal_supply_request_detail" name="Detail demande fourniture">
+    <t t-call="portal.portal_layout">
+      <t t-set="state_labels" t-value="{'draft': 'Brouillon', 'submitted': 'Soumis', 'approved': 'Approuve', 'rejected': 'Refuse', 'done': 'Termine'}"/>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0"><t t-out="supply_request.name"/></h3>
+        <span class="badge text-bg-light"><t t-out="state_labels.get(supply_request.state, supply_request.state)"/></span>
+      </div>
+      <div t-if="success_message" class="alert alert-success" role="alert">
+        <t t-out="success_message"/>
+      </div>
+      <div t-if="error_message" class="alert alert-danger" role="alert">
+        <t t-out="error_message"/>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <dl class="row mb-0">
+            <dt class="col-sm-3">Employe</dt>
+            <dd class="col-sm-9"><t t-out="supply_request.employee_id.name"/></dd>
+            <dt class="col-sm-3">Article</dt>
+            <dd class="col-sm-9"><t t-out="supply_request.item_name"/></dd>
+            <dt class="col-sm-3">Quantite</dt>
+            <dd class="col-sm-9"><t t-out="supply_request.quantity"/></dd>
+            <dt class="col-sm-3">Cout estime</dt>
+            <dd class="col-sm-9"><t t-out="supply_request.estimated_cost"/></dd>
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9"><t t-out="supply_request.description or '-'"/></dd>
+            <dt class="col-sm-3">Motif</dt>
+            <dd class="col-sm-9"><t t-out="supply_request.reason or '-'"/></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="mt-3 d-flex gap-2">
+        <a class="btn btn-secondary" href="/my/supply_requests">Retour a la liste</a>
+        <t t-if="supply_request.state == 'draft'">
+          <form action="" t-att-action="'/my/supply_requests/%s/submit' % supply_request.id" method="post" class="d-inline">
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <button type="submit" class="btn btn-primary">Soumettre</button>
+          </form>
+        </t>
+      </div>
+    </t>
+  </template>
+
+  <template id="portal_new_supply_request" name="Nouvelle demande fourniture">
+    <t t-call="portal.portal_layout">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Nouvelle demande de fournitures</h3>
+        <a class="btn btn-secondary" href="/my/supply_requests">Retour</a>
+      </div>
+      <div t-if="error_message" class="alert alert-danger" role="alert">
+        <t t-out="error_message"/>
+      </div>
+      <form action="/my/supply_requests/create" method="post" class="card">
+        <div class="card-body">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <div class="mb-3">
+            <label class="form-label" for="supply_item_name">Article</label>
+            <input id="supply_item_name" type="text" name="item_name" class="form-control" required="required" t-att-value="form_values.get('item_name', '')"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="supply_description">Description</label>
+            <textarea id="supply_description" name="description" class="form-control" rows="4"><t t-out="form_values.get('description', '')"/></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="supply_quantity">Quantite</label>
+              <input id="supply_quantity" type="number" step="0.01" min="0.01" name="quantity" class="form-control" required="required" t-att-value="form_values.get('quantity', '1')"/>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="supply_estimated_cost">Cout estime</label>
+              <input id="supply_estimated_cost" type="number" step="0.01" min="0" name="estimated_cost" class="form-control" t-att-value="form_values.get('estimated_cost', '')"/>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="supply_reason">Motif</label>
+            <textarea id="supply_reason" name="reason" class="form-control" rows="4"><t t-out="form_values.get('reason', '')"/></textarea>
+          </div>
+        </div>
+        <div class="card-footer text-end">
+          <button type="submit" class="btn btn-primary">Creer</button>
+        </div>
+      </form>
+    </t>
+  </template>
+</odoo>

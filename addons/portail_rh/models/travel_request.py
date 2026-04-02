@@ -36,8 +36,16 @@ class HrTravelRequest(models.Model):
         readonly=True,
     )
     destination = fields.Char(required=True)
-    date_from = fields.Date(string="Date début", required=True)
-    date_to = fields.Date(string="Date fin", required=True)
+    date_from = fields.Date(
+        string="Date début",
+        required=True,
+        default=fields.Date.context_today,
+    )
+    date_to = fields.Date(
+        string="Date fin",
+        required=True,
+        default=fields.Date.context_today,
+    )
     duration_days = fields.Float(
         string="Durée (jours)",
         compute="_compute_duration_days",
@@ -214,7 +222,12 @@ class HrTravelRequest(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         default_employee_id = self._default_employee_id()
+        default_date = fields.Date.context_today(self)
         for vals in vals_list:
             if not vals.get("employee_id") and default_employee_id:
                 vals["employee_id"] = default_employee_id
+            vals.setdefault("date_from", default_date)
+            vals.setdefault("date_to", vals.get("date_from", default_date))
+            vals.setdefault("state", "draft")
         return super().create(vals_list)
+
