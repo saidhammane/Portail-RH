@@ -1,4 +1,26 @@
-﻿<odoo>
+<odoo>
+  <record id="view_hr_travel_request_search" model="ir.ui.view">
+    <field name="name">hr.travel.request.search</field>
+    <field name="model">hr.travel.request</field>
+    <field name="arch" type="xml">
+      <search string="Recherche demandes de déplacement">
+        <field name="name"/>
+        <field name="employee_id"/>
+        <field name="destination"/>
+        <field name="state"/>
+        <filter name="my_requests" string="Mes demandes" domain="[('employee_id.user_id', '=', uid)]"/>
+        <separator/>
+        <filter name="state_submitted" string="Soumis" domain="[('state', '=', 'submitted')]"/>
+        <filter name="state_approved" string="Approuvées" domain="[('state', '=', 'approved')]"/>
+        <filter name="state_rejected" string="Refusées" domain="[('state', '=', 'rejected')]"/>
+        <filter name="state_done" string="Terminées" domain="[('state', '=', 'done')]"/>
+        <separator/>
+        <filter name="group_by_employee" string="Employé" context="{'group_by': 'employee_id'}"/>
+        <filter name="group_by_state" string="État" context="{'group_by': 'state'}"/>
+      </search>
+    </field>
+  </record>
+
   <record id="view_hr_travel_request_tree" model="ir.ui.view">
     <field name="name">hr.travel.request.tree</field>
     <field name="model">hr.travel.request</field>

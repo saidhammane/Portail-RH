@@ -85,6 +85,10 @@
     <field name="view_id" ref="view_hr_travel_request_report_pivot"/>
     <field name="search_view_id" ref="view_hr_travel_request_report_search"/>
     <field name="context">{'search_default_filter_last_3_months': 1, 'group_by': ['month_start']}</field>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('portail_rh.group_portail_rh_manager'), ref('portail_rh.group_portail_rh_hr')])]"
+    />
   </record>
 
   <menuitem
@@ -102,6 +106,6 @@
     parent="portail_rh.menu_portail_rh_travel_root"
     action="action_hr_travel_request_indicators"
     sequence="6"
-    groups="base.group_user"
+    groups="portail_rh.group_portail_rh_manager,portail_rh.group_portail_rh_hr"
   />
 </odoo>
