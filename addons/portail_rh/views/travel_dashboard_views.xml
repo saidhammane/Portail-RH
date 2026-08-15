@@ -106,6 +106,12 @@
     parent="portail_rh.menu_portail_rh_travel_root"
     action="action_hr_travel_request_indicators"
     sequence="6"
-    groups="portail_rh.group_portail_rh_manager,portail_rh.group_portail_rh_hr"
   />
+
+  <record id="menu_hr_travel_request_indicators" model="ir.ui.menu">
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('portail_rh.group_portail_rh_manager'), ref('portail_rh.group_portail_rh_hr')])]"
+    />
+  </record>
 </odoo>
