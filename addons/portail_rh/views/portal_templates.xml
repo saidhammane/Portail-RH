@@ -32,14 +32,14 @@
     </xpath>
     <div id="portal_client_category" position="inside">
       <t t-call="portal.portal_docs_entry">
-        <t t-set="icon" t-value="'/sale/static/src/img/bag.svg'"/>
+        <t t-set="icon" t-value="'/portail_rh/static/description/icon.png'"/>
         <t t-set="title">Mes deplacements</t>
         <t t-set="url" t-value="'/my/travel_requests'"/>
         <t t-set="text">Suivez et creez vos demandes de deplacement</t>
         <t t-set="placeholder_count" t-value="'travel_request_count'"/>
       </t>
       <t t-call="portal.portal_docs_entry">
-        <t t-set="icon" t-value="'/project/static/src/img/tasks.svg'"/>
+        <t t-set="icon" t-value="'/portail_rh/static/description/icon.png'"/>
         <t t-set="title">Mes fournitures</t>
         <t t-set="url" t-value="'/my/supply_requests'"/>
         <t t-set="text">Suivez et creez vos demandes de fournitures</t>
@@ -48,491 +48,285 @@
     </div>
   </template>
 
+  <template id="portal_request_badge" name="Statut demande RH">
+    <t t-set="badge_classes" t-value="{'draft': 'text-bg-secondary', 'submitted': 'text-bg-primary', 'approved': 'text-bg-success', 'rejected': 'text-bg-danger', 'done': 'text-bg-dark'}"/>
+    <span
+      class="badge rounded-pill"
+      t-att-class="badge_classes.get(portal_record.state, 'text-bg-light')"
+    >
+      <t t-out="portal_state_labels.get(portal_record.state, portal_record.state)"/>
+    </span>
+  </template>
+
+  <template id="portal_request_list" name="Liste demandes RH">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs_searchbar" t-value="True"/>
+      <t t-call="portal.portal_searchbar">
+        <t t-set="title" t-value="'Mes deplacements' if request_type == 'travel' else 'Mes fournitures'"/>
+        <a class="btn btn-primary" t-att-href="default_url + '/new'">Nouvelle demande</a>
+      </t>
+
+      <div t-if="success_message" class="alert alert-success" role="alert">
+        <t t-out="success_message"/>
+      </div>
+      <div t-if="not portal_records" class="alert alert-warning" role="alert">
+        Aucune demande pour le moment.
+      </div>
+      <t t-if="portal_records" t-call="portal.portal_table">
+        <thead>
+          <tr class="active">
+            <th>Reference</th>
+            <th t-if="request_type == 'travel'">Destination</th>
+            <th t-else="">Article</th>
+            <th t-if="request_type == 'supply'" class="text-end">Quantite</th>
+            <th t-if="request_type == 'travel'" class="text-end">Date debut</th>
+            <th t-if="request_type == 'travel'" class="text-end">Date fin</th>
+            <th t-else="" class="text-end">Date creation</th>
+            <th t-if="request_type == 'supply'" class="text-end">Cout estime</th>
+            <th class="text-end">Etat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <t t-foreach="portal_records" t-as="portal_record">
+            <tr>
+              <td>
+                <a t-att-href="'%s/%s' % (default_url, portal_record.id)">
+                  <t t-out="portal_record.name"/>
+                </a>
+              </td>
+              <td t-if="request_type == 'travel'"><t t-out="portal_record.destination"/></td>
+              <td t-else=""><t t-out="portal_record.item_name"/></td>
+              <td t-if="request_type == 'supply'" class="text-end">
+                <t t-out="portal_record.quantity"/>
+              </td>
+              <td t-if="request_type == 'travel'" class="text-end">
+                <span t-field="portal_record.date_from" t-options="{'widget': 'date'}"/>
+              </td>
+              <td t-if="request_type == 'travel'" class="text-end">
+                <span t-field="portal_record.date_to" t-options="{'widget': 'date'}"/>
+              </td>
+              <td t-else="" class="text-end">
+                <span t-field="portal_record.create_date" t-options="{'widget': 'date'}"/>
+              </td>
+              <td t-if="request_type == 'supply'" class="text-end">
+                <t t-out="portal_record.estimated_cost"/>
+              </td>
+              <td class="text-end"><t t-call="portail_rh.portal_request_badge"/></td>
+            </tr>
+          </t>
+        </tbody>
+      </t>
+    </t>
+  </template>
+
+  <template id="portal_request_detail" name="Detail demande RH">
+    <t t-call="portal.portal_layout">
+      <div class="mb-4">
+        <h2 class="mb-1"><t t-out="portal_record.name"/></h2>
+        <p class="text-muted mb-0">
+          <t t-if="request_type == 'travel'">Demande de deplacement</t>
+          <t t-else="">Demande de fournitures</t>
+        </p>
+      </div>
+      <div t-if="success_message" class="alert alert-success" role="alert">
+        <t t-out="success_message"/>
+      </div>
+      <div t-if="error_message" class="alert alert-danger" role="alert">
+        <t t-out="error_message"/>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <t t-call="portal.portal_record_layout">
+            <t t-set="card_header"><h5 class="mb-0">Informations generales</h5></t>
+            <t t-set="card_body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <strong>Employe</strong>
+                  <div><t t-out="portal_record.employee_id.name"/></div>
+                </div>
+                <t t-if="request_type == 'travel'">
+                  <div class="col-md-6">
+                    <strong>Destination</strong>
+                    <div><t t-out="portal_record.destination"/></div>
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Date debut</strong>
+                    <div><span t-field="portal_record.date_from" t-options="{'widget': 'date'}"/></div>
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Date fin</strong>
+                    <div><span t-field="portal_record.date_to" t-options="{'widget': 'date'}"/></div>
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Duree</strong>
+                    <div><t t-out="portal_record.duration_days"/> jour(s)</div>
+                  </div>
+                </t>
+                <t t-else="">
+                  <div class="col-md-6">
+                    <strong>Article</strong>
+                    <div><t t-out="portal_record.item_name"/></div>
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Quantite</strong>
+                    <div><t t-out="portal_record.quantity"/></div>
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Departement</strong>
+                    <div><t t-out="portal_record.department_id.name or '-'"/></div>
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Date creation</strong>
+                    <div><span t-field="portal_record.create_date" t-options="{'widget': 'date'}"/></div>
+                  </div>
+                </t>
+                <div class="col-md-6">
+                  <strong>Cout estime</strong>
+                  <div><t t-out="portal_record.estimated_cost"/></div>
+                </div>
+              </div>
+            </t>
+          </t>
+
+          <t
+            t-call="portal.portal_record_layout"
+            t-if="(request_type == 'travel' and portal_record.purpose) or (request_type == 'supply' and (portal_record.description or portal_record.reason))"
+          >
+            <t t-set="card_header"><h5 class="mb-0">Justification</h5></t>
+            <t t-set="card_body">
+              <p t-if="request_type == 'travel'" class="mb-0"><t t-out="portal_record.purpose"/></p>
+              <div t-else="">
+                <p t-if="portal_record.description"><strong>Description</strong><br/><t t-out="portal_record.description"/></p>
+                <p t-if="portal_record.reason" class="mb-0"><strong>Motif</strong><br/><t t-out="portal_record.reason"/></p>
+              </div>
+            </t>
+          </t>
+        </div>
+
+        <t t-call="portal.portal_record_sidebar">
+          <t t-set="classes" t-value="'col-lg-4'"/>
+          <t t-set="title">
+            <div class="w-100">
+              <h4 class="mb-2">Statut</h4>
+              <t t-call="portail_rh.portal_request_badge"/>
+            </div>
+          </t>
+          <t t-set="entries">
+            <div class="list-group mb-3">
+              <div class="list-group-item d-flex justify-content-between">
+                <span>Reference</span><strong><t t-out="portal_record.name"/></strong>
+              </div>
+              <div class="list-group-item d-flex justify-content-between">
+                <span t-if="request_type == 'travel'">Destination</span>
+                <span t-else="">Article</span>
+                <strong>
+                  <t t-if="request_type == 'travel'" t-out="portal_record.destination"/>
+                  <t t-else="" t-out="portal_record.item_name"/>
+                </strong>
+              </div>
+            </div>
+            <div class="d-grid gap-2">
+              <form
+                t-if="portal_record.state == 'draft'"
+                t-att-action="'%s/%s/submit' % (default_url, portal_record.id)"
+                method="post"
+              >
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <button type="submit" class="btn btn-primary w-100">Soumettre</button>
+              </form>
+              <a class="btn btn-outline-secondary" t-att-href="default_url">Retour a la liste</a>
+            </div>
+          </t>
+        </t>
+      </div>
+    </t>
+  </template>
+
+  <template id="portal_request_form" name="Creation demande RH">
+    <t t-call="portal.portal_layout">
+      <div class="mb-4">
+        <h2 class="mb-1">
+          <t t-if="request_type == 'travel'">Nouvelle demande de deplacement</t>
+          <t t-else="">Nouvelle demande de fournitures</t>
+        </h2>
+        <p class="text-muted mb-0">Creez votre demande avant soumission au manager.</p>
+      </div>
+      <div t-if="error_message" class="alert alert-danger" role="alert">
+        <t t-out="error_message"/>
+      </div>
+      <t t-call="portal.portal_record_layout">
+        <t t-set="card_body">
+          <form t-att-action="default_url + '/create'" method="post">
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <div class="row g-3">
+              <t t-if="request_type == 'travel'">
+                <div class="col-12">
+                  <label class="form-label" for="travel_destination">Destination</label>
+                  <input id="travel_destination" type="text" name="destination" class="form-control" required="required" t-att-value="form_values.get('destination', '')"/>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="travel_date_from">Date debut</label>
+                  <input id="travel_date_from" type="date" name="date_from" class="form-control" required="required" t-att-value="form_values.get('date_from', '')"/>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="travel_date_to">Date fin</label>
+                  <input id="travel_date_to" type="date" name="date_to" class="form-control" required="required" t-att-value="form_values.get('date_to', '')"/>
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="travel_purpose">Motif</label>
+                  <textarea id="travel_purpose" name="purpose" class="form-control" rows="4"><t t-out="form_values.get('purpose', '')"/></textarea>
+                </div>
+              </t>
+              <t t-else="">
+                <div class="col-12">
+                  <label class="form-label" for="supply_item_name">Article</label>
+                  <input id="supply_item_name" type="text" name="item_name" class="form-control" required="required" t-att-value="form_values.get('item_name', '')"/>
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="supply_description">Description</label>
+                  <textarea id="supply_description" name="description" class="form-control" rows="4"><t t-out="form_values.get('description', '')"/></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="supply_quantity">Quantite</label>
+                  <input id="supply_quantity" type="number" step="0.01" min="0.01" name="quantity" class="form-control" required="required" t-att-value="form_values.get('quantity', '1')"/>
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="supply_reason">Motif</label>
+                  <textarea id="supply_reason" name="reason" class="form-control" rows="4"><t t-out="form_values.get('reason', '')"/></textarea>
+                </div>
+              </t>
+              <div class="col-md-6">
+                <label class="form-label" for="estimated_cost">Cout estime</label>
+                <input id="estimated_cost" type="number" step="0.01" min="0" name="estimated_cost" class="form-control" t-att-value="form_values.get('estimated_cost', '')"/>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+              <a class="btn btn-outline-secondary" t-att-href="default_url">Retour a la liste</a>
+              <button type="submit" class="btn btn-primary">Creer la demande</button>
+            </div>
+          </form>
+        </t>
+      </t>
+    </t>
+  </template>
+
   <template id="portal_my_travel_requests" name="Mes deplacements">
-    <t t-call="portal.portal_layout">
-      <t t-set="breadcrumbs_searchbar" t-value="True"/>
-      <t t-set="badge_classes" t-value="{'draft': 'text-bg-secondary', 'submitted': 'text-bg-primary', 'approved': 'text-bg-success', 'rejected': 'text-bg-danger', 'done': 'text-bg-dark'}"/>
-      <t t-call="portal.portal_searchbar">
-        <t t-set="title" t-value="portal_list_title"/>
-        <a class="btn btn-primary" t-att-href="portal_new_route">Nouvelle demande</a>
-      </t>
-
-      <div t-if="success_message" class="alert alert-success" role="alert">
-        <t t-out="success_message"/>
-      </div>
-      <div t-if="not travel_requests" class="alert alert-warning" role="alert">
-        <t t-out="portal_empty_message"/>
-      </div>
-      <t t-elif="travel_requests" t-call="portal.portal_table">
-        <thead>
-          <tr class="active">
-            <th>Reference</th>
-            <th>Destination</th>
-            <th class="text-end">Date debut</th>
-            <th class="text-end">Date fin</th>
-            <th class="text-end">Etat</th>
-          </tr>
-        </thead>
-        <tbody>
-          <t t-foreach="travel_requests" t-as="travel_request">
-            <tr>
-              <td>
-                <a t-att-href="'/my/travel_requests/%s' % travel_request.id">
-                  <t t-out="travel_request.name"/>
-                </a>
-              </td>
-              <td><t t-out="travel_request.destination"/></td>
-              <td class="text-end">
-                <span t-field="travel_request.date_from" t-options="{'widget': 'date'}"/>
-              </td>
-              <td class="text-end">
-                <span t-field="travel_request.date_to" t-options="{'widget': 'date'}"/>
-              </td>
-              <td class="text-end">
-                <span
-                  class="badge rounded-pill"
-                  t-att-class="badge_classes.get(travel_request.state, 'text-bg-light')"
-                >
-                  <t t-out="portal_state_labels.get(travel_request.state, travel_request.state)"/>
-                </span>
-              </td>
-            </tr>
-          </t>
-        </tbody>
-      </t>
-    </t>
+    <t t-call="portail_rh.portal_request_list"/>
   </template>
-
   <template id="portal_travel_request_detail" name="Detail demande deplacement">
-    <t t-call="portal.portal_layout">
-      <t t-set="badge_classes" t-value="{'draft': 'text-bg-secondary', 'submitted': 'text-bg-primary', 'approved': 'text-bg-success', 'rejected': 'text-bg-danger', 'done': 'text-bg-dark'}"/>
-
-      <div class="mb-4">
-        <h2 class="mb-1"><t t-out="travel_request.name"/></h2>
-        <p class="text-muted mb-0">Demande de deplacement</p>
-      </div>
-
-      <div t-if="success_message" class="alert alert-success" role="alert">
-        <t t-out="success_message"/>
-      </div>
-      <div t-if="error_message" class="alert alert-danger" role="alert">
-        <t t-out="error_message"/>
-      </div>
-
-      <div class="row g-4">
-        <div class="col-lg-8">
-          <t t-call="portal.portal_record_layout">
-            <t t-set="card_header">
-              <h5 class="mb-0">Informations generales</h5>
-            </t>
-            <t t-set="card_body">
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <strong>Employe</strong>
-                  <div><t t-out="travel_request.employee_id.name"/></div>
-                </div>
-                <div class="col-md-6">
-                  <strong>Destination</strong>
-                  <div><t t-out="travel_request.destination"/></div>
-                </div>
-                <div class="col-md-6">
-                  <strong>Date debut</strong>
-                  <div><span t-field="travel_request.date_from" t-options="{'widget': 'date'}"/></div>
-                </div>
-                <div class="col-md-6">
-                  <strong>Date fin</strong>
-                  <div><span t-field="travel_request.date_to" t-options="{'widget': 'date'}"/></div>
-                </div>
-                <div class="col-md-6">
-                  <strong>Duree</strong>
-                  <div><t t-out="travel_request.duration_days"/> jour(s)</div>
-                </div>
-                <div class="col-md-6">
-                  <strong>Cout estime</strong>
-                  <div><t t-out="travel_request.estimated_cost"/></div>
-                </div>
-              </div>
-            </t>
-          </t>
-
-          <t t-call="portal.portal_record_layout" t-if="travel_request.purpose">
-            <t t-set="card_header">
-              <h5 class="mb-0">Motif</h5>
-            </t>
-            <t t-set="card_body">
-              <p class="mb-0"><t t-out="travel_request.purpose"/></p>
-            </t>
-          </t>
-        </div>
-
-        <t t-call="portal.portal_record_sidebar">
-          <t t-set="classes" t-value="'col-lg-4'"/>
-          <t t-set="title">
-            <div class="w-100">
-              <h4 class="mb-2">Statut</h4>
-              <span
-                class="badge rounded-pill"
-                t-att-class="badge_classes.get(travel_request.state, 'text-bg-light')"
-              >
-                <t t-out="portal_state_labels.get(travel_request.state, travel_request.state)"/>
-              </span>
-            </div>
-          </t>
-          <t t-set="entries">
-            <div class="list-group mb-3">
-              <div class="list-group-item d-flex justify-content-between">
-                <span>Reference</span>
-                <strong><t t-out="travel_request.name"/></strong>
-              </div>
-              <div class="list-group-item d-flex justify-content-between">
-                <span>Destination</span>
-                <strong><t t-out="travel_request.destination"/></strong>
-              </div>
-              <div class="list-group-item d-flex justify-content-between">
-                <span>Date debut</span>
-                <strong><span t-field="travel_request.date_from" t-options="{'widget': 'date'}"/></strong>
-              </div>
-              <div class="list-group-item d-flex justify-content-between">
-                <span>Date fin</span>
-                <strong><span t-field="travel_request.date_to" t-options="{'widget': 'date'}"/></strong>
-              </div>
-            </div>
-            <div class="d-grid gap-2">
-              <form
-                t-if="travel_request.state == 'draft'"
-                t-att-action="portal_submit_route % travel_request.id"
-                method="post"
-              >
-                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                <button type="submit" class="btn btn-primary w-100">Soumettre</button>
-              </form>
-              <a class="btn btn-outline-secondary" href="/my/travel_requests">Retour a la liste</a>
-            </div>
-          </t>
-        </t>
-      </div>
-    </t>
+    <t t-call="portail_rh.portal_request_detail"/>
   </template>
-
   <template id="portal_new_travel_request" name="Nouvelle demande deplacement">
-    <t t-call="portal.portal_layout">
-      <div class="mb-4">
-        <h2 class="mb-1"><t t-out="portal_new_title"/></h2>
-        <p class="text-muted mb-0">Creez votre demande avant soumission au manager.</p>
-      </div>
-
-      <div t-if="error_message" class="alert alert-danger" role="alert">
-        <t t-out="error_message"/>
-      </div>
-
-      <t t-call="portal.portal_record_layout">
-        <t t-set="card_body">
-          <form action="/my/travel_requests/create" method="post">
-            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-            <div class="row g-3">
-              <div class="col-12">
-                <label class="form-label" for="travel_destination">Destination</label>
-                <input
-                  id="travel_destination"
-                  type="text"
-                  name="destination"
-                  class="form-control"
-                  required="required"
-                  t-att-value="form_values.get('destination', '')"
-                />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="travel_date_from">Date debut</label>
-                <input
-                  id="travel_date_from"
-                  type="date"
-                  name="date_from"
-                  class="form-control"
-                  required="required"
-                  t-att-value="form_values.get('date_from', '')"
-                />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="travel_date_to">Date fin</label>
-                <input
-                  id="travel_date_to"
-                  type="date"
-                  name="date_to"
-                  class="form-control"
-                  required="required"
-                  t-att-value="form_values.get('date_to', '')"
-                />
-              </div>
-              <div class="col-12">
-                <label class="form-label" for="travel_purpose">Motif</label>
-                <textarea id="travel_purpose" name="purpose" class="form-control" rows="4"><t t-out="form_values.get('purpose', '')"/></textarea>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="travel_estimated_cost">Cout estime</label>
-                <input
-                  id="travel_estimated_cost"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  name="estimated_cost"
-                  class="form-control"
-                  t-att-value="form_values.get('estimated_cost', '')"
-                />
-              </div>
-            </div>
-            <div class="d-flex justify-content-between mt-4">
-              <a class="btn btn-outline-secondary" href="/my/travel_requests">Retour a la liste</a>
-              <button type="submit" class="btn btn-primary">Creer la demande</button>
-            </div>
-          </form>
-        </t>
-      </t>
-    </t>
+    <t t-call="portail_rh.portal_request_form"/>
   </template>
-
   <template id="portal_my_supply_requests" name="Mes fournitures">
-    <t t-call="portal.portal_layout">
-      <t t-set="breadcrumbs_searchbar" t-value="True"/>
-      <t t-set="badge_classes" t-value="{'draft': 'text-bg-secondary', 'submitted': 'text-bg-primary', 'approved': 'text-bg-success', 'rejected': 'text-bg-danger', 'done': 'text-bg-dark'}"/>
-      <t t-call="portal.portal_searchbar">
-        <t t-set="title" t-value="portal_list_title"/>
-        <a class="btn btn-primary" t-att-href="portal_new_route">Nouvelle demande</a>
-      </t>
-
-      <div t-if="success_message" class="alert alert-success" role="alert">
-        <t t-out="success_message"/>
-      </div>
-      <div t-if="not supply_requests" class="alert alert-warning" role="alert">
-        <t t-out="portal_empty_message"/>
-      </div>
-      <t t-elif="supply_requests" t-call="portal.portal_table">
-        <thead>
-          <tr class="active">
-            <th>Reference</th>
-            <th>Article</th>
-            <th class="text-end">Quantite</th>
-            <th class="text-end">Cout estime</th>
-            <th class="text-end">Date creation</th>
-            <th class="text-end">Etat</th>
-          </tr>
-        </thead>
-        <tbody>
-          <t t-foreach="supply_requests" t-as="supply_request">
-            <tr>
-              <td>
-                <a t-att-href="'/my/supply_requests/%s' % supply_request.id">
-                  <t t-out="supply_request.name"/>
-                </a>
-              </td>
-              <td><t t-out="supply_request.item_name"/></td>
-              <td class="text-end"><t t-out="supply_request.quantity"/></td>
-              <td class="text-end"><t t-out="supply_request.estimated_cost"/></td>
-              <td class="text-end">
-                <span t-field="supply_request.create_date" t-options="{'widget': 'date'}"/>
-              </td>
-              <td class="text-end">
-                <span
-                  class="badge rounded-pill"
-                  t-att-class="badge_classes.get(supply_request.state, 'text-bg-light')"
-                >
-                  <t t-out="portal_state_labels.get(supply_request.state, supply_request.state)"/>
-                </span>
-              </td>
-            </tr>
-          </t>
-        </tbody>
-      </t>
-    </t>
+    <t t-call="portail_rh.portal_request_list"/>
   </template>
-
   <template id="portal_supply_request_detail" name="Detail demande fourniture">
-    <t t-call="portal.portal_layout">
-      <t t-set="badge_classes" t-value="{'draft': 'text-bg-secondary', 'submitted': 'text-bg-primary', 'approved': 'text-bg-success', 'rejected': 'text-bg-danger', 'done': 'text-bg-dark'}"/>
-
-      <div class="mb-4">
-        <h2 class="mb-1"><t t-out="supply_request.name"/></h2>
-        <p class="text-muted mb-0">Demande de fournitures</p>
-      </div>
-
-      <div t-if="success_message" class="alert alert-success" role="alert">
-        <t t-out="success_message"/>
-      </div>
-      <div t-if="error_message" class="alert alert-danger" role="alert">
-        <t t-out="error_message"/>
-      </div>
-
-      <div class="row g-4">
-        <div class="col-lg-8">
-          <t t-call="portal.portal_record_layout">
-            <t t-set="card_header">
-              <h5 class="mb-0">Informations generales</h5>
-            </t>
-            <t t-set="card_body">
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <strong>Employe</strong>
-                  <div><t t-out="supply_request.employee_id.name"/></div>
-                </div>
-                <div class="col-md-6">
-                  <strong>Article</strong>
-                  <div><t t-out="supply_request.item_name"/></div>
-                </div>
-                <div class="col-md-6">
-                  <strong>Quantite</strong>
-                  <div><t t-out="supply_request.quantity"/></div>
-                </div>
-                <div class="col-md-6">
-                  <strong>Cout estime</strong>
-                  <div><t t-out="supply_request.estimated_cost"/></div>
-                </div>
-                <div class="col-md-6">
-                  <strong>Departement</strong>
-                  <div><t t-out="supply_request.department_id.name or '-'"/></div>
-                </div>
-                <div class="col-md-6">
-                  <strong>Date creation</strong>
-                  <div><span t-field="supply_request.create_date" t-options="{'widget': 'date'}"/></div>
-                </div>
-              </div>
-            </t>
-          </t>
-
-          <t t-call="portal.portal_record_layout" t-if="supply_request.description or supply_request.reason">
-            <t t-set="card_header">
-              <h5 class="mb-0">Justification</h5>
-            </t>
-            <t t-set="card_body">
-              <div class="row g-3">
-                <div class="col-12" t-if="supply_request.description">
-                  <strong>Description</strong>
-                  <p class="mb-0 mt-1"><t t-out="supply_request.description"/></p>
-                </div>
-                <div class="col-12" t-if="supply_request.reason">
-                  <strong>Motif</strong>
-                  <p class="mb-0 mt-1"><t t-out="supply_request.reason"/></p>
-                </div>
-              </div>
-            </t>
-          </t>
-        </div>
-
-        <t t-call="portal.portal_record_sidebar">
-          <t t-set="classes" t-value="'col-lg-4'"/>
-          <t t-set="title">
-            <div class="w-100">
-              <h4 class="mb-2">Statut</h4>
-              <span
-                class="badge rounded-pill"
-                t-att-class="badge_classes.get(supply_request.state, 'text-bg-light')"
-              >
-                <t t-out="portal_state_labels.get(supply_request.state, supply_request.state)"/>
-              </span>
-            </div>
-          </t>
-          <t t-set="entries">
-            <div class="list-group mb-3">
-              <div class="list-group-item d-flex justify-content-between">
-                <span>Reference</span>
-                <strong><t t-out="supply_request.name"/></strong>
-              </div>
-              <div class="list-group-item d-flex justify-content-between">
-                <span>Article</span>
-                <strong><t t-out="supply_request.item_name"/></strong>
-              </div>
-              <div class="list-group-item d-flex justify-content-between">
-                <span>Quantite</span>
-                <strong><t t-out="supply_request.quantity"/></strong>
-              </div>
-              <div class="list-group-item d-flex justify-content-between">
-                <span>Departement</span>
-                <strong><t t-out="supply_request.department_id.name or '-'"/></strong>
-              </div>
-            </div>
-            <div class="d-grid gap-2">
-              <form
-                t-if="supply_request.state == 'draft'"
-                t-att-action="portal_submit_route % supply_request.id"
-                method="post"
-              >
-                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                <button type="submit" class="btn btn-primary w-100">Soumettre</button>
-              </form>
-              <a class="btn btn-outline-secondary" href="/my/supply_requests">Retour a la liste</a>
-            </div>
-          </t>
-        </t>
-      </div>
-    </t>
+    <t t-call="portail_rh.portal_request_detail"/>
   </template>
-
   <template id="portal_new_supply_request" name="Nouvelle demande fourniture">
-    <t t-call="portal.portal_layout">
-      <div class="mb-4">
-        <h2 class="mb-1"><t t-out="portal_new_title"/></h2>
-        <p class="text-muted mb-0">Creez votre demande avant soumission au manager.</p>
-      </div>
-
-      <div t-if="error_message" class="alert alert-danger" role="alert">
-        <t t-out="error_message"/>
-      </div>
-
-      <t t-call="portal.portal_record_layout">
-        <t t-set="card_body">
-          <form action="/my/supply_requests/create" method="post">
-            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-            <div class="row g-3">
-              <div class="col-12">
-                <label class="form-label" for="supply_item_name">Article</label>
-                <input
-                  id="supply_item_name"
-                  type="text"
-                  name="item_name"
-                  class="form-control"
-                  required="required"
-                  t-att-value="form_values.get('item_name', '')"
-                />
-              </div>
-              <div class="col-12">
-                <label class="form-label" for="supply_description">Description</label>
-                <textarea id="supply_description" name="description" class="form-control" rows="4"><t t-out="form_values.get('description', '')"/></textarea>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="supply_quantity">Quantite</label>
-                <input
-                  id="supply_quantity"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  name="quantity"
-                  class="form-control"
-                  required="required"
-                  t-att-value="form_values.get('quantity', '1')"
-                />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="supply_estimated_cost">Cout estime</label>
-                <input
-                  id="supply_estimated_cost"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  name="estimated_cost"
-                  class="form-control"
-                  t-att-value="form_values.get('estimated_cost', '')"
-                />
-              </div>
-              <div class="col-12">
-                <label class="form-label" for="supply_reason">Motif</label>
-                <textarea id="supply_reason" name="reason" class="form-control" rows="4"><t t-out="form_values.get('reason', '')"/></textarea>
-              </div>
-            </div>
-            <div class="d-flex justify-content-between mt-4">
-              <a class="btn btn-outline-secondary" href="/my/supply_requests">Retour a la liste</a>
-              <button type="submit" class="btn btn-primary">Creer la demande</button>
-            </div>
-          </form>
-        </t>
-      </t>
-    </t>
+    <t t-call="portail_rh.portal_request_form"/>
   </template>
 </odoo>
