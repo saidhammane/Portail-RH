@@ -35,6 +35,26 @@
     <field name="search_view_id" ref="view_hr_supply_request_search"/>
   </record>
 
+  <record id="action_my_attestation_requests" model="ir.actions.act_window">
+    <field name="name">Mes demandes d'attestations</field>
+    <field name="res_model">hr.attestation.request</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+    <field name="context">{'search_default_my_requests': 1}</field>
+    <field name="search_view_id" ref="view_hr_attestation_request_search"/>
+    <field name="groups_id" eval="[(6, 0, [ref('portail_rh.group_portail_rh_employee')])]"/>
+  </record>
+
+  <record id="action_all_attestation_requests" model="ir.actions.act_window">
+    <field name="name">Demandes d'attestations</field>
+    <field name="res_model">hr.attestation.request</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[]</field>
+    <field name="context">{}</field>
+    <field name="search_view_id" ref="view_hr_attestation_request_search"/>
+    <field name="groups_id" eval="[(6, 0, [ref('portail_rh.group_portail_rh_hr')])]"/>
+  </record>
+
   <menuitem
     id="menu_portail_rh_root"
     name="Portail RH"
@@ -94,5 +114,31 @@
     action="action_my_supply_requests"
     sequence="20"
     groups="portail_rh.group_portail_rh_employee"
+  />
+
+  <menuitem
+    id="menu_portail_rh_attestation_root"
+    name="Attestations"
+    parent="menu_portail_rh_root"
+    sequence="40"
+    groups="portail_rh.group_portail_rh_employee,portail_rh.group_portail_rh_hr"
+  />
+
+  <menuitem
+    id="menu_hr_attestation_request_my_requests"
+    name="Mes demandes"
+    parent="menu_portail_rh_attestation_root"
+    action="action_my_attestation_requests"
+    sequence="10"
+    groups="portail_rh.group_portail_rh_employee"
+  />
+
+  <menuitem
+    id="menu_hr_attestation_request"
+    name="Demandes"
+    parent="menu_portail_rh_attestation_root"
+    action="action_all_attestation_requests"
+    sequence="20"
+    groups="portail_rh.group_portail_rh_hr"
   />
 </odoo>
