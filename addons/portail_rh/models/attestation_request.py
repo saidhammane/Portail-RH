@@ -1,5 +1,5 @@
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 
 
 class HrAttestationRequest(models.Model):
@@ -127,6 +127,24 @@ class HrAttestationRequest(models.Model):
             )
         self.with_context(attestation_workflow=True).write({"state": "draft"})
 
+    def _check_attestation_print_access(self):
+        self.check_access_rights("read")
+        self.check_access_rule("read")
+        is_rh_user = self._is_rh_user()
+        for record in self:
+            if record.state not in ("approved", "done"):
+                raise UserError(
+                    _("Seules les attestations approuvees ou terminees peuvent etre imprimees.")
+                )
+            if not is_rh_user and record.employee_id.user_id != self.env.user:
+                raise AccessError(_("Vous ne pouvez imprimer que vos propres attestations."))
+        return True
+
+    def action_print_attestation(self):
+        self.ensure_one()
+        self._check_attestation_print_access()
+        return self.env.ref("portail_rh.action_report_hr_attestation").report_action(self)
+
     def write(self, vals):
         if "state" in vals and not self.env.context.get("attestation_workflow"):
             raise UserError(_("Utilisez les boutons du workflow pour modifier l'etat."))
@@ -139,3 +157,20 @@ class HrAttestationRequest(models.Model):
                         _("Modification interdite apres soumission. Contactez le service RH.")
                     )
         return super().write(vals)
+
+
+class ReportHrAttestationRequest(models.AbstractModel):
+    _name = "report.portail_rh.report_attestation_document"
+    _description = "Rapport attestation RH"
+
+    @api.model
+    def _get_report_values(self, docids, data=None):
+        docs = self.env["hr.attestation.request"].browse(docids).exists()
+        if len(docs) != len(docids):
+            raise AccessError(_("Une ou plusieurs attestations sont introuvables."))
+        docs._check_attestation_print_access()
+        return {
+            "doc_ids": docs.ids,
+            "doc_model": "hr.attestation.request",
+            "docs": docs,
+        }

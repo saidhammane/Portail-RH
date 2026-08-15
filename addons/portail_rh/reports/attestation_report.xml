@@ -1,0 +1,99 @@
+<odoo>
+  <record id="action_report_hr_attestation" model="ir.actions.report">
+    <field name="name">Attestation RH</field>
+    <field name="model">hr.attestation.request</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">portail_rh.report_attestation_document</field>
+    <field name="report_file">portail_rh.report_attestation_document</field>
+    <field name="binding_model_id" ref="model_hr_attestation_request"/>
+    <field name="binding_type">report</field>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('portail_rh.group_portail_rh_employee'), ref('portail_rh.group_portail_rh_hr')])]"
+    />
+    <field name="print_report_name">('Attestation_%s' % (object.name or '')).replace('/', '_')</field>
+  </record>
+
+  <template id="report_attestation_document">
+    <t t-call="web.html_container">
+      <t t-foreach="docs" t-as="o">
+        <t t-call="web.external_layout">
+          <t t-set="company_name" t-value="o.employee_id.company_id.name or res_company.name"/>
+          <t t-if="o.attestation_type == 'work'" t-set="attestation_title">Attestation de travail</t>
+          <t t-elif="o.attestation_type == 'salary'" t-set="attestation_title">Attestation de salaire</t>
+          <t t-elif="o.attestation_type == 'internship'" t-set="attestation_title">Attestation de stage</t>
+          <t t-else="" t-set="attestation_title">Attestation</t>
+
+          <div class="page">
+            <div class="text-end mb-4">
+              <strong>Référence :</strong>
+              <span t-field="o.name"/>
+            </div>
+
+            <h2 class="text-center mb-5">
+              <span t-out="attestation_title"/>
+            </h2>
+
+            <p>
+              Nous soussignés, <strong><span t-out="company_name"/></strong>,
+              <t t-if="o.attestation_type == 'work'">
+                attestons que <strong><span t-field="o.employee_id.name"/></strong>
+                fait partie des effectifs de notre société.
+              </t>
+              <t t-elif="o.attestation_type == 'salary'">
+                attestons que <strong><span t-field="o.employee_id.name"/></strong>
+                est salarié(e) au sein de notre société.
+              </t>
+              <t t-elif="o.attestation_type == 'internship'">
+                attestons que <strong><span t-field="o.employee_id.name"/></strong>
+                effectue ou a effectué un stage au sein de notre société.
+              </t>
+              <t t-else="">
+                attestons la situation professionnelle de
+                <strong><span t-field="o.employee_id.name"/></strong>
+                au sein de notre société.
+              </t>
+            </p>
+
+            <p>
+              La présente attestation est délivrée à la personne concernée
+              pour servir et valoir ce que de droit.
+            </p>
+
+            <table class="table table-sm mt-4">
+              <tbody>
+                <tr>
+                  <th>Employé</th>
+                  <td><span t-field="o.employee_id.name"/></td>
+                </tr>
+                <tr>
+                  <th>Département</th>
+                  <td><span t-out="o.department_id.name or 'Non renseigné'"/></td>
+                </tr>
+                <tr>
+                  <th>Type d'attestation</th>
+                  <td><span t-out="attestation_title"/></td>
+                </tr>
+                <tr>
+                  <th>Date de demande</th>
+                  <td><span t-field="o.request_date" t-options="{'widget': 'date'}"/></td>
+                </tr>
+                <tr t-if="o.reason">
+                  <th>Motif</th>
+                  <td><span t-field="o.reason"/></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="mt-5 text-end">
+              <p>
+                Fait le <span t-out="time.strftime('%d/%m/%Y')"/>
+              </p>
+              <p><strong><span t-out="company_name"/></strong></p>
+            </div>
+          </div>
+        </t>
+      </t>
+    </t>
+  </template>
+</odoo>

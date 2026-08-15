@@ -48,6 +48,12 @@
           <button name="action_reject" type="object" string="Refuser" invisible="state != 'submitted' or not can_approve"/>
           <button name="action_done" type="object" string="Terminer" class="btn-primary" invisible="state != 'approved' or not can_approve"/>
           <button name="action_set_draft" type="object" string="Remettre en brouillon" invisible="state not in ('submitted', 'rejected')"/>
+          <button
+            name="action_print_attestation"
+            type="object"
+            string="Imprimer l'attestation"
+            invisible="state not in ('approved', 'done')"
+          />
           <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected,done"/>
         </header>
         <sheet>
