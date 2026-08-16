@@ -5,7 +5,7 @@ from werkzeug.exceptions import NotFound
 from odoo import _, http
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 from odoo.exceptions import UserError, ValidationError
-from odoo.http import request
+from odoo.http import content_disposition, request
 
 
 class PortailRHPortal(CustomerPortal):
@@ -32,6 +32,17 @@ class PortailRHPortal(CustomerPortal):
             "new_template": "portail_rh.portal_new_supply_request",
             "page_prefix": "supply_request",
         },
+        "attestation": {
+            "model": "hr.attestation.request",
+            "url": "/my/attestation_requests",
+            "history": "my_attestation_requests_history",
+            "record_key": "attestation_request",
+            "records_key": "attestation_requests",
+            "list_template": "portail_rh.portal_my_attestation_requests",
+            "detail_template": "portail_rh.portal_attestation_request_detail",
+            "new_template": "portail_rh.portal_new_attestation_request",
+            "page_prefix": "attestation_request",
+        },
     }
 
     FORM_DEFAULTS = {
@@ -47,6 +58,10 @@ class PortailRHPortal(CustomerPortal):
             "description": "",
             "quantity": "1",
             "estimated_cost": "",
+            "reason": "",
+        },
+        "attestation": {
+            "attestation_type": "",
             "reason": "",
         },
     }
@@ -71,8 +86,11 @@ class PortailRHPortal(CustomerPortal):
             raise NotFound()
         return record
 
+    def _selection_values(self, model_name, field_name):
+        return request.env[model_name].fields_get([field_name])[field_name]["selection"]
+
     def _state_labels(self, model_name):
-        return dict(request.env[model_name].fields_get(["state"])["state"]["selection"])
+        return dict(self._selection_values(model_name, "state"))
 
     def _searchbar_filters(self):
         return OrderedDict(
@@ -104,11 +122,20 @@ class PortailRHPortal(CustomerPortal):
                     ("state", common["state"]),
                 ]
             )
+        if request_type == "supply":
+            return OrderedDict(
+                [
+                    ("date", {"label": _("Date de creation"), "order": "create_date desc, id desc"}),
+                    ("name", common["name"]),
+                    ("item", {"label": _("Article"), "order": "item_name asc, id desc"}),
+                    ("state", common["state"]),
+                ]
+            )
         return OrderedDict(
             [
-                ("date", {"label": _("Date de creation"), "order": "create_date desc, id desc"}),
+                ("date", {"label": _("Date de demande"), "order": "request_date desc, id desc"}),
                 ("name", common["name"]),
-                ("item", {"label": _("Article"), "order": "item_name asc, id desc"}),
+                ("type", {"label": _("Type"), "order": "attestation_type asc, id desc"}),
                 ("state", common["state"]),
             ]
         )
@@ -119,6 +146,8 @@ class PortailRHPortal(CustomerPortal):
             ("travel", "submitted"): _("Votre demande de deplacement a ete soumise."),
             ("supply", "created"): _("Votre demande de fournitures a ete creee en brouillon."),
             ("supply", "submitted"): _("Votre demande de fournitures a ete soumise."),
+            ("attestation", "created"): _("Votre demande d'attestation a ete creee en brouillon."),
+            ("attestation", "submitted"): _("Votre demande d'attestation a ete soumise."),
         }.get((request_type, code))
 
     def _prepare_home_portal_values(self, counters):
@@ -126,6 +155,7 @@ class PortailRHPortal(CustomerPortal):
         for request_type, counter in (
             ("travel", "travel_request_count"),
             ("supply", "supply_request_count"),
+            ("attestation", "attestation_request_count"),
         ):
             if counter not in counters:
                 continue
@@ -176,6 +206,10 @@ class PortailRHPortal(CustomerPortal):
             }
         )
         values[config["records_key"]] = records
+        if request_type == "attestation":
+            values["attestation_type_labels"] = dict(
+                self._selection_values(config["model"], "attestation_type")
+            )
         return values
 
     def _detail_values(self, request_type, record, message=None, error=None):
@@ -193,6 +227,10 @@ class PortailRHPortal(CustomerPortal):
                 "success_message": self._feedback_message(request_type, message),
             }
         )
+        if request_type == "attestation":
+            values["attestation_type_labels"] = dict(
+                self._selection_values(config["model"], "attestation_type")
+            )
         return self._get_page_view_values(
             record, None, values, config["history"], no_breadcrumbs=False
         )
@@ -212,6 +250,10 @@ class PortailRHPortal(CustomerPortal):
                 "request_type": request_type,
             }
         )
+        if request_type == "attestation":
+            values["attestation_types"] = self._selection_values(
+                self.REQUEST_CONFIG[request_type]["model"], "attestation_type"
+            )
         return values
 
     def _create_values(self, request_type, employee, values):
@@ -227,12 +269,19 @@ class PortailRHPortal(CustomerPortal):
                 "estimated_cost": float(values["estimated_cost"] or 0),
                 "state": "draft",
             }
+        if request_type == "supply":
+            return {
+                "employee_id": employee.id,
+                "item_name": values["item_name"].strip(),
+                "description": values["description"],
+                "quantity": float(values["quantity"] or 1),
+                "estimated_cost": float(values["estimated_cost"] or 0),
+                "reason": values["reason"],
+                "state": "draft",
+            }
         return {
             "employee_id": employee.id,
-            "item_name": values["item_name"].strip(),
-            "description": values["description"],
-            "quantity": float(values["quantity"] or 1),
-            "estimated_cost": float(values["estimated_cost"] or 0),
+            "attestation_type": values["attestation_type"],
             "reason": values["reason"],
             "state": "draft",
         }
@@ -337,3 +386,65 @@ class PortailRHPortal(CustomerPortal):
     )
     def portal_submit_supply_request(self, request_id, **post):
         return self._submit("supply", request_id)
+
+    @http.route(
+        ["/my/attestation_requests", "/my/attestation_requests/page/<int:page>"],
+        type="http",
+        auth="user",
+        website=True,
+    )
+    def portal_my_attestation_requests(self, page=1, sortby=None, filterby=None, **kw):
+        return self._render_list("attestation", page, sortby, filterby, kw.get("message"))
+
+    @http.route("/my/attestation_requests/new", type="http", auth="user", website=True)
+    def portal_new_attestation_request(self, **kw):
+        return self._render_new("attestation", kw, kw.get("error_message"))
+
+    @http.route(
+        "/my/attestation_requests/create",
+        type="http",
+        auth="user",
+        website=True,
+        methods=["POST"],
+    )
+    def portal_create_attestation_request(self, **post):
+        return self._create("attestation", post)
+
+    @http.route("/my/attestation_requests/<int:request_id>", type="http", auth="user", website=True)
+    def portal_attestation_request_detail(self, request_id, **kw):
+        return self._render_detail(
+            "attestation", request_id, kw.get("message"), kw.get("error_message")
+        )
+
+    @http.route(
+        "/my/attestation_requests/<int:request_id>/submit",
+        type="http",
+        auth="user",
+        website=True,
+        methods=["POST"],
+    )
+    def portal_submit_attestation_request(self, request_id, **post):
+        return self._submit("attestation", request_id)
+
+    @http.route(
+        "/my/attestation_requests/<int:request_id>/pdf",
+        type="http",
+        auth="user",
+        website=True,
+    )
+    def portal_attestation_request_pdf(self, request_id, **kw):
+        record = self._request_record("attestation", request_id)
+        if record.state not in ("approved", "done"):
+            raise NotFound()
+        pdf, _content_type = request.env.ref(
+            "portail_rh.action_report_hr_attestation"
+        )._render_qweb_pdf("portail_rh.report_attestation_document", res_ids=record.ids)
+        filename = "Attestation_%s.pdf" % record.name.replace("/", "_")
+        return request.make_response(
+            pdf,
+            headers=[
+                ("Content-Type", "application/pdf"),
+                ("Content-Length", len(pdf)),
+                ("Content-Disposition", content_disposition(filename)),
+            ],
+        )
