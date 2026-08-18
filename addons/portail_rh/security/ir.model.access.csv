@@ -10,3 +10,5 @@ access_hr_supply_request_manager,hr.supply.request.manager,model_hr_supply_reque
 access_hr_supply_request_hr,hr.supply.request.hr,model_hr_supply_request,portail_rh.group_portail_rh_hr,1,1,1,1
 access_hr_attestation_request_employee,hr.attestation.request.employee,model_hr_attestation_request,portail_rh.group_portail_rh_employee,1,1,1,0
 access_hr_attestation_request_hr,hr.attestation.request.hr,model_hr_attestation_request,portail_rh.group_portail_rh_hr,1,1,1,1
+access_hr_attendance_device_log_hr,hr.attendance.device.log.hr,model_hr_attendance_device_log,portail_rh.group_portail_rh_hr,1,0,0,0
+access_hr_attendance_device_log_system,hr.attendance.device.log.system,model_hr_attendance_device_log,base.group_system,1,1,1,1

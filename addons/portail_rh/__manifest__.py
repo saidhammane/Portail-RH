@@ -1,6 +1,6 @@
 {
     "name": "Portail RH",
-    "version": "17.0.1.5.0",
+    "version": "17.0.1.6.0",
     "depends": ["base", "mail", "hr", "portal", "website"],
     "data": [
         "security/security.xml",
@@ -12,6 +12,7 @@
         "views/supply_request_views.xml",
         "views/attestation_request_views.xml",
         "views/menu.xml",
+        "views/attendance_log_views.xml",
         "views/portal_templates.xml",
         "views/travel_dashboard_views.xml",
     ],

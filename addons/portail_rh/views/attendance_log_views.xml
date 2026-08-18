@@ -1,0 +1,91 @@
+<odoo>
+  <record id="view_hr_attendance_device_log_search" model="ir.ui.view">
+    <field name="name">hr.attendance.device.log.search</field>
+    <field name="model">hr.attendance.device.log</field>
+    <field name="arch" type="xml">
+      <search string="Rechercher dans les logs de pointage">
+        <field name="employee_id"/>
+        <field name="device_user_id"/>
+        <field name="punch_datetime"/>
+        <field name="state"/>
+        <field name="punch_type"/>
+        <separator/>
+        <filter name="group_by_employee" string="Employe" context="{'group_by': 'employee_id'}"/>
+        <filter name="group_by_state" string="Etat" context="{'group_by': 'state'}"/>
+        <filter name="group_by_device" string="Appareil" context="{'group_by': 'device_serial'}"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_hr_attendance_device_log_tree" model="ir.ui.view">
+    <field name="name">hr.attendance.device.log.tree</field>
+    <field name="model">hr.attendance.device.log</field>
+    <field name="arch" type="xml">
+      <tree string="Logs de pointage" default_order="punch_datetime desc">
+        <field name="punch_datetime"/>
+        <field name="device_user_id"/>
+        <field name="employee_id"/>
+        <field name="punch_type" widget="badge"/>
+        <field name="device_name"/>
+        <field name="state" widget="badge"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_hr_attendance_device_log_form" model="ir.ui.view">
+    <field name="name">hr.attendance.device.log.form</field>
+    <field name="model">hr.attendance.device.log</field>
+    <field name="arch" type="xml">
+      <form string="Log de pointage">
+        <sheet>
+          <group>
+            <group string="Pointage">
+              <field name="punch_datetime"/>
+              <field name="device_user_id"/>
+              <field name="employee_id"/>
+              <field name="punch_type"/>
+              <field name="state"/>
+            </group>
+            <group string="Appareil et source">
+              <field name="device_name"/>
+              <field name="device_serial"/>
+              <field name="external_uid"/>
+              <field name="company_id"/>
+            </group>
+          </group>
+          <group string="Traitement">
+            <field name="error_message" nolabel="1"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_hr_attendance_device_log" model="ir.actions.act_window">
+    <field name="name">Logs de pointage</field>
+    <field name="res_model">hr.attendance.device.log</field>
+    <field name="view_mode">tree,form</field>
+    <field name="search_view_id" ref="view_hr_attendance_device_log_search"/>
+    <field
+      name="groups_id"
+      eval="[(6, 0, [ref('portail_rh.group_portail_rh_hr'), ref('base.group_system')])]"
+    />
+  </record>
+
+  <menuitem
+    id="menu_portail_rh_attendance_root"
+    name="Presence"
+    parent="menu_portail_rh_root"
+    sequence="50"
+    groups="portail_rh.group_portail_rh_hr,base.group_system"
+  />
+
+  <menuitem
+    id="menu_hr_attendance_device_log"
+    name="Logs de pointage"
+    parent="menu_portail_rh_attendance_root"
+    action="action_hr_attendance_device_log"
+    sequence="10"
+    groups="portail_rh.group_portail_rh_hr,base.group_system"
+  />
+</odoo>
