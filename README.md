@@ -2,6 +2,8 @@
 
 Projet Odoo 17 Community avec un seul module custom : `addons/portail_rh`.
 
+Le depot contient aussi un simulateur ZKTeco autonome dans `services/zkteco_mock`. Il fournit une API locale et un mois de pointages realistes pour tester une future synchronisation avec Odoo.
+
 ## Apercu
 
 Ce projet fournit un mini portail RH avec :
@@ -153,6 +155,12 @@ Base PostgreSQL :
 - port : `5432`
 - user : `odoo`
 - password : `odoo`
+
+Simulateur ZKTeco :
+- API : `http://localhost:8090`
+- cle locale par defaut : `zkteco-demo-key`
+- donnees : juillet 2026, 9 employes, pointages entree/sortie
+- documentation : `services/zkteco_mock/README.md`
 
 ## Installer ou mettre a jour le module
 

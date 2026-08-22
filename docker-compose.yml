@@ -20,10 +20,24 @@ services:
       HOST: db
       USER: odoo
       PASSWORD: odoo
+      ZKTECO_API_URL: http://zkteco-mock:8090
+      ZKTECO_API_KEY: ${ZKTECO_API_KEY:-zkteco-demo-key}
     volumes:
       - odoo-web-data:/var/lib/odoo
       - ./addons:/mnt/extra-addons
 
+  zkteco-mock:
+    build:
+      context: ./services/zkteco_mock
+    ports:
+      - "8090:8090"
+    environment:
+      ZKTECO_API_KEY: ${ZKTECO_API_KEY:-zkteco-demo-key}
+      ZKTECO_SEED_MONTH: ${ZKTECO_SEED_MONTH:-2026-07}
+    volumes:
+      - zkteco-mock-data:/data
+
 volumes:
   odoo-web-data:
   odoo-db-data:
+  zkteco-mock-data:
