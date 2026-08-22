@@ -22,6 +22,7 @@ services:
       PASSWORD: odoo
       ZKTECO_API_URL: http://zkteco-mock:8090
       ZKTECO_API_KEY: ${ZKTECO_API_KEY:-zkteco-demo-key}
+      ZKTECO_TIMEZONE: ${ZKTECO_TIMEZONE:-Africa/Casablanca}
     volumes:
       - odoo-web-data:/var/lib/odoo
       - ./addons:/mnt/extra-addons

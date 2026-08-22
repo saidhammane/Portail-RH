@@ -1,12 +1,13 @@
 {
     "name": "Portail RH",
-    "version": "17.0.1.6.0",
-    "depends": ["base", "mail", "hr", "portal", "website"],
+    "version": "17.0.1.7.0",
+    "depends": ["base", "mail", "hr", "hr_attendance", "portal", "website"],
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
         "security/rules.xml",
         "data/sequence.xml",
+        "data/attendance_cron.xml",
         "reports/attestation_report.xml",
         "views/travel_request_views.xml",
         "views/supply_request_views.xml",

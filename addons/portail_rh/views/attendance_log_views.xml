@@ -1,4 +1,28 @@
 <odoo>
+  <record id="view_hr_employee_form_zkteco" model="ir.ui.view">
+    <field name="name">hr.employee.form.zkteco</field>
+    <field name="model">hr.employee</field>
+    <field name="inherit_id" ref="hr.view_employee_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='barcode']" position="after">
+        <field name="zkteco_user_id" placeholder="Ex. 1001"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_hr_employee_zkteco_tree" model="ir.ui.view">
+    <field name="name">hr.employee.zkteco.tree</field>
+    <field name="model">hr.employee</field>
+    <field name="arch" type="xml">
+      <tree string="Mapping des employes ZKTeco">
+        <field name="name"/>
+        <field name="work_email"/>
+        <field name="department_id"/>
+        <field name="zkteco_user_id"/>
+      </tree>
+    </field>
+  </record>
+
   <record id="view_hr_attendance_device_log_search" model="ir.ui.view">
     <field name="name">hr.attendance.device.log.search</field>
     <field name="model">hr.attendance.device.log</field>
@@ -9,10 +33,16 @@
         <field name="punch_datetime"/>
         <field name="state"/>
         <field name="punch_type"/>
+        <field name="attendance_id"/>
+        <separator/>
+        <filter name="filter_to_process" string="A traiter" domain="[('state', '=', 'mapped')]"/>
+        <filter name="filter_errors" string="Erreurs" domain="[('state', '=', 'error')]"/>
+        <filter name="filter_processed" string="Traites" domain="[('state', '=', 'processed')]"/>
         <separator/>
         <filter name="group_by_employee" string="Employe" context="{'group_by': 'employee_id'}"/>
         <filter name="group_by_state" string="Etat" context="{'group_by': 'state'}"/>
         <filter name="group_by_device" string="Appareil" context="{'group_by': 'device_serial'}"/>
+        <filter name="group_by_day" string="Jour" context="{'group_by': 'punch_datetime:day'}"/>
       </search>
     </field>
   </record>
@@ -21,13 +51,32 @@
     <field name="name">hr.attendance.device.log.tree</field>
     <field name="model">hr.attendance.device.log</field>
     <field name="arch" type="xml">
-      <tree string="Logs de pointage" default_order="punch_datetime desc">
+      <tree
+        string="Logs de pointage"
+        default_order="punch_datetime desc"
+        decoration-danger="state == 'error'"
+        decoration-success="state == 'processed'"
+      >
+        <header>
+          <button
+            name="action_sync_and_process"
+            type="object"
+            string="Synchroniser et traiter"
+            class="btn-primary"
+            display="always"
+          />
+          <button name="action_import_zkteco_mock" type="object" string="Importer" display="always"/>
+          <button name="action_map_employees" type="object" string="Mapper" display="always"/>
+          <button name="action_process_logs" type="object" string="Traiter" display="always"/>
+        </header>
         <field name="punch_datetime"/>
         <field name="device_user_id"/>
         <field name="employee_id"/>
         <field name="punch_type" widget="badge"/>
         <field name="device_name"/>
+        <field name="attendance_id" optional="show"/>
         <field name="state" widget="badge"/>
+        <field name="error_message" optional="hide"/>
       </tree>
     </field>
   </record>
@@ -37,6 +86,10 @@
     <field name="model">hr.attendance.device.log</field>
     <field name="arch" type="xml">
       <form string="Log de pointage">
+        <header>
+          <button name="action_sync_and_process" type="object" string="Synchroniser et traiter" class="btn-primary"/>
+          <field name="state" widget="statusbar" statusbar_visible="raw,mapped,processed,error"/>
+        </header>
         <sheet>
           <group>
             <group string="Pointage">
@@ -44,7 +97,7 @@
               <field name="device_user_id"/>
               <field name="employee_id"/>
               <field name="punch_type"/>
-              <field name="state"/>
+              <field name="attendance_id"/>
             </group>
             <group string="Appareil et source">
               <field name="device_name"/>
@@ -61,15 +114,117 @@
     </field>
   </record>
 
+  <record id="view_hr_attendance_tree_zkteco" model="ir.ui.view">
+    <field name="name">hr.attendance.tree.zkteco</field>
+    <field name="model">hr.attendance</field>
+    <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+    <field name="arch" type="xml">
+      <field name="worked_hours" position="after">
+        <field name="zkteco_late_minutes" optional="show"/>
+        <field name="zkteco_early_departure_minutes" optional="show"/>
+        <field name="zkteco_status" widget="badge" optional="show"/>
+        <field name="zkteco_managed" column_invisible="1"/>
+      </field>
+    </field>
+  </record>
+
+  <record id="view_hr_attendance_form_zkteco" model="ir.ui.view">
+    <field name="name">hr.attendance.form.zkteco</field>
+    <field name="model">hr.attendance</field>
+    <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+    <field name="arch" type="xml">
+      <field name="worked_hours" position="after">
+        <field name="zkteco_managed"/>
+        <field name="zkteco_status" invisible="not zkteco_managed"/>
+        <field name="zkteco_late_minutes" invisible="not zkteco_managed"/>
+        <field name="zkteco_early_departure_minutes" invisible="not zkteco_managed"/>
+      </field>
+    </field>
+  </record>
+
+  <record id="view_hr_attendance_zkteco_search" model="ir.ui.view">
+    <field name="name">hr.attendance.zkteco.search</field>
+    <field name="model">hr.attendance</field>
+    <field name="arch" type="xml">
+      <search string="Rechercher dans les presences ZKTeco">
+        <field name="employee_id"/>
+        <field name="department_id"/>
+        <field name="check_in"/>
+        <field name="zkteco_status"/>
+        <separator/>
+        <filter name="filter_late" string="Retards" domain="[('zkteco_late_minutes', '&gt;', 0)]"/>
+        <filter name="filter_early" string="Departs anticipes" domain="[('zkteco_early_departure_minutes', '&gt;', 0)]"/>
+        <filter name="filter_anomalies" string="Anomalies" domain="[('zkteco_status', '!=', 'on_time')]"/>
+        <separator/>
+        <filter name="group_employee" string="Employe" context="{'group_by': 'employee_id'}"/>
+        <filter name="group_department" string="Departement" context="{'group_by': 'department_id'}"/>
+        <filter name="group_status" string="Statut" context="{'group_by': 'zkteco_status'}"/>
+        <filter name="group_month" string="Mois" context="{'group_by': 'check_in:month'}"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_hr_attendance_zkteco_graph" model="ir.ui.view">
+    <field name="name">hr.attendance.zkteco.graph</field>
+    <field name="model">hr.attendance</field>
+    <field name="arch" type="xml">
+      <graph string="Indicateurs de presence" type="bar">
+        <field name="employee_id" type="row"/>
+        <field name="worked_hours" type="measure"/>
+        <field name="zkteco_late_minutes" type="measure"/>
+        <field name="zkteco_early_departure_minutes" type="measure"/>
+      </graph>
+    </field>
+  </record>
+
+  <record id="view_hr_attendance_zkteco_pivot" model="ir.ui.view">
+    <field name="name">hr.attendance.zkteco.pivot</field>
+    <field name="model">hr.attendance</field>
+    <field name="arch" type="xml">
+      <pivot string="Indicateurs de presence">
+        <field name="employee_id" type="row"/>
+        <field name="check_in" type="col" interval="month"/>
+        <field name="worked_hours" type="measure"/>
+        <field name="zkteco_late_minutes" type="measure"/>
+        <field name="zkteco_early_departure_minutes" type="measure"/>
+      </pivot>
+    </field>
+  </record>
+
   <record id="action_hr_attendance_device_log" model="ir.actions.act_window">
     <field name="name">Logs de pointage</field>
     <field name="res_model">hr.attendance.device.log</field>
     <field name="view_mode">tree,form</field>
     <field name="search_view_id" ref="view_hr_attendance_device_log_search"/>
-    <field
-      name="groups_id"
-      eval="[(6, 0, [ref('portail_rh.group_portail_rh_hr'), ref('base.group_system')])]"
-    />
+    <field name="groups_id" eval="[(6, 0, [ref('portail_rh.group_portail_rh_hr'), ref('base.group_system')])]"/>
+  </record>
+
+  <record id="action_hr_employee_zkteco_mapping" model="ir.actions.act_window">
+    <field name="name">Mapping des employes</field>
+    <field name="res_model">hr.employee</field>
+    <field name="view_mode">tree,form</field>
+    <field name="view_id" ref="view_hr_employee_zkteco_tree"/>
+    <field name="groups_id" eval="[(6, 0, [ref('portail_rh.group_portail_rh_hr'), ref('base.group_system')])]"/>
+  </record>
+
+  <record id="action_hr_attendance_zkteco" model="ir.actions.act_window">
+    <field name="name">Presences traitees</field>
+    <field name="res_model">hr.attendance</field>
+    <field name="view_mode">tree,form,graph,pivot</field>
+    <field name="domain">[('zkteco_managed', '=', True)]</field>
+    <field name="search_view_id" ref="view_hr_attendance_zkteco_search"/>
+    <field name="groups_id" eval="[(6, 0, [ref('portail_rh.group_portail_rh_hr'), ref('base.group_system')])]"/>
+  </record>
+
+  <record id="action_hr_attendance_zkteco_dashboard" model="ir.actions.act_window">
+    <field name="name">Indicateurs de presence</field>
+    <field name="res_model">hr.attendance</field>
+    <field name="view_mode">graph,pivot</field>
+    <field name="view_id" ref="view_hr_attendance_zkteco_graph"/>
+    <field name="domain">[('zkteco_managed', '=', True)]</field>
+    <field name="search_view_id" ref="view_hr_attendance_zkteco_search"/>
+    <field name="context">{'search_default_group_month': 1}</field>
+    <field name="groups_id" eval="[(6, 0, [ref('portail_rh.group_portail_rh_hr'), ref('base.group_system')])]"/>
   </record>
 
   <menuitem
@@ -79,13 +234,36 @@
     sequence="50"
     groups="portail_rh.group_portail_rh_hr,base.group_system"
   />
-
+  <menuitem
+    id="menu_hr_attendance_zkteco_dashboard"
+    name="Tableau de bord"
+    parent="menu_portail_rh_attendance_root"
+    action="action_hr_attendance_zkteco_dashboard"
+    sequence="5"
+    groups="portail_rh.group_portail_rh_hr,base.group_system"
+  />
+  <menuitem
+    id="menu_hr_attendance_zkteco"
+    name="Presences traitees"
+    parent="menu_portail_rh_attendance_root"
+    action="action_hr_attendance_zkteco"
+    sequence="10"
+    groups="portail_rh.group_portail_rh_hr,base.group_system"
+  />
   <menuitem
     id="menu_hr_attendance_device_log"
     name="Logs de pointage"
     parent="menu_portail_rh_attendance_root"
     action="action_hr_attendance_device_log"
-    sequence="10"
+    sequence="20"
+    groups="portail_rh.group_portail_rh_hr,base.group_system"
+  />
+  <menuitem
+    id="menu_hr_employee_zkteco_mapping"
+    name="Mapping des employes"
+    parent="menu_portail_rh_attendance_root"
+    action="action_hr_employee_zkteco_mapping"
+    sequence="30"
     groups="portail_rh.group_portail_rh_hr,base.group_system"
   />
 </odoo>

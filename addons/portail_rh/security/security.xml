@@ -22,7 +22,7 @@
     <field name="category_id" ref="portail_rh.module_category_portail_rh"/>
     <field
       name="implied_ids"
-      eval="[(4, ref('portail_rh.group_portail_rh_manager')), (4, ref('hr.group_hr_user'))]"
+      eval="[(4, ref('portail_rh.group_portail_rh_manager')), (4, ref('hr.group_hr_user')), (4, ref('hr_attendance.group_hr_attendance_manager'))]"
     />
   </record>
 </odoo>
