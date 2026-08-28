@@ -67,7 +67,10 @@ class HrTravelRequest(models.Model):
 
     def _is_rh_user(self):
         group = self.env.ref("portail_rh.group_portail_rh_hr", raise_if_not_found=False)
-        return bool(group and self.env.user.has_group("portail_rh.group_portail_rh_hr"))
+        return bool(
+            self.env.su
+            or (group and self.env.user.has_group("portail_rh.group_portail_rh_hr"))
+        )
 
     @api.depends("manager_id", "manager_id.user_id")
     @api.depends_context("uid")
@@ -149,7 +152,7 @@ class HrTravelRequest(models.Model):
         self.ensure_one()
         if self.state != "draft":
             raise UserError(_("Seules les demandes en brouillon peuvent être soumises."))
-        self.write({"state": "submitted"})
+        self.with_context(portail_rh_workflow=True).write({"state": "submitted"})
         self._create_manager_todo_activity()
 
     def action_approve(self):
@@ -158,7 +161,7 @@ class HrTravelRequest(models.Model):
             raise UserError(_("Vous n'êtes pas autorisé à valider cette demande."))
         if self.state != "submitted":
             raise UserError(_("Seules les demandes soumises peuvent être approuvées."))
-        self.write({"state": "approved"})
+        self.with_context(portail_rh_workflow=True).write({"state": "approved"})
         self._close_manager_todo_activity()
 
     def action_reject(self):
@@ -167,7 +170,7 @@ class HrTravelRequest(models.Model):
             raise UserError(_("Vous n'êtes pas autorisé à valider cette demande."))
         if self.state != "submitted":
             raise UserError(_("Seules les demandes soumises peuvent être refusées."))
-        self.write({"state": "rejected"})
+        self.with_context(portail_rh_workflow=True).write({"state": "rejected"})
         self._close_manager_todo_activity()
 
     def action_done(self):
@@ -176,7 +179,7 @@ class HrTravelRequest(models.Model):
             raise UserError(_("Vous n'êtes pas autorisé à valider cette demande."))
         if self.state != "approved":
             raise UserError(_("Seules les demandes approuvées peuvent être terminées."))
-        self.write({"state": "done"})
+        self.with_context(portail_rh_workflow=True).write({"state": "done"})
         self._close_manager_todo_activity()
 
     def action_set_draft(self):
@@ -194,9 +197,12 @@ class HrTravelRequest(models.Model):
         elif not (is_manager or is_rh_user):
             raise UserError(_("Vous n'êtes pas autorisé."))
 
-        self.write({"state": "draft"})
+        self.with_context(portail_rh_workflow=True).write({"state": "draft"})
 
     def write(self, vals):
+        if "state" in vals and not self.env.context.get("portail_rh_workflow"):
+            raise UserError(_("Utilisez les boutons du workflow pour modifier l'etat."))
+
         protected_fields = {
             "employee_id",
             "destination",
@@ -224,6 +230,8 @@ class HrTravelRequest(models.Model):
         default_employee_id = self._default_employee_id()
         default_date = fields.Date.context_today(self)
         for vals in vals_list:
+            if not self._is_rh_user():
+                vals["state"] = "draft"
             if not vals.get("employee_id") and default_employee_id:
                 vals["employee_id"] = default_employee_id
             vals.setdefault("date_from", default_date)

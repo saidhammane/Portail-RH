@@ -348,7 +348,7 @@ class HrAttendanceDeviceLog(models.Model):
         Attendance = self.env["hr.attendance"].sudo()
         logs = Log.search(
             [
-                ("state", "=", "mapped"),
+                ("state", "in", ("mapped", "error")),
                 ("employee_id", "!=", False),
                 ("attendance_id", "=", False),
             ],

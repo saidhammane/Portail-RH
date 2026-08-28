@@ -64,7 +64,10 @@ class HrSupplyRequest(models.Model):
 
     def _is_rh_user(self):
         group = self.env.ref("portail_rh.group_portail_rh_hr", raise_if_not_found=False)
-        return bool(group and self.env.user.has_group("portail_rh.group_portail_rh_hr"))
+        return bool(
+            self.env.su
+            or (group and self.env.user.has_group("portail_rh.group_portail_rh_hr"))
+        )
 
     @api.depends("manager_id", "manager_id.user_id")
     @api.depends_context("uid")
@@ -143,6 +146,8 @@ class HrSupplyRequest(models.Model):
         sequence_model = self.env["ir.sequence"]
         default_employee_id = self._default_employee_id()
         for vals in vals_list:
+            if not self._is_rh_user():
+                vals["state"] = "draft"
             if not vals.get("employee_id") and default_employee_id:
                 vals["employee_id"] = default_employee_id
             if not vals.get("name") or vals["name"] == _("Nouveau"):
@@ -153,7 +158,7 @@ class HrSupplyRequest(models.Model):
         self.ensure_one()
         if self.state != "draft":
             raise UserError(_("Seules les demandes en brouillon peuvent etre soumises."))
-        self.write({"state": "submitted"})
+        self.with_context(portail_rh_workflow=True).write({"state": "submitted"})
         self._create_manager_todo_activity()
 
     def action_approve(self):
@@ -162,7 +167,7 @@ class HrSupplyRequest(models.Model):
             raise UserError(_("Vous n'etes pas autorise a approuver cette demande."))
         if self.state != "submitted":
             raise UserError(_("Seules les demandes soumises peuvent etre approuvees."))
-        self.write({"state": "approved"})
+        self.with_context(portail_rh_workflow=True).write({"state": "approved"})
         self._close_manager_todo_activity()
 
     def action_reject(self):
@@ -171,14 +176,14 @@ class HrSupplyRequest(models.Model):
             raise UserError(_("Vous n'etes pas autorise a refuser cette demande."))
         if self.state != "submitted":
             raise UserError(_("Seules les demandes soumises peuvent etre refusees."))
-        self.write({"state": "rejected"})
+        self.with_context(portail_rh_workflow=True).write({"state": "rejected"})
         self._close_manager_todo_activity()
 
     def action_set_draft(self):
         self.ensure_one()
         if self.state not in ("submitted", "rejected"):
             raise UserError(_("Seules les demandes soumises ou refusees peuvent revenir en brouillon."))
-        self.write({"state": "draft"})
+        self.with_context(portail_rh_workflow=True).write({"state": "draft"})
 
     def action_done(self):
         self.ensure_one()
@@ -186,9 +191,12 @@ class HrSupplyRequest(models.Model):
             raise UserError(_("Vous n'etes pas autorise a terminer cette demande."))
         if self.state != "approved":
             raise UserError(_("Seules les demandes approuvees peuvent etre terminees."))
-        self.write({"state": "done"})
+        self.with_context(portail_rh_workflow=True).write({"state": "done"})
 
     def write(self, vals):
+        if "state" in vals and not self.env.context.get("portail_rh_workflow"):
+            raise UserError(_("Utilisez les boutons du workflow pour modifier l'etat."))
+
         protected_fields = {
             "name",
             "employee_id",
@@ -212,4 +220,3 @@ class HrSupplyRequest(models.Model):
                     )
 
         return super().write(vals)
-

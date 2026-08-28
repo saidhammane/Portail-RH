@@ -68,7 +68,7 @@ class HrAttestationRequest(models.Model):
     can_approve = fields.Boolean(compute="_compute_can_approve")
 
     def _is_rh_user(self):
-        return self.env.user.has_group("portail_rh.group_portail_rh_hr")
+        return self.env.su or self.env.user.has_group("portail_rh.group_portail_rh_hr")
 
     @api.depends_context("uid")
     def _compute_can_approve(self):

@@ -1,25 +1,53 @@
 # Portail RH - Odoo 17
 
-Projet Odoo 17 Community avec un seul module custom : `addons/portail_rh`.
+Application RH pour Odoo 17 Community, livree avec Docker Compose et un simulateur ZKTeco local.
 
-Le depot contient aussi un simulateur ZKTeco autonome dans `services/zkteco_mock`. Il fournit une API locale et un mois de pointages realistes pour tester une future synchronisation avec Odoo.
+## Fonctionnalites
 
-## Apercu
+### Demandes RH
 
-Ce projet fournit un mini portail RH avec :
-- demandes de deplacement
-- demandes de fournitures
-- workflow employe / manager / RH
-- tableau de bord des deplacements
-- portail web employe pour consulter, creer et soumettre ses demandes
+- Deplacements : creation, soumission, validation manager/RH, refus et cloture.
+- Fournitures : creation, soumission, validation manager/RH, refus et cloture.
+- Attestations : demande employe, validation RH et generation PDF securisee.
+- Activites Odoo automatiques pour les validations manager.
+- Champs sensibles verrouilles apres soumission.
+- Etats modifiables uniquement par les actions du workflow.
 
-## Stack technique
+### Portail employe
 
-- Odoo 17 Community
-- PostgreSQL 15
-- Docker Compose
+- Tableau de bord et compteurs personnels.
+- Listes, filtres, tri et pagination.
+- Creation et soumission depuis le portail.
+- Detail de chaque demande.
+- Telechargement d'une attestation approuvee au format PDF.
+- Isolation stricte : un employe ne voit que ses propres demandes.
 
-## Structure du projet
+Routes principales :
+
+- `/my/travel_requests`
+- `/my/supply_requests`
+- `/my/attestation_requests`
+
+### Pointage ZKTeco
+
+- Simulateur autonome avec une API protegee par cle.
+- 9 employes et 383 pointages realistes pour juillet 2026.
+- Import pagine et idempotent des pointages dans Odoo.
+- Association automatique par identifiant ZKTeco ou adresse email.
+- Conversion des paires entree/sortie en presences Odoo.
+- Recuperation automatique lorsqu'une sortie arrive apres une entree deja signalee en erreur.
+- Detection des retards et departs anticipes selon le calendrier de travail.
+- Synchronisation manuelle ou planifiee par cron.
+
+### Reporting et securite
+
+- Tableau de bord pivot/graphique des deplacements.
+- Profils Employe, Manager et RH.
+- ACL et record rules pour chaque modele.
+- Acces aux attestations PDF verifie cote serveur.
+- Identifiants externes ZKTeco uniques par appareil.
+
+## Architecture
 
 ```text
 odoo-dev/
@@ -30,225 +58,90 @@ odoo-dev/
 |       |-- demo/
 |       |-- migrations/
 |       |-- models/
+|       |-- reports/
 |       |-- security/
 |       |-- static/
+|       |-- tests/
 |       `-- views/
+|-- services/
+|   `-- zkteco_mock/
 `-- docker-compose.yml
 ```
 
-## Module custom
+Stack : Odoo 17 Community, PostgreSQL 15, Python 3.12 pour le simulateur et Docker Compose.
 
-Nom du module :
-- `Portail RH`
+Version du module : `17.0.1.8.0`.
 
-Chemin :
-- `addons/portail_rh`
-
-Version actuelle :
-- `17.0.1.2.0`
-
-Dependances :
-- `base`
-- `mail`
-- `hr`
-- `portal`
-- `website`
-
-## Fonctionnalites principales
-
-### 1. Demandes de deplacement
-
-Modele :
-- `hr.travel.request`
-
-Fonctionnalites :
-- creation d'une demande
-- etats : `draft`, `submitted`, `approved`, `rejected`, `done`
-- validation par manager ou RH
-- protection des modifications apres soumission
-- activite manager lors de la soumission
-
-Champs principaux :
-- employe
-- departement
-- manager
-- destination
-- date debut
-- date fin
-- duree
-- cout estime
-- motif
-- etat
-
-### 2. Demandes de fournitures
-
-Modele :
-- `hr.supply.request`
-
-Fonctionnalites :
-- creation d'une demande
-- etats : `draft`, `submitted`, `approved`, `rejected`, `done`
-- validation par manager ou RH
-- activite manager lors de la soumission
-
-Champs principaux :
-- employe
-- departement
-- manager
-- article
-- description
-- quantite
-- cout estime
-- motif
-- etat
-
-### 3. Tableau de bord
-
-Modele report :
-- `hr.travel.request.report`
-
-Fonctionnalites :
-- vue pivot
-- vue graph
-- filtres par periode
-- filtres par etat
-- indicateurs de cout et volume
-
-### 4. Portail web employe
-
-Routes principales :
-- `/my/home`
-- `/my/travel_requests`
-- `/my/travel_requests/new`
-- `/my/supply_requests`
-- `/my/supply_requests/new`
-
-Regle de securite :
-- un employe ne voit que ses propres demandes
-- filtrage base sur `employee_id.user_id = user.id`
-
-## Securite
-
-Groupes utilises :
-- `portail_rh.group_portail_rh_employee`
-- `portail_rh.group_portail_rh_manager`
-- `portail_rh.group_portail_rh_hr`
-
-Les ACL et record rules couvrent :
-- demandes de deplacement
-- demandes de fournitures
-- tableau de bord deplacement
-
-## Lancer le projet
-
-Depuis la racine du projet :
+## Demarrage
 
 ```powershell
 docker compose up -d
 ```
 
-Acces Odoo :
-- `http://localhost:8069`
+Services :
 
-Base PostgreSQL :
-- host : `localhost`
-- port : `5432`
-- user : `odoo`
-- password : `odoo`
+- Odoo : `http://localhost:8069`
+- PostgreSQL : `localhost:5432`
+- Simulateur ZKTeco : `http://localhost:8090/demo`
 
-Simulateur ZKTeco :
-- API : `http://localhost:8090`
-- cle locale par defaut : `zkteco-demo-key`
-- donnees : juillet 2026, 9 employes, pointages entree/sortie
-- documentation : `services/zkteco_mock/README.md`
+Configuration ZKTeco par defaut :
 
-## Installer ou mettre a jour le module
+- URL interne : `http://zkteco-mock:8090`
+- Cle : `zkteco-demo-key`
+- Fuseau horaire : `Africa/Casablanca`
 
-Depuis l'interface Odoo :
-1. Ouvrir `Apps`
-2. Rechercher `Portail RH`
-3. Cliquer sur `Installer` ou `Mettre a niveau`
+Ces valeurs peuvent etre surchargees avec `ZKTECO_API_KEY`, `ZKTECO_SEED_MONTH` et `ZKTECO_TIMEZONE`.
+
+## Installation ou mise a jour
+
+Depuis l'interface Odoo, installer ou mettre a niveau l'application `Portail RH`.
 
 Depuis Docker :
 
 ```powershell
-docker compose exec -T odoo odoo -d odoo_dev -u portail_rh --db_host db --db_user odoo --db_password odoo --stop-after-init
+docker compose exec -T odoo odoo -d odoo_dev -u portail_rh --db_host db --db_user odoo --db_password odoo --stop-after-init --no-http
 ```
 
-## Donnees de demo
+## Donnees de demonstration
 
-Les donnees de demo sont dans :
-- `addons/portail_rh/demo/hr_demo_data.xml`
+Le fichier `addons/portail_rh/demo/hr_demo_data.xml` fournit :
 
-Elles sont chargees uniquement si la base est creee avec les donnees de demo activees.
+- 3 departements et leurs managers ;
+- 6 employes et leurs utilisateurs ;
+- 3 demandes de deplacement ;
+- 3 demandes de fournitures ;
+- 3 demandes d'attestation.
 
-Contenu demo :
-- 3 departements
-- managers
-- employes
-- utilisateurs de test
-- demandes de deplacement
-- demandes de fournitures
+Mot de passe des utilisateurs de demonstration : `Test@1234`.
 
-Mot de passe demo :
+Le simulateur ZKTeco utilise les memes adresses email et associe les employes lors du premier import.
 
-```text
-Test@1234
+## Tests
+
+### Tests du module Odoo
+
+Le module contient des tests de workflow, securite, pointage, portail HTTP et rapport PDF.
+
+```powershell
+docker compose run --rm odoo odoo -d portail_rh_test -i portail_rh --without-demo=all --test-enable --test-tags /portail_rh --db_host db --db_user odoo --db_password odoo --stop-after-init --log-level=test
 ```
 
-## Fichiers importants
+Pour relancer les tests sur une base deja initialisee, remplacer `-i` par `-u`.
 
-Modeles :
-- `addons/portail_rh/models/travel_request.py`
-- `addons/portail_rh/models/supply_request.py`
-- `addons/portail_rh/models/travel_dashboard.py`
+### Tests du simulateur ZKTeco
 
-Controleurs :
-- `addons/portail_rh/controllers/portal.py`
+```powershell
+docker run --rm -v "${PWD}/services/zkteco_mock:/app" -w /app python:3.12-slim python -m unittest discover -s tests -v
+```
 
-Securite :
-- `addons/portail_rh/security/security.xml`
-- `addons/portail_rh/security/ir.model.access.csv`
-- `addons/portail_rh/security/rules.xml`
+## Verification de livraison
 
-Vues :
-- `addons/portail_rh/views/menu.xml`
-- `addons/portail_rh/views/travel_request_views.xml`
-- `addons/portail_rh/views/supply_request_views.xml`
-- `addons/portail_rh/views/travel_dashboard_views.xml`
-- `addons/portail_rh/views/portal_templates.xml`
+Avant une livraison :
 
-## Verifications conseillees
+1. Verifier que `docker compose ps` affiche les trois services actifs.
+2. Mettre a niveau `portail_rh` sur la base cible.
+3. Executer les tests Odoo et ZKTeco.
+4. Tester une synchronisation ZKTeco sur une base de recette.
+5. Verifier le telechargement d'une attestation approuvee.
 
-Back-office :
-- l'app `Portail RH` apparait dans le lanceur
-- le menu `Deplacements` fonctionne
-- le menu `Fournitures` fonctionne
-- les droits changent selon le role
-
-Portail :
-- `/my/home`
-- `/my/travel_requests`
-- `/my/travel_requests/new`
-- `/my/supply_requests`
-- `/my/supply_requests/new`
-
-Donnees :
-- un employe ne voit que ses propres demandes
-- un manager traite les demandes de son equipe
-- RH voit tout
-
-## Resume
-
-Ce depot est volontairement simple :
-- un seul module custom
-- backend + portail web
-- workflows RH de base
-- Docker pour le lancement local
-
-Prochaines extensions possibles :
-- pieces jointes
-- notifications email
-- impression PDF
-- workflow multi-niveaux
-- dashboards plus riches
+La base `odoo_dev` est une base de developpement. Utiliser une sauvegarde PostgreSQL avant toute mise a niveau d'une base de production.

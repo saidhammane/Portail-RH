@@ -272,5 +272,29 @@
       <field name="reason">Remplacement materiel use</field>
       <field name="state">rejected</field>
     </record>
+
+    <record id="demo_attestation_request_1" model="hr.attestation.request">
+      <field name="employee_id" ref="portail_rh.emp_rh_1"/>
+      <field name="attestation_type">work</field>
+      <field name="reason">Dossier bancaire</field>
+      <field name="request_date">2026-04-08</field>
+      <field name="state">submitted</field>
+    </record>
+
+    <record id="demo_attestation_request_2" model="hr.attestation.request">
+      <field name="employee_id" ref="portail_rh.emp_it_1"/>
+      <field name="attestation_type">salary</field>
+      <field name="reason">Demande administrative</field>
+      <field name="request_date">2026-04-12</field>
+      <field name="state">approved</field>
+    </record>
+
+    <record id="demo_attestation_request_3" model="hr.attestation.request">
+      <field name="employee_id" ref="portail_rh.emp_fin_1"/>
+      <field name="attestation_type">other</field>
+      <field name="reason">Justificatif professionnel</field>
+      <field name="request_date">2026-04-18</field>
+      <field name="state">done</field>
+    </record>
   </data>
 </odoo>
