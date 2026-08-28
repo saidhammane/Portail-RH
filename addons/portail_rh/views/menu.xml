@@ -141,4 +141,39 @@
     sequence="20"
     groups="portail_rh.group_portail_rh_hr"
   />
+
+  <menuitem
+    id="menu_portail_rh_onboarding_root"
+    name="Integration"
+    parent="menu_portail_rh_root"
+    sequence="50"
+    groups="portail_rh.group_portail_rh_manager,portail_rh.group_portail_rh_hr"
+  />
+
+  <menuitem
+    id="menu_hr_onboarding_document"
+    name="Documents"
+    parent="menu_portail_rh_onboarding_root"
+    action="action_hr_onboarding_document"
+    sequence="10"
+    groups="portail_rh.group_portail_rh_hr"
+  />
+
+  <menuitem
+    id="menu_hr_onboarding_plan"
+    name="Plans"
+    parent="menu_portail_rh_onboarding_root"
+    action="action_hr_onboarding_plan"
+    sequence="20"
+    groups="portail_rh.group_portail_rh_hr"
+  />
+
+  <menuitem
+    id="menu_hr_onboarding_employee_task"
+    name="Checklists"
+    parent="menu_portail_rh_onboarding_root"
+    action="action_hr_onboarding_employee_task"
+    sequence="30"
+    groups="portail_rh.group_portail_rh_manager,portail_rh.group_portail_rh_hr"
+  />
 </odoo>

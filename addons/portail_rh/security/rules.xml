@@ -75,4 +75,78 @@
     <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_hr'))]"/>
     <field name="domain_force">[(1, '=', 1)]</field>
   </record>
+
+  <record id="rule_hr_onboarding_document_hr_company" model="ir.rule">
+    <field name="name">hr.onboarding.document - RH: societes autorisees</field>
+    <field name="model_id" ref="model_hr_onboarding_document"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_hr'))]"/>
+    <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+  </record>
+
+  <record id="rule_hr_onboarding_conversation_own" model="ir.rule">
+    <field name="name">hr.onboarding.conversation - utilisateur: les siennes</field>
+    <field name="model_id" ref="model_hr_onboarding_conversation"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_employee'))]"/>
+    <field name="domain_force">[('user_id', '=', user.id), ('employee_id.user_id', '=', user.id)]</field>
+  </record>
+
+  <record id="rule_hr_onboarding_message_own" model="ir.rule">
+    <field name="name">hr.onboarding.message - utilisateur: ses conversations</field>
+    <field name="model_id" ref="model_hr_onboarding_message"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_employee'))]"/>
+    <field name="domain_force">[('conversation_id.user_id', '=', user.id), ('conversation_id.employee_id.user_id', '=', user.id)]</field>
+  </record>
+
+  <record id="rule_hr_onboarding_plan_employee_scope" model="ir.rule">
+    <field name="name">hr.onboarding.plan - employe: plans applicables</field>
+    <field name="model_id" ref="model_hr_onboarding_plan"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_employee'))]"/>
+    <field name="domain_force">['&amp;', ('active', '=', True), '&amp;', '|', ('department_id', '=', False), ('department_id.member_ids.user_id', '=', user.id), '|', ('job_id', '=', False), ('job_id.employee_ids.user_id', '=', user.id)]</field>
+  </record>
+
+  <record id="rule_hr_onboarding_plan_hr_all" model="ir.rule">
+    <field name="name">hr.onboarding.plan - RH: tous</field>
+    <field name="model_id" ref="model_hr_onboarding_plan"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_hr'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+  </record>
+
+  <record id="rule_hr_onboarding_plan_line_employee_scope" model="ir.rule">
+    <field name="name">hr.onboarding.plan.line - employe: plans applicables</field>
+    <field name="model_id" ref="model_hr_onboarding_plan_line"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_employee'))]"/>
+    <field name="domain_force">['&amp;', ('plan_id.active', '=', True), '&amp;', '|', ('plan_id.department_id', '=', False), ('plan_id.department_id.member_ids.user_id', '=', user.id), '|', ('plan_id.job_id', '=', False), ('plan_id.job_id.employee_ids.user_id', '=', user.id)]</field>
+  </record>
+
+  <record id="rule_hr_onboarding_plan_line_hr_all" model="ir.rule">
+    <field name="name">hr.onboarding.plan.line - RH: toutes</field>
+    <field name="model_id" ref="model_hr_onboarding_plan_line"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_hr'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+  </record>
+
+  <record id="rule_hr_onboarding_employee_task_own" model="ir.rule">
+    <field name="name">hr.onboarding.employee.task - employe: ses taches</field>
+    <field name="model_id" ref="model_hr_onboarding_employee_task"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_employee'))]"/>
+    <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+  </record>
+
+  <record id="rule_hr_onboarding_employee_task_manager_team" model="ir.rule">
+    <field name="name">hr.onboarding.employee.task - manager: son equipe</field>
+    <field name="model_id" ref="model_hr_onboarding_employee_task"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_manager'))]"/>
+    <field name="domain_force">[('employee_id.parent_id.user_id', '=', user.id)]</field>
+    <field name="perm_read" eval="True"/>
+    <field name="perm_write" eval="False"/>
+    <field name="perm_create" eval="False"/>
+    <field name="perm_unlink" eval="False"/>
+  </record>
+
+  <record id="rule_hr_onboarding_employee_task_hr_all" model="ir.rule">
+    <field name="name">hr.onboarding.employee.task - RH: toutes</field>
+    <field name="model_id" ref="model_hr_onboarding_employee_task"/>
+    <field name="groups" eval="[(4, ref('portail_rh.group_portail_rh_hr'))]"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+  </record>
 </odoo>

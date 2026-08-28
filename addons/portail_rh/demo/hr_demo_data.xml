@@ -16,7 +16,6 @@
       <field name="name">عائشة الهادي</field>
       <field name="login">aicha.elhadi@local.test</field>
       <field name="email">aicha.elhadi@local.test</field>
-      <field name="password">Test@1234</field>
       <field name="company_id" ref="base.main_company"/>
       <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
       <field
@@ -29,7 +28,6 @@
       <field name="name">أمين الوزاني</field>
       <field name="login">amine.ouazzani@local.test</field>
       <field name="email">amine.ouazzani@local.test</field>
-      <field name="password">Test@1234</field>
       <field name="company_id" ref="base.main_company"/>
       <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
       <field
@@ -42,7 +40,6 @@
       <field name="name">يوسف بنعلي</field>
       <field name="login">youssef.benali@local.test</field>
       <field name="email">youssef.benali@local.test</field>
-      <field name="password">Test@1234</field>
       <field name="company_id" ref="base.main_company"/>
       <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
       <field
@@ -88,7 +85,6 @@
       <field name="name">مريم الزهراوي</field>
       <field name="login">mariam.zahraoui@local.test</field>
       <field name="email">mariam.zahraoui@local.test</field>
-      <field name="password">Test@1234</field>
       <field name="company_id" ref="base.main_company"/>
       <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
       <field
@@ -101,7 +97,6 @@
       <field name="name">خالد الراشدي</field>
       <field name="login">khalid.rachidi@local.test</field>
       <field name="email">khalid.rachidi@local.test</field>
-      <field name="password">Test@1234</field>
       <field name="company_id" ref="base.main_company"/>
       <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
       <field
@@ -114,7 +109,6 @@
       <field name="name">سارة الكتاني</field>
       <field name="login">sara.kettani@local.test</field>
       <field name="email">sara.kettani@local.test</field>
-      <field name="password">Test@1234</field>
       <field name="company_id" ref="base.main_company"/>
       <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
       <field
@@ -127,7 +121,6 @@
       <field name="name">ياسين الفاسي</field>
       <field name="login">yassine.fassi@local.test</field>
       <field name="email">yassine.fassi@local.test</field>
-      <field name="password">Test@1234</field>
       <field name="company_id" ref="base.main_company"/>
       <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
       <field
@@ -140,7 +133,6 @@
       <field name="name">سمية الإدريسي</field>
       <field name="login">soumya.idrissi@local.test</field>
       <field name="email">soumya.idrissi@local.test</field>
-      <field name="password">Test@1234</field>
       <field name="company_id" ref="base.main_company"/>
       <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
       <field
@@ -153,7 +145,6 @@
       <field name="name">رضا السوسي</field>
       <field name="login">reda.soussi@local.test</field>
       <field name="email">reda.soussi@local.test</field>
-      <field name="password">Test@1234</field>
       <field name="company_id" ref="base.main_company"/>
       <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
       <field

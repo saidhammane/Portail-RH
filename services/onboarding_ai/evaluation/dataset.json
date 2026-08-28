@@ -1,0 +1,76 @@
+{
+  "documents": [
+    {
+      "document_id": 1,
+      "title": "Guide collaborateur",
+      "company_id": 1,
+      "department_id": null,
+      "visibility": "employee",
+      "text": "Les horaires de travail sont de 09:00 a 18:00. Le badge d'acces est obligatoire a l'entree. Les conges sont demandes depuis le portail RH. Les fournitures sont commandees avec une demande de fournitures. Les attestations de travail sont telechargeables apres validation RH. Les deplacements professionnels sont soumis au manager. Le point de rassemblement securite est devant le batiment principal. Le livret d'accueil est remis pendant la premiere journee."
+    },
+    {
+      "document_id": 2,
+      "title": "Guide informatique",
+      "company_id": 1,
+      "department_id": 10,
+      "visibility": "department",
+      "text": "Le VPN informatique utilise le client WireGuard. Le support informatique est contacte avec un ticket helpdesk. L'ordinateur portable est remis le premier jour. La double authentification MFA est obligatoire. Le mot de passe professionnel doit etre renouvele tous les quatre-vingt-dix jours. La messagerie interne est accessible apres activation du compte."
+    },
+    {
+      "document_id": 3,
+      "title": "Guide manager informatique",
+      "company_id": 1,
+      "department_id": 10,
+      "visibility": "manager",
+      "text": "Le manager valide les objectifs de la periode d'essai. Un entretien d'integration est organise apres trente jours. Le manager controle la checklist de son equipe. Les demandes de fournitures de l'equipe sont approuvees par le manager."
+    },
+    {
+      "document_id": 4,
+      "title": "Procedure RH confidentielle",
+      "company_id": 1,
+      "department_id": null,
+      "visibility": "hr",
+      "text": "Le service RH controle la paie avant le virement du vingt-huit. Les dossiers disciplinaires sont accessibles uniquement aux responsables RH. La correction d'un bulletin de salaire est traitee par la paie."
+    },
+    {
+      "document_id": 5,
+      "title": "Guide autre societe",
+      "company_id": 2,
+      "department_id": null,
+      "visibility": "employee",
+      "text": "La cantine de la seconde societe ouvre a midi. Le parking visiteurs se trouve au sous-sol."
+    }
+  ],
+  "questions": [
+    {"id": 1, "question": "Quels sont les horaires de travail ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": 1},
+    {"id": 2, "question": "Le badge d'acces est-il obligatoire ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": 1},
+    {"id": 3, "question": "Ou demander mes conges ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": 1},
+    {"id": 4, "question": "Comment commander des fournitures ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": 1},
+    {"id": 5, "question": "Quand puis-je telecharger une attestation de travail ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": 1},
+    {"id": 6, "question": "A qui soumettre un deplacement professionnel ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": 1},
+    {"id": 7, "question": "Ou est le point de rassemblement securite ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": 1},
+    {"id": 8, "question": "Quand recoit-on le livret d'accueil ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": 1},
+    {"id": 9, "question": "Quelle est l'heure de debut des horaires ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": 1},
+    {"id": 10, "question": "Qui valide les attestations de travail ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": 1},
+    {"id": 11, "question": "Quel client utilise le VPN informatique ?", "company_id": 1, "department_id": 10, "scopes": ["employee"], "expected_document_id": 2},
+    {"id": 12, "question": "Comment contacter le support informatique ?", "company_id": 1, "department_id": 10, "scopes": ["employee"], "expected_document_id": 2},
+    {"id": 13, "question": "Quand est remis l'ordinateur portable ?", "company_id": 1, "department_id": 10, "scopes": ["employee"], "expected_document_id": 2},
+    {"id": 14, "question": "La double authentification MFA est-elle obligatoire ?", "company_id": 1, "department_id": 10, "scopes": ["employee"], "expected_document_id": 2},
+    {"id": 15, "question": "Quand renouveler le mot de passe professionnel ?", "company_id": 1, "department_id": 10, "scopes": ["employee"], "expected_document_id": 2},
+    {"id": 16, "question": "Quand la messagerie interne devient-elle accessible ?", "company_id": 1, "department_id": 10, "scopes": ["employee"], "expected_document_id": 2},
+    {"id": 17, "question": "Qui valide les objectifs de la periode d'essai ?", "company_id": 1, "department_id": 10, "scopes": ["employee", "manager"], "expected_document_id": 3},
+    {"id": 18, "question": "Quand organiser l'entretien d'integration ?", "company_id": 1, "department_id": 10, "scopes": ["employee", "manager"], "expected_document_id": 3},
+    {"id": 19, "question": "Qui controle la checklist de l'equipe ?", "company_id": 1, "department_id": 10, "scopes": ["employee", "manager"], "expected_document_id": 3},
+    {"id": 20, "question": "Qui approuve les fournitures de l'equipe ?", "company_id": 1, "department_id": 10, "scopes": ["employee", "manager"], "expected_document_id": 3},
+    {"id": 21, "question": "Quand le service RH controle-t-il la paie ?", "company_id": 1, "department_id": 20, "scopes": ["employee", "manager", "hr"], "expected_document_id": 4},
+    {"id": 22, "question": "Qui peut consulter les dossiers disciplinaires ?", "company_id": 1, "department_id": 20, "scopes": ["employee", "manager", "hr"], "expected_document_id": 4},
+    {"id": 23, "question": "Qui traite la correction d'un bulletin de salaire ?", "company_id": 1, "department_id": 20, "scopes": ["employee", "manager", "hr"], "expected_document_id": 4},
+    {"id": 24, "question": "Quel est le budget d'une navette vers Mars ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": null},
+    {"id": 25, "question": "Puis-je consulter les dossiers disciplinaires ?", "company_id": 1, "department_id": 20, "scopes": ["employee"], "expected_document_id": null},
+    {"id": 26, "question": "Quel client utilise le VPN informatique ?", "company_id": 1, "department_id": 99, "scopes": ["employee"], "expected_document_id": null},
+    {"id": 27, "question": "Quels sont les horaires de travail ?", "company_id": 2, "department_id": 20, "scopes": ["employee"], "expected_document_id": null},
+    {"id": 28, "question": "Qui controle la checklist de l'equipe informatique ?", "company_id": 1, "department_id": 20, "scopes": ["employee", "manager"], "expected_document_id": null},
+    {"id": 29, "question": "Quelle couleur choisir pour une fusee ?", "company_id": 1, "department_id": 10, "scopes": ["employee"], "expected_document_id": null},
+    {"id": 30, "question": "Quel restaurant est ouvert dimanche soir ?", "company_id": 1, "department_id": 10, "scopes": ["employee"], "expected_document_id": null}
+  ]
+}

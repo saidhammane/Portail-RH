@@ -1,6 +1,6 @@
 {
     "name": "Portail RH",
-    "version": "17.0.1.8.0",
+    "version": "17.0.2.0.0",
     "depends": ["base", "mail", "hr", "hr_attendance", "portal", "website"],
     "data": [
         "security/security.xml",
@@ -12,6 +12,7 @@
         "views/travel_request_views.xml",
         "views/supply_request_views.xml",
         "views/attestation_request_views.xml",
+        "views/onboarding_views.xml",
         "views/menu.xml",
         "views/attendance_log_views.xml",
         "views/portal_templates.xml",
@@ -26,6 +27,7 @@
         ],
     },
     "application": True,
+    "post_init_hook": "post_init_hook",
     "license": "LGPL-3",
 }
 

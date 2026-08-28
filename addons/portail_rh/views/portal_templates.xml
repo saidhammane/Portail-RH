@@ -34,6 +34,11 @@
       <li t-if="page_name == 'attestation_request_detail'" class="breadcrumb-item active">
         <t t-out="attestation_request.name"/>
       </li>
+      <li t-if="page_name in ('onboarding', 'onboarding_checklist')" class="breadcrumb-item active">
+        <a t-if="page_name == 'onboarding_checklist'" href="/my/onboarding">Assistant d'integration</a>
+        <t t-else="">Assistant d'integration</t>
+      </li>
+      <li t-if="page_name == 'onboarding_checklist'" class="breadcrumb-item active">Checklist</li>
     </xpath>
   </template>
 
@@ -62,6 +67,13 @@
         <t t-set="url" t-value="'/my/attestation_requests'"/>
         <t t-set="text">Demandez et telechargez vos attestations RH</t>
         <t t-set="placeholder_count" t-value="'attestation_request_count'"/>
+      </t>
+      <t t-call="portal.portal_docs_entry">
+        <t t-set="icon" t-value="'/portail_rh/static/description/icon.png'"/>
+        <t t-set="title">Assistant d'integration</t>
+        <t t-set="url" t-value="'/my/onboarding'"/>
+        <t t-set="text">Posez vos questions avec des sources et suivez votre checklist</t>
+        <t t-set="placeholder_count" t-value="'onboarding_task_count'"/>
       </t>
     </div>
   </template>
@@ -408,5 +420,136 @@
   </template>
   <template id="portal_new_attestation_request" name="Nouvelle demande attestation">
     <t t-call="portail_rh.portal_request_form"/>
+  </template>
+
+  <template id="portal_my_onboarding" name="Assistant d'integration">
+    <t t-call="portal.portal_layout">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+          <h2 class="mb-1">Assistant d'integration</h2>
+          <p class="text-muted mb-0">Les reponses sont limitees aux documents que vous etes autorise a consulter.</p>
+        </div>
+        <a href="/my/onboarding/checklist" class="btn btn-outline-primary">Voir toute la checklist</a>
+      </div>
+      <div t-if="success_message" class="alert alert-success" role="alert"><t t-out="success_message"/></div>
+      <div t-if="error_message" class="alert alert-danger" role="alert"><t t-out="error_message"/></div>
+
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="card shadow-sm">
+            <div class="card-header bg-white"><strong>Conversation</strong></div>
+            <div class="card-body">
+              <div t-if="not messages" class="alert alert-info mb-4">
+                Posez une question sur votre integration, les horaires, les outils ou les procedures internes.
+              </div>
+              <div class="d-flex flex-column gap-3 mb-4">
+                <t t-foreach="messages" t-as="chat_message">
+                  <div t-attf-class="p-3 rounded #{'bg-primary text-white ms-lg-5' if chat_message.role == 'user' else 'bg-light me-lg-5'}">
+                    <div class="small fw-bold mb-1">
+                      <t t-if="chat_message.role == 'user'">Vous</t>
+                      <t t-else="">Assistant</t>
+                    </div>
+                    <div style="white-space: pre-wrap"><t t-out="chat_message.content"/></div>
+                    <t t-if="chat_message.role == 'assistant'">
+                      <div t-if="message_sources.get(chat_message.id)" class="mt-3 pt-3 border-top">
+                        <strong class="small">Sources</strong>
+                        <ol class="small mb-0 mt-1">
+                          <li t-foreach="message_sources.get(chat_message.id, [])" t-as="source">
+                            <t t-out="source.get('title')"/> — <t t-out="source.get('section')"/>
+                            (<t t-out="int(source.get('score', 0) * 100)"/>%)
+                          </li>
+                        </ol>
+                      </div>
+                      <div class="d-flex flex-wrap gap-2 mt-3">
+                        <form action="/my/onboarding/feedback" method="post">
+                          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                          <input type="hidden" name="message_id" t-att-value="chat_message.id"/>
+                          <button name="feedback" value="helpful" type="submit" class="btn btn-sm btn-outline-success">Utile</button>
+                          <button name="feedback" value="not_helpful" type="submit" class="btn btn-sm btn-outline-secondary">Pas utile</button>
+                        </form>
+                        <form t-if="chat_message.needs_escalation and not chat_message.escalation_activity_id" action="/my/onboarding/escalate" method="post">
+                          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                          <input type="hidden" name="message_id" t-att-value="chat_message.id"/>
+                          <button type="submit" class="btn btn-sm btn-outline-primary">Transmettre a RH</button>
+                        </form>
+                        <span t-if="chat_message.escalation_activity_id" class="badge text-bg-info align-self-center">Transmis a RH</span>
+                      </div>
+                    </t>
+                  </div>
+                </t>
+              </div>
+              <form action="/my/onboarding/ask" method="post">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <label for="onboarding_question" class="form-label fw-bold">Votre question</label>
+                <textarea id="onboarding_question" name="question" class="form-control" rows="3" maxlength="2000" required="required" placeholder="Ex. Quels sont mes horaires de travail ?"></textarea>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                  <small class="text-muted">Une absence de source produit un refus et peut etre transmise a RH.</small>
+                  <button type="submit" class="btn btn-primary">Envoyer</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between">
+              <strong>Ma checklist</strong>
+              <span><t t-out="completed_task_count"/>/<t t-out="len(onboarding_tasks)"/></span>
+            </div>
+            <div class="list-group list-group-flush">
+              <div t-if="not onboarding_tasks" class="list-group-item text-muted">Aucune tache assignee.</div>
+              <div t-foreach="onboarding_tasks[:5]" t-as="task" class="list-group-item d-flex justify-content-between gap-2">
+                <span t-att-class="'text-decoration-line-through text-muted' if task.state == 'done' else ''"><t t-out="task.plan_line_id.name"/></span>
+                <span t-attf-class="badge #{'text-bg-success' if task.state == 'done' else ('text-bg-primary' if task.state == 'in_progress' else 'text-bg-secondary')}"><t t-out="task_state_labels.get(task.state)"/></span>
+              </div>
+            </div>
+          </div>
+          <div class="card shadow-sm">
+            <div class="card-header bg-white"><strong>Liens rapides</strong></div>
+            <div class="list-group list-group-flush">
+              <a href="/my/travel_requests/new" class="list-group-item list-group-item-action">Nouvelle demande de deplacement</a>
+              <a href="/my/supply_requests/new" class="list-group-item list-group-item-action">Nouvelle demande de fournitures</a>
+              <a href="/my/attestation_requests/new" class="list-group-item list-group-item-action">Nouvelle demande d'attestation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </t>
+  </template>
+
+  <template id="portal_onboarding_checklist" name="Checklist d'integration">
+    <t t-call="portal.portal_layout">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="mb-1">Ma checklist d'integration</h2>
+          <p class="text-muted mb-0"><t t-out="completed_task_count"/> etape(s) terminee(s) sur <t t-out="len(onboarding_tasks)"/>.</p>
+        </div>
+        <a href="/my/onboarding" class="btn btn-outline-secondary">Retour a l'assistant</a>
+      </div>
+      <div class="card shadow-sm">
+        <div t-if="not onboarding_tasks" class="card-body text-muted">Aucun plan d'integration ne vous est encore assigne.</div>
+        <div t-if="onboarding_tasks" class="list-group list-group-flush">
+          <div t-foreach="onboarding_tasks" t-as="task" class="list-group-item p-3">
+            <div class="d-flex flex-wrap justify-content-between gap-3">
+              <div>
+                <h5 t-att-class="'mb-1 text-decoration-line-through text-muted' if task.state == 'done' else 'mb-1'"><t t-out="task.plan_line_id.name"/></h5>
+                <p t-if="task.plan_line_id.description" class="text-muted mb-0"><t t-out="task.plan_line_id.description"/></p>
+                <span t-if="task.plan_line_id.required" class="badge text-bg-warning mt-2">Obligatoire</span>
+              </div>
+              <form t-att-action="'/my/onboarding/checklist/%s/state' % task.id" method="post" class="d-flex gap-2 align-items-center">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <select name="state" class="form-select form-select-sm">
+                  <option value="todo" t-att-selected="task.state == 'todo'">A faire</option>
+                  <option value="in_progress" t-att-selected="task.state == 'in_progress'">En cours</option>
+                  <option value="done" t-att-selected="task.state == 'done'">Terminee</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary">Mettre a jour</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </t>
   </template>
 </odoo>

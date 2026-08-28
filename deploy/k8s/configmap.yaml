@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: onboarding-ai-config
+data:
+  ENVIRONMENT: "kubernetes"
+  LOG_LEVEL: "INFO"
+  REDIS_URL: "redis://onboarding-redis:6379/0"
+  REDIS_QUEUE: "onboarding:index:queue"
+  QDRANT_URL: "http://onboarding-qdrant:6333"
+  QDRANT_COLLECTION: "onboarding_documents"
+  DATA_DIR: "/data/jobs"
+  ODOO_CALLBACK_URL: "http://odoo:8069/portail_rh/onboarding/index/callback"
+  LLM_PROVIDER: "extractive"
+  LLM_API_URL: ""
+  LLM_CHAT_MODEL: ""
+  EMBEDDING_MODEL: "hashing-128"
+  SESSION_TTL: "3600"
+  CACHE_TTL: "900"
+  RATE_LIMIT_PER_MINUTE: "20"
+  RAG_TOP_K: "5"
+  RAG_MIN_SCORE: "0.08"

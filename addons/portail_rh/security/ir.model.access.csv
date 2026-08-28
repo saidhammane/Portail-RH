@@ -12,3 +12,12 @@ access_hr_attestation_request_employee,hr.attestation.request.employee,model_hr_
 access_hr_attestation_request_hr,hr.attestation.request.hr,model_hr_attestation_request,portail_rh.group_portail_rh_hr,1,1,1,1
 access_hr_attendance_device_log_hr,hr.attendance.device.log.hr,model_hr_attendance_device_log,portail_rh.group_portail_rh_hr,1,0,0,0
 access_hr_attendance_device_log_system,hr.attendance.device.log.system,model_hr_attendance_device_log,base.group_system,1,1,1,1
+access_hr_onboarding_document_hr,hr.onboarding.document.hr,model_hr_onboarding_document,portail_rh.group_portail_rh_hr,1,1,1,1
+access_hr_onboarding_conversation_employee,hr.onboarding.conversation.employee,model_hr_onboarding_conversation,portail_rh.group_portail_rh_employee,1,1,1,0
+access_hr_onboarding_message_employee,hr.onboarding.message.employee,model_hr_onboarding_message,portail_rh.group_portail_rh_employee,1,0,0,0
+access_hr_onboarding_plan_employee,hr.onboarding.plan.employee,model_hr_onboarding_plan,portail_rh.group_portail_rh_employee,1,0,0,0
+access_hr_onboarding_plan_hr,hr.onboarding.plan.hr,model_hr_onboarding_plan,portail_rh.group_portail_rh_hr,1,1,1,1
+access_hr_onboarding_plan_line_employee,hr.onboarding.plan.line.employee,model_hr_onboarding_plan_line,portail_rh.group_portail_rh_employee,1,0,0,0
+access_hr_onboarding_plan_line_hr,hr.onboarding.plan.line.hr,model_hr_onboarding_plan_line,portail_rh.group_portail_rh_hr,1,1,1,1
+access_hr_onboarding_employee_task_employee,hr.onboarding.employee.task.employee,model_hr_onboarding_employee_task,portail_rh.group_portail_rh_employee,1,1,0,0
+access_hr_onboarding_employee_task_hr,hr.onboarding.employee.task.hr,model_hr_onboarding_employee_task,portail_rh.group_portail_rh_hr,1,1,1,1

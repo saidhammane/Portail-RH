@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onboarding-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: onboarding-redis
+  template:
+    metadata:
+      labels:
+        app: onboarding-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.4-alpine
+          command: ["redis-server", "--appendonly", "yes", "--save", "60", "1"]
+          ports:
+            - name: redis
+              containerPort: 6379
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: onboarding-redis-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: onboarding-redis
+spec:
+  type: ClusterIP
+  selector:
+    app: onboarding-redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis

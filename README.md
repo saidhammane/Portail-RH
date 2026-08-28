@@ -1,147 +1,155 @@
 # Portail RH - Odoo 17
 
-Application RH pour Odoo 17 Community, livree avec Docker Compose et un simulateur ZKTeco local.
+Application RH Odoo 17 Community avec portail employe, workflows de demandes, pointage ZKTeco et assistant d'integration RAG securise.
 
 ## Fonctionnalites
 
-### Demandes RH
+- Deplacements, fournitures et attestations PDF avec workflows Employe / Manager / RH.
+- Portail natif Odoo, isolation des employes, formulaires et telechargements controles cote serveur.
+- Simulateur ZKTeco, import idempotent vers `hr.attendance`, retards et departs anticipes.
+- Documents d'integration PDF, DOCX et TXT administres par RH.
+- Indexation asynchrone Redis vers Qdrant avec verrou de deduplication.
+- Assistant cite : chaque reponse acceptee contient des sources autorisees.
+- Refus explicite et proposition d'escalade RH lorsque les sources sont insuffisantes.
+- Checklist personnalisee par departement et poste.
+- Cache, sessions avec TTL et rate limiting dans Redis.
 
-- Deplacements : creation, soumission, validation manager/RH, refus et cloture.
-- Fournitures : creation, soumission, validation manager/RH, refus et cloture.
-- Attestations : demande employe, validation RH et generation PDF securisee.
-- Activites Odoo automatiques pour les validations manager.
-- Champs sensibles verrouilles apres soumission.
-- Etats modifiables uniquement par les actions du workflow.
-
-### Portail employe
-
-- Tableau de bord et compteurs personnels.
-- Listes, filtres, tri et pagination.
-- Creation et soumission depuis le portail.
-- Detail de chaque demande.
-- Telechargement d'une attestation approuvee au format PDF.
-- Isolation stricte : un employe ne voit que ses propres demandes.
-
-Routes principales :
+Routes portail principales :
 
 - `/my/travel_requests`
 - `/my/supply_requests`
 - `/my/attestation_requests`
-
-### Pointage ZKTeco
-
-- Simulateur autonome avec une API protegee par cle.
-- 9 employes et 383 pointages realistes pour juillet 2026.
-- Import pagine et idempotent des pointages dans Odoo.
-- Association automatique par identifiant ZKTeco ou adresse email.
-- Conversion des paires entree/sortie en presences Odoo.
-- Recuperation automatique lorsqu'une sortie arrive apres une entree deja signalee en erreur.
-- Detection des retards et departs anticipes selon le calendrier de travail.
-- Synchronisation manuelle ou planifiee par cron.
-
-### Reporting et securite
-
-- Tableau de bord pivot/graphique des deplacements.
-- Profils Employe, Manager et RH.
-- ACL et record rules pour chaque modele.
-- Acces aux attestations PDF verifie cote serveur.
-- Identifiants externes ZKTeco uniques par appareil.
+- `/my/onboarding`
+- `/my/onboarding/checklist`
 
 ## Architecture
 
 ```text
-odoo-dev/
-|-- addons/
-|   `-- portail_rh/
-|       |-- controllers/
-|       |-- data/
-|       |-- demo/
-|       |-- migrations/
-|       |-- models/
-|       |-- reports/
-|       |-- security/
-|       |-- static/
-|       |-- tests/
-|       `-- views/
-|-- services/
-|   `-- zkteco_mock/
-`-- docker-compose.yml
+Navigateur
+   |
+   v
+Odoo 17 + PostgreSQL  ---- post-commit ----> FastAPI ----> Redis queue
+   ^                         chat serveur       |              |
+   |                                            v              v
+   +------ callback authentifie <----------- Qdrant <------ Worker
+                                                   embeddings / extraction
 ```
 
-Stack : Odoo 17 Community, PostgreSQL 15, Python 3.12 pour le simulateur et Docker Compose.
+Odoo reste la source de verite pour les utilisateurs, roles, documents, conversations, feedbacks et checklists. Redis ne contient que des donnees ephemeres. Qdrant n'est pas expose sur l'hote et chaque recherche applique des filtres societe, departement et visibilite. Odoo recontrole ensuite les sources avant de les enregistrer ou de les afficher.
 
-Version du module : `17.0.1.8.0`.
+Voir [docs/ai-onboarding-architecture.md](docs/ai-onboarding-architecture.md) pour les flux et le modele de securite.
 
-## Demarrage
+Version du module : `17.0.2.0.0`.
+
+## Configuration locale
 
 ```powershell
-docker compose up -d
+Copy-Item .env.example .env
 ```
 
-Services :
+Renseigner au minimum dans `.env` :
+
+- `POSTGRES_PASSWORD`
+- `ZKTECO_API_KEY`
+- `ONBOARDING_AI_SERVICE_TOKEN` (16 caracteres minimum)
+- `ODOO_DATABASE`
+
+Le fichier `.env` est ignore par Git. `PORTAIL_RH_DEMO_PASSWORD` est facultatif et permet de definir localement les mots de passe des utilisateurs de demonstration. Aucun mot de passe de demonstration n'est versionne.
+
+Le provider par defaut `extractive` fonctionne sans cle externe et ne formule que des extraits cites. Providers pris en charge :
+
+- `extractive` : embeddings locaux deterministes, utile pour developpement et tests ;
+- `ollama` : definir `LLM_PROVIDER=ollama`, `LLM_API_URL`, `LLM_CHAT_MODEL` et `EMBEDDING_MODEL` ;
+- `openai` compatible : definir `LLM_PROVIDER=openai`, l'URL, les modeles et `LLM_API_KEY`.
+
+Les cles ne sont jamais journalisees.
+
+## Demarrage Docker
+
+```powershell
+docker compose up -d --build
+docker compose ps
+```
+
+Services publies localement :
 
 - Odoo : `http://localhost:8069`
-- PostgreSQL : `localhost:5432`
-- Simulateur ZKTeco : `http://localhost:8090/demo`
+- API onboarding : `http://127.0.0.1:8088`
+- PostgreSQL : `127.0.0.1:5432`
+- ZKTeco : `http://127.0.0.1:8090/demo`
 
-Configuration ZKTeco par defaut :
+Redis et Qdrant restent uniquement sur le reseau Compose.
 
-- URL interne : `http://zkteco-mock:8090`
-- Cle : `zkteco-demo-key`
-- Fuseau horaire : `Africa/Casablanca`
-
-Ces valeurs peuvent etre surchargees avec `ZKTECO_API_KEY`, `ZKTECO_SEED_MONTH` et `ZKTECO_TIMEZONE`.
-
-## Installation ou mise a jour
-
-Depuis l'interface Odoo, installer ou mettre a niveau l'application `Portail RH`.
-
-Depuis Docker :
+Verification :
 
 ```powershell
-docker compose exec -T odoo odoo -d odoo_dev -u portail_rh --db_host db --db_user odoo --db_password odoo --stop-after-init --no-http
+Invoke-RestMethod http://127.0.0.1:8088/health
+Invoke-RestMethod http://127.0.0.1:8088/ready
+docker compose exec -T redis redis-cli ping
 ```
 
-## Donnees de demonstration
+## Installation et mise a niveau Odoo
 
-Le fichier `addons/portail_rh/demo/hr_demo_data.xml` fournit :
+Installer `Portail RH` depuis Apps ou executer :
 
-- 3 departements et leurs managers ;
-- 6 employes et leurs utilisateurs ;
-- 3 demandes de deplacement ;
-- 3 demandes de fournitures ;
-- 3 demandes d'attestation.
+```powershell
+docker compose run --rm odoo odoo -d $env:ODOO_DATABASE -i portail_rh --db_host db --db_user odoo --db_password "$env:POSTGRES_PASSWORD" --stop-after-init --no-http
+```
 
-Mot de passe des utilisateurs de demonstration : `Test@1234`.
+Pour une mise a niveau, remplacer `-i` par `-u`. Sauvegarder la base cible avant toute mise a niveau hors developpement.
 
-Le simulateur ZKTeco utilise les memes adresses email et associe les employes lors du premier import.
+## Scenario de demonstration
+
+1. Se connecter comme RH et ouvrir `Portail RH > Integration > Documents`.
+2. Charger un PDF textuel, DOCX ou TXT, choisir societe, departement et visibilite.
+3. Attendre l'etat `Indexe` ; le worker met a jour Odoo par callback authentifie.
+4. Creer un plan et ses etapes dans `Integration > Plans`.
+5. Se connecter comme employe et ouvrir `/my/onboarding`.
+6. Poser une question couverte : la reponse affiche `[1]` et la source.
+7. Poser une question inconnue : l'assistant refuse et propose `Transmettre a RH`.
+8. Verifier la checklist et les liens rapides vers les trois demandes RH.
 
 ## Tests
 
-### Tests du module Odoo
-
-Le module contient des tests de workflow, securite, pointage, portail HTTP et rapport PDF.
+Tests Odoo complets :
 
 ```powershell
-docker compose run --rm odoo odoo -d portail_rh_test -i portail_rh --without-demo=all --test-enable --test-tags /portail_rh --db_host db --db_user odoo --db_password odoo --stop-after-init --log-level=test
+docker compose run --rm odoo odoo -d portail_rh_test -i portail_rh --without-demo=all --test-enable --test-tags /portail_rh --db_host db --db_user odoo --db_password "$env:POSTGRES_PASSWORD" --stop-after-init --log-level=test
 ```
 
-Pour relancer les tests sur une base deja initialisee, remplacer `-i` par `-u`.
+Tests et evaluation du service IA :
 
-### Tests du simulateur ZKTeco
+```powershell
+docker compose build onboarding-ai-api
+docker run --rm portail-rh-onboarding-ai:local python -m pytest -q
+docker run --rm portail-rh-onboarding-ai:local python -m evaluation.run_evaluation
+```
+
+Tests ZKTeco :
 
 ```powershell
 docker run --rm -v "${PWD}/services/zkteco_mock:/app" -w /app python:3.12-slim python -m unittest discover -s tests -v
 ```
 
-## Verification de livraison
+Baseline deterministe actuelle sur 30 questions : citations correctes 95,65 %, refus corrects 100 %, exactitude globale 96,67 %, cache 50 % sur deux passages. Ces mesures valident le dataset local ; elles ne constituent pas une garantie de qualite sur des documents reels ou un provider externe.
 
-Avant une livraison :
+## Kubernetes
 
-1. Verifier que `docker compose ps` affiche les trois services actifs.
-2. Mettre a niveau `portail_rh` sur la base cible.
-3. Executer les tests Odoo et ZKTeco.
-4. Tester une synchronisation ZKTeco sur une base de recette.
-5. Verifier le telechargement d'une attestation approuvee.
+Les manifests sont sous `deploy/k8s` et se valident avec :
 
-La base `odoo_dev` est une base de developpement. Utiliser une sauvegarde PostgreSQL avant toute mise a niveau d'une base de production.
+```powershell
+kubectl kustomize deploy/k8s
+```
+
+Avant un deploiement, remplacer le tag d'image, provisionner un stockage `ReadWriteMany` pour les fichiers de jobs, adapter `ODOO_CALLBACK_URL`, et creer `onboarding-ai-secrets` avec un gestionnaire de secrets. `secret.example.yaml` ne contient aucune valeur reelle et n'est pas inclus automatiquement par Kustomize.
+
+Ces manifests ont ete rendus et valides syntaxiquement, mais pas testes sur un cluster cible ; ils ne sont donc pas declares production-ready.
+
+## Limites
+
+- Pas d'OCR : les PDF scannes sans couche texte sont refuses.
+- Le provider `extractive` exige un recouvrement lexical et peut refuser des paraphrases.
+- La qualite d'un provider LLM externe depend du modele, des documents et du seuil configure.
+- Qdrant est deploye en instance unique dans les exemples Docker/Kubernetes.
+- Le PVC de jobs Kubernetes exige une classe de stockage RWX compatible.
+- La retention des conversations reste geree dans PostgreSQL/Odoo et doit suivre la politique de confidentialite de l'organisation.

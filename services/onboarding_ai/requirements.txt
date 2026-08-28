@@ -1,0 +1,9 @@
+fastapi>=0.116,<1.0
+uvicorn[standard]>=0.35,<1.0
+pydantic-settings>=2.10,<3.0
+redis>=6.4,<8.0
+qdrant-client>=1.15,<1.17
+httpx>=0.28,<1.0
+pypdf>=6.0,<7.0
+python-docx>=1.2,<2.0
+pytest>=8.4,<10.0

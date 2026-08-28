@@ -223,10 +223,10 @@ class HrAttendanceDeviceLog(models.Model):
 
     @api.model
     def _zkteco_connection(self):
-        return (
-            os.getenv("ZKTECO_API_URL", "http://zkteco-mock:8090"),
-            os.getenv("ZKTECO_API_KEY", "zkteco-demo-key"),
-        )
+        api_key = os.getenv("ZKTECO_API_KEY")
+        if not api_key:
+            raise UserError(_("La variable ZKTECO_API_KEY est obligatoire."))
+        return (os.getenv("ZKTECO_API_URL", "http://zkteco-mock:8090"), api_key)
 
     @api.model
     def _zkteco_employee_mapping(self, source_employees):

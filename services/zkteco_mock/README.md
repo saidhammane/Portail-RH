@@ -10,10 +10,10 @@ The seed excludes weekends and the Moroccan Throne Day on July 30. It also inclu
 docker compose up -d zkteco-mock
 ```
 
-The default API key is intended for local development only:
+Set a private API key before starting the service:
 
-```text
-zkteco-demo-key
+```powershell
+$env:ZKTECO_API_KEY = Read-Host "ZKTeco API key"
 ```
 
 ## API
@@ -29,7 +29,7 @@ Open the browser-friendly local data viewer directly at [http://localhost:8090/d
 All `/api/v1` routes require the `X-API-Key` header:
 
 ```powershell
-$headers = @{ "X-API-Key" = "zkteco-demo-key" }
+$headers = @{ "X-API-Key" = $env:ZKTECO_API_KEY }
 Invoke-RestMethod http://localhost:8090/api/v1/stats -Headers $headers
 Invoke-RestMethod http://localhost:8090/api/v1/devices -Headers $headers
 Invoke-RestMethod http://localhost:8090/api/v1/employees -Headers $headers

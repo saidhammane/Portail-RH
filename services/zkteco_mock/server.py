@@ -26,7 +26,6 @@ SEED_VERSION = "2"
 LOCAL_TIMEZONE = "Africa/Casablanca"
 DEFAULT_DB_PATH = "/data/zkteco_mock.db"
 DEFAULT_SEED_MONTH = "2026-07"
-DEFAULT_API_KEY = "zkteco-demo-key"
 
 
 @dataclass(frozen=True)
@@ -499,7 +498,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--port", type=int, default=int(os.getenv("ZKTECO_PORT", "8090")))
     parser.add_argument("--db", default=os.getenv("ZKTECO_DB_PATH", DEFAULT_DB_PATH))
     parser.add_argument("--month", default=os.getenv("ZKTECO_SEED_MONTH", DEFAULT_SEED_MONTH))
-    parser.add_argument("--api-key", default=os.getenv("ZKTECO_API_KEY", DEFAULT_API_KEY))
+    parser.add_argument("--api-key", default=os.getenv("ZKTECO_API_KEY"))
     parser.add_argument("--reset-db", action="store_true")
     parser.add_argument("--init-only", action="store_true")
     return parser.parse_args()
@@ -507,6 +506,8 @@ def parse_arguments() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_arguments()
+    if not args.api_key:
+        raise SystemExit("--api-key or ZKTECO_API_KEY is required")
     initialize_database(args.db, args.month, reset=args.reset_db)
     if args.init_only:
         print(f"Initialized {args.db} with deterministic data for {args.month}")
