@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 import time
 
 from fastapi import HTTPException, status
@@ -10,7 +11,98 @@ from .providers import STOP_WORDS, TOKEN_PATTERN, embed_texts, generate_grounded
 from .schemas import ChatRequest, ChatResponse, ChatSource
 
 
-REFUSAL_ANSWER = "Information insuffisante dans les documents autorises."
+REFUSAL_ANSWER = (
+    "Je n'ai pas trouve d'information verifiee sur ce sujet dans les documents "
+    "auxquels vous avez acces. Reformulez la question ou transmettez-la a RH."
+)
+GENERIC_QUERY_TOKENS = {
+    "avoir",
+    "comment",
+    "deux",
+    "faire",
+    "jour",
+    "jours",
+    "mes",
+    "possible",
+    "puis",
+    "quelle",
+    "quels",
+    "semaine",
+    "sont",
+    "travail",
+}
+SYNONYM_GROUPS = (
+    {"distance", "remote", "teletravail", "vpn"},
+    {"absence", "conge", "conges", "leave", "vacances"},
+    {"heure", "heures", "horaire", "horaires", "schedule", "working"},
+    {"avantage", "avantages", "benefit", "benefits", "assurance"},
+    {"attestation", "certificate", "certificat", "salaire"},
+    {"informatique", "it", "support", "ordinateur", "laptop"},
+)
+
+
+def meaningful_question_tokens(question: str) -> set[str]:
+    tokens = {
+        token
+        for token in TOKEN_PATTERN.findall(question.lower())
+        if token not in STOP_WORDS
+        and token not in GENERIC_QUERY_TOKENS
+        and len(token) > 2
+    }
+    for synonym_group in SYNONYM_GROUPS:
+        if tokens & synonym_group:
+            tokens |= synonym_group
+    return tokens
+
+
+def build_extractive_answer(points, question: str) -> str:
+    """Return a short, readable answer while keeping each statement cited."""
+    question_tokens = meaningful_question_tokens(question)
+    asks_for_hours = bool(
+        question_tokens & {"heure", "heures", "horaire", "horaires", "schedule", "working"}
+    )
+    statements = []
+    for source_index, point in enumerate(points, start=1):
+        text = str((point.payload or {}).get("text") or "").strip()
+        sentences = [
+            sentence.strip(" -\t")
+            for sentence in re.split(r"(?<=[.!?])\s+|\n+", text)
+            if len(sentence.strip()) >= 20
+        ]
+        ranked = sorted(
+            sentences,
+            key=lambda sentence: (
+                len(
+                    question_tokens
+                    & {
+                        token
+                        for token in TOKEN_PATTERN.findall(sentence.lower())
+                        if token not in STOP_WORDS and len(token) > 2
+                    }
+                )
+                + (2 if asks_for_hours and re.search(r"\b\d{1,2}[:h]\d{2}\b", sentence) else 0)
+            ),
+            reverse=True,
+        )
+        best_overlap = (
+            len(
+                question_tokens
+                & {
+                    token
+                    for token in TOKEN_PATTERN.findall(ranked[0].lower())
+                    if token not in STOP_WORDS and len(token) > 2
+                }
+            )
+            if ranked
+            else 0
+        )
+        if ranked and best_overlap:
+            statements.append("%s [%s]" % (ranked[0][:500], source_index))
+        if len(statements) == 3:
+            break
+    return "Voici ce que disent les documents internes :\n\n" + "\n\n".join(
+        "- " + statement for statement in statements
+    )
 
 
 def build_access_filter(payload: ChatRequest) -> models.Filter:
@@ -154,11 +246,7 @@ async def retrieve_chunks(payload: ChatRequest, settings: Settings, qdrant_clien
         if is_payload_authorized(point.payload or {}, payload)
     ]
     if settings.llm_provider == "extractive":
-        question_tokens = {
-            token
-            for token in TOKEN_PATTERN.findall(payload.question.lower())
-            if token not in STOP_WORDS and len(token) > 2
-        }
+        question_tokens = meaningful_question_tokens(payload.question)
         points = [
             point
             for point in points
@@ -253,7 +341,7 @@ async def answer_chat(payload: ChatRequest, settings: Settings, redis_client, qd
         context = "\n\n".join(context_parts)
         answer = await generate_grounded_answer(context, payload.question, settings)
         if settings.llm_provider == "extractive":
-            answer = "Selon les documents autorises :\n\n" + context
+            answer = build_extractive_answer(points, payload.question)
         if not any("[%s]" % index in answer for index in range(1, len(sources) + 1)):
             answer += "\n\nSource : [1]"
         response = ChatResponse(

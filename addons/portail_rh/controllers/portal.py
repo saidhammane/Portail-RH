@@ -271,6 +271,7 @@ class PortailRHPortal(CustomerPortal):
 
     def _onboarding_values(self, employee, conversation, error=None, message=None):
         tasks = request.env["hr.onboarding.employee.task"].ensure_for_employee(employee)
+        employee_profile = employee.sudo()
         messages = conversation.message_ids.sudo()
         source_details = {}
         for chat_message in messages.filtered(lambda item: item.role == "assistant"):
@@ -280,11 +281,21 @@ class PortailRHPortal(CustomerPortal):
                 )
             except (TypeError, ValueError):
                 source_details[chat_message.id] = []
+        suggested_questions = [
+            _("Quels sont mes horaires de travail ?"),
+            _("Comment demander un conge ou une attestation ?"),
+            _("Quels avantages sont proposes aux employes ?"),
+            _("Comment utiliser le VPN et contacter le support IT ?"),
+        ]
+        if employee_profile.department_id.name == "Informatique":
+            suggested_questions.insert(1, _("Quelle est la procedure de mise en production ?"))
         values = self._prepare_portal_layout_values()
         values.update(
             {
                 "page_name": "onboarding",
                 "employee": employee,
+                "employee_job_name": employee_profile.job_id.name or _("Collaborateur"),
+                "employee_department_name": employee_profile.department_id.name or _("Equipe Atlas"),
                 "conversation": conversation,
                 "messages": messages,
                 "message_sources": source_details,
@@ -297,6 +308,7 @@ class PortailRHPortal(CustomerPortal):
                         "state"
                     ]["selection"]
                 ),
+                "suggested_questions": suggested_questions,
                 "error_message": error,
                 "success_message": {
                     "feedback": _("Merci pour votre retour."),

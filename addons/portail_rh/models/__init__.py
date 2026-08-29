@@ -6,3 +6,4 @@ from . import attendance_log
 from . import onboarding_document
 from . import onboarding_conversation
 from . import onboarding_checklist
+from . import company_demo

@@ -424,12 +424,21 @@
 
   <template id="portal_my_onboarding" name="Assistant d'integration">
     <t t-call="portal.portal_layout">
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-        <div>
-          <h2 class="mb-1">Assistant d'integration</h2>
-          <p class="text-muted mb-0">Les reponses sont limitees aux documents que vous etes autorise a consulter.</p>
+      <div class="rounded-4 bg-primary text-white p-4 p-lg-5 mb-4 shadow-sm">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+          <div>
+            <div class="text-white-50 small text-uppercase fw-bold mb-2">Atlas Digital Services</div>
+            <h1 class="h2 mb-2">Bonjour <t t-out="employee.name"/> 👋</h1>
+            <p class="mb-0 opacity-75">
+              Votre assistant RH verifie les politiques internes avant de repondre.
+              Posez une question simplement, en francais ou en anglais.
+            </p>
+          </div>
+          <div class="text-lg-end">
+            <div class="fw-bold"><t t-out="employee_job_name"/></div>
+            <div class="opacity-75"><t t-out="employee_department_name"/></div>
+          </div>
         </div>
-        <a href="/my/onboarding/checklist" class="btn btn-outline-primary">Voir toute la checklist</a>
       </div>
       <div t-if="success_message" class="alert alert-success" role="alert"><t t-out="success_message"/></div>
       <div t-if="error_message" class="alert alert-danger" role="alert"><t t-out="error_message"/></div>
@@ -437,7 +446,10 @@
       <div class="row g-4">
         <div class="col-lg-8">
           <div class="card shadow-sm">
-            <div class="card-header bg-white"><strong>Conversation</strong></div>
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <strong>Demandez a Atlas Assistant</strong>
+              <span class="badge text-bg-success">Sources verifiees</span>
+            </div>
             <div class="card-body">
               <div t-if="not messages" class="alert alert-info mb-4">
                 Posez une question sur votre integration, les horaires, les outils ou les procedures internes.
@@ -478,13 +490,25 @@
                   </div>
                 </t>
               </div>
+              <div class="mb-3">
+                <div class="small text-muted fw-bold mb-2">Questions frequentes</div>
+                <div class="d-flex flex-wrap gap-2">
+                  <form t-foreach="suggested_questions" t-as="suggested_question" action="/my/onboarding/ask" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="question" t-att-value="suggested_question"/>
+                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill">
+                      <t t-out="suggested_question"/>
+                    </button>
+                  </form>
+                </div>
+              </div>
               <form action="/my/onboarding/ask" method="post">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                <label for="onboarding_question" class="form-label fw-bold">Votre question</label>
-                <textarea id="onboarding_question" name="question" class="form-control" rows="3" maxlength="2000" required="required" placeholder="Ex. Quels sont mes horaires de travail ?"></textarea>
+                <label for="onboarding_question" class="form-label fw-bold">Que souhaitez-vous savoir ?</label>
+                <textarea id="onboarding_question" name="question" class="form-control form-control-lg" rows="3" maxlength="2000" required="required" placeholder="Ex. Puis-je teletravailler deux jours par semaine ?"></textarea>
                 <div class="d-flex justify-content-between align-items-center mt-2">
-                  <small class="text-muted">Une absence de source produit un refus et peut etre transmise a RH.</small>
-                  <button type="submit" class="btn btn-primary">Envoyer</button>
+                  <small class="text-muted">Si aucune source ne couvre le sujet, vous pourrez contacter RH en un clic.</small>
+                  <button type="submit" class="btn btn-primary px-4">Demander</button>
                 </div>
               </form>
             </div>
@@ -503,6 +527,9 @@
                 <span t-att-class="'text-decoration-line-through text-muted' if task.state == 'done' else ''"><t t-out="task.plan_line_id.name"/></span>
                 <span t-attf-class="badge #{'text-bg-success' if task.state == 'done' else ('text-bg-primary' if task.state == 'in_progress' else 'text-bg-secondary')}"><t t-out="task_state_labels.get(task.state)"/></span>
               </div>
+            </div>
+            <div class="card-footer bg-white">
+              <a href="/my/onboarding/checklist" class="btn btn-outline-primary w-100">Voir toute la checklist</a>
             </div>
           </div>
           <div class="card shadow-sm">

@@ -1,4 +1,9 @@
 <odoo>
+  <record id="action_employee_portal_home" model="ir.actions.act_url">
+    <field name="name">Mon espace RH</field>
+    <field name="url">/my/onboarding</field>
+    <field name="target">self</field>
+  </record>
   <record id="action_hr_travel_request" model="ir.actions.act_window">
     <field name="name">Demandes</field>
     <field name="res_model">hr.travel.request</field>
