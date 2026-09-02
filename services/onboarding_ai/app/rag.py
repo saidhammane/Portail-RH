@@ -7,7 +7,13 @@ from fastapi import HTTPException, status
 from qdrant_client import models
 
 from .config import Settings
-from .providers import STOP_WORDS, TOKEN_PATTERN, embed_texts, generate_grounded_answer
+from .providers import (
+    STOP_WORDS,
+    TOKEN_PATTERN,
+    embed_texts,
+    generate_grounded_answer,
+    generate_smalltalk_answer,
+)
 from .schemas import ChatRequest, ChatResponse, ChatSource
 
 
@@ -30,6 +36,16 @@ GENERIC_QUERY_TOKENS = {
     "semaine",
     "sont",
     "travail",
+    "bravico",
+    "fait",
+    "elle",
+    "elles",
+    "il",
+    "ils",
+    "lui",
+    "leur",
+    "lequel",
+    "laquelle",
 }
 SYNONYM_GROUPS = (
     {"distance", "remote", "teletravail", "vpn"},
@@ -38,6 +54,23 @@ SYNONYM_GROUPS = (
     {"avantage", "avantages", "benefit", "benefits", "assurance"},
     {"attestation", "certificate", "certificat", "salaire"},
     {"informatique", "it", "support", "ordinateur", "laptop"},
+    {"facture", "factures", "facturation", "electronique", "electroniques"},
+)
+FOLLOW_UP_PREFIXES = ("et ", "mais ", "sinon ", "aussi ")
+FOLLOW_UP_REFERENCES = {
+    "cela",
+    "ca",
+    "ça",
+    "celui",
+    "celle",
+    "ceux",
+    "celles",
+    "precedent",
+    "précédent",
+}
+SMALLTALK_PATTERN = re.compile(
+    r"^\s*(?:hello|hi|hey|bonjour|bonsoir|salut|coucou|merci|thanks)[\s!?.]*$",
+    re.I,
 )
 
 
@@ -53,6 +86,52 @@ def meaningful_question_tokens(question: str) -> set[str]:
         if tokens & synonym_group:
             tokens |= synonym_group
     return tokens
+
+
+def is_follow_up_question(question: str) -> bool:
+    normalized = " ".join(question.lower().split())
+    raw_tokens = set(TOKEN_PATTERN.findall(normalized))
+    return normalized.startswith(FOLLOW_UP_PREFIXES) or bool(
+        raw_tokens & FOLLOW_UP_REFERENCES
+    )
+
+
+def is_smalltalk_question(question: str) -> bool:
+    return bool(SMALLTALK_PATTERN.fullmatch(question))
+
+
+def resolve_generation_question(payload: ChatRequest) -> str:
+    """Turn a short conversational reference into a clear model question."""
+    if not is_follow_up_question(payload.question):
+        return payload.question
+    question = re.sub(
+        r"^(?:et|mais|sinon|aussi)\s+", "", payload.question.strip(), flags=re.I
+    )
+    previous_questions = [
+        message.content for message in payload.history if message.role == "user"
+    ]
+    previous = previous_questions[-1] if previous_questions else ""
+    previous_tokens = meaningful_question_tokens(previous)
+    reference_noun = "element"
+    for candidates, noun in (
+        ({"produit", "produits"}, "produit"),
+        ({"contact", "contacts"}, "contact"),
+        ({"avantage", "avantages"}, "avantage"),
+        ({"document", "documents"}, "document"),
+    ):
+        if previous_tokens & candidates:
+            reference_noun = noun
+            break
+    question = re.sub(r"\blequel\b", "quel %s" % reference_noun, question, flags=re.I)
+    question = re.sub(
+        r"\blaquelle\b", "quelle %s" % reference_noun, question, flags=re.I
+    )
+    if len(meaningful_question_tokens(question)) <= 1 and previous:
+        return "Question precedente: %s\nQuestion actuelle: %s" % (
+            previous[:400],
+            question,
+        )
+    return question
 
 
 def build_extractive_answer(points, question: str) -> str:
@@ -103,6 +182,52 @@ def build_extractive_answer(points, question: str) -> str:
     return "Voici ce que disent les documents internes :\n\n" + "\n\n".join(
         "- " + statement for statement in statements
     )
+
+
+def build_relevant_excerpt(text: str, question: str, limit: int = 420) -> str:
+    """Keep the sentences most relevant to the question inside the model context."""
+    clean_text = str(text or "").strip()
+    sentences = [
+        sentence.strip()
+        for sentence in re.split(r"(?<=[.!?])\s+|\n+", clean_text)
+        if sentence.strip()
+    ]
+    question_tokens = meaningful_question_tokens(question)
+
+    def overlap(sentence):
+        sentence_tokens = {
+            token
+            for token in TOKEN_PATTERN.findall(sentence.lower())
+            if token not in STOP_WORDS and len(token) > 2
+        }
+        score = len(question_tokens & sentence_tokens)
+        if re.match(r"^(?:le produit|il|elle|cela|ca|Ã§a)\b", sentence.lower()):
+            score -= 2
+        return score
+
+    ranked = sorted(enumerate(sentences), key=lambda item: (-overlap(item[1]), item[0]))
+    selected = []
+    size = 0
+    for _, sentence in ranked:
+        if selected and size + len(sentence) + 1 > limit:
+            continue
+        selected.append(sentence)
+        size += len(sentence) + 1
+        if size >= limit:
+            break
+    return " ".join(selected)[:limit] or clean_text[:limit]
+
+
+def clean_generated_answer(answer: str) -> str:
+    """Keep the compact model's response complete when it starts a second sentence."""
+    clean_answer = " ".join(str(answer or "").split())
+    list_parts = clean_answer.split(" - ")
+    if len(list_parts) > 1 and not re.search(r"[.!?]$", list_parts[-1]):
+        clean_answer = " - ".join(list_parts[:-1]).rstrip(" ,;:-")
+    sentences = re.split(r"(?<=[.!?])\s+", clean_answer)
+    if len(sentences) > 1:
+        return sentences[0]
+    return clean_answer
 
 
 def build_access_filter(payload: ChatRequest) -> models.Filter:
@@ -205,10 +330,20 @@ async def enforce_rate_limit(payload: ChatRequest, settings: Settings, redis_cli
 
 async def cache_key(payload: ChatRequest, settings: Settings, redis_client) -> str:
     normalized_question = " ".join(payload.question.lower().split())
-    question_hash = hashlib.sha256(normalized_question.encode("utf-8")).hexdigest()
-    cache_context = "%s|%s|%s|%s" % (
+    relevant_history = (
+        payload.history[-6:] if is_follow_up_question(payload.question) else []
+    )
+    normalized_history = "|".join(
+        "%s:%s" % (message.role, " ".join(message.content.lower().split()))
+        for message in relevant_history
+    )
+    question_hash = hashlib.sha256(
+        (normalized_history + "|" + normalized_question).encode("utf-8")
+    ).hexdigest()
+    cache_context = "%s|%s|%s|%s|%s" % (
         ",".join(sorted(set(payload.group_scopes))),
         settings.llm_provider,
+        settings.llm_chat_model or "",
         settings.embedding_model,
         settings.rag_min_score,
     )
@@ -226,14 +361,19 @@ async def cache_key(payload: ChatRequest, settings: Settings, redis_client) -> s
 
 
 async def retrieve_chunks(payload: ChatRequest, settings: Settings, qdrant_client):
-    vector = (await embed_texts([payload.question], settings))[0]
+    retrieval_question = resolve_generation_question(payload)
+    vector = (await embed_texts([retrieval_question], settings))[0]
+    uses_hashing_index = settings.embedding_model.startswith("hashing-")
     try:
         result = await qdrant_client.query_points(
             collection_name=settings.qdrant_collection,
             query=vector,
             query_filter=build_access_filter(payload),
-            limit=settings.rag_top_k,
-            score_threshold=settings.rag_min_score,
+            # Hashing vectors are intentionally lightweight and can rank lexical
+            # collisions highly. Fetch a wider candidate set, then apply the exact
+            # token-overlap guard below before giving anything to the model.
+            limit=max(20, settings.rag_top_k * 5) if uses_hashing_index else settings.rag_top_k,
+            score_threshold=None if uses_hashing_index else settings.rag_min_score,
             with_payload=True,
         )
     except Exception as error:
@@ -245,20 +385,38 @@ async def retrieve_chunks(payload: ChatRequest, settings: Settings, qdrant_clien
         for point in result.points
         if is_payload_authorized(point.payload or {}, payload)
     ]
-    if settings.llm_provider == "extractive":
-        question_tokens = meaningful_question_tokens(payload.question)
-        points = [
-            point
-            for point in points
-            if question_tokens
-            & {
+    if uses_hashing_index:
+        retrieval_tokens = meaningful_question_tokens(retrieval_question)
+        raw_retrieval_tokens = {
+            token
+            for token in TOKEN_PATTERN.findall(retrieval_question.lower())
+            if token not in STOP_WORDS
+            and token not in GENERIC_QUERY_TOKENS
+            and len(token) > 2
+        }
+
+        def overlap_count(point):
+            point_tokens = {
                 token
                 for token in TOKEN_PATTERN.findall(
                     str((point.payload or {}).get("text") or "").lower()
                 )
                 if token not in STOP_WORDS and len(token) > 2
             }
+            return len(retrieval_tokens & point_tokens)
+
+        matches_known_topic = any(
+            raw_retrieval_tokens & synonym_group
+            for synonym_group in SYNONYM_GROUPS
+        )
+        minimum_overlap = (
+            1 if matches_known_topic or len(raw_retrieval_tokens) < 2 else 2
+        )
+        points = [
+            point for point in points if overlap_count(point) >= minimum_overlap
         ]
+        points.sort(key=lambda point: (overlap_count(point), point.score), reverse=True)
+        points = points[: settings.rag_top_k]
     return points
 
 
@@ -315,6 +473,25 @@ async def answer_chat(payload: ChatRequest, settings: Settings, redis_client, qd
         await store_session(payload, settings, redis_client)
         return response
 
+    if is_smalltalk_question(payload.question):
+        answer = await generate_smalltalk_answer(payload.question, settings)
+        answer = " ".join(str(answer or "").split())
+        response = ChatResponse(
+            answer=answer,
+            sources=[],
+            confidence=1.0,
+            latency_ms=int((time.perf_counter() - started) * 1000),
+            needs_escalation=False,
+            smalltalk=True,
+        )
+        await redis_client.set(
+            response_cache_key,
+            response.model_dump_json(),
+            ex=settings.cache_ttl,
+        )
+        await store_session(payload, settings, redis_client)
+        return response
+
     points = await retrieve_chunks(payload, settings, qdrant_client)
     sources = build_sources(points)
     if not sources:
@@ -326,6 +503,7 @@ async def answer_chat(payload: ChatRequest, settings: Settings, redis_client, qd
             needs_escalation=True,
         )
     else:
+        generation_question = resolve_generation_question(payload)
         context_parts = []
         for index, point in enumerate(points, start=1):
             point_payload = point.payload or {}
@@ -335,20 +513,30 @@ async def answer_chat(payload: ChatRequest, settings: Settings, redis_client, qd
                     index,
                     point_payload.get("title") or "Document",
                     point_payload.get("section") or "Section",
-                    point_payload.get("text") or "",
+                    build_relevant_excerpt(
+                        point_payload.get("text") or "", generation_question
+                    ),
                 )
             )
         context = "\n\n".join(context_parts)
-        answer = await generate_grounded_answer(context, payload.question, settings)
+        answer = await generate_grounded_answer(
+            context, generation_question, settings, history=[]
+        )
         if settings.llm_provider == "extractive":
             answer = build_extractive_answer(points, payload.question)
-        if not any("[%s]" % index in answer for index in range(1, len(sources) + 1)):
+        else:
+            answer = clean_generated_answer(answer)
+        refused = answer.strip().lower().startswith("information insuffisante")
+        if not refused and not any(
+            "[%s]" % index in answer for index in range(1, len(sources) + 1)
+        ):
             answer += "\n\nSource : [1]"
         response = ChatResponse(
-            answer=answer,
-            sources=sources,
-            confidence=sources[0].score,
+            answer=REFUSAL_ANSWER if refused else answer,
+            sources=[] if refused else sources,
+            confidence=0.0 if refused else sources[0].score,
             latency_ms=int((time.perf_counter() - started) * 1000),
+            needs_escalation=refused,
         )
 
     await redis_client.set(

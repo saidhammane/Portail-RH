@@ -9,3 +9,6 @@ __pycache__/
 .coverage
 htmlcov/
 services/onboarding_ai/data/
+
+bi/local/
+bi/data/

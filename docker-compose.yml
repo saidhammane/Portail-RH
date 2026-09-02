@@ -5,10 +5,10 @@ x-onboarding-ai-environment: &onboarding-ai-environment
   QDRANT_COLLECTION: onboarding_documents
   DATA_DIR: /data/jobs
   ODOO_CALLBACK_URL: http://odoo:8069/portail_rh/onboarding/index/callback?db=${ODOO_DATABASE:-odoo_dev}
-  LLM_PROVIDER: ${LLM_PROVIDER:-extractive}
-  LLM_API_URL: ${LLM_API_URL:-}
+  LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+  LLM_API_URL: ${LLM_API_URL:-http://ollama:11434}
   LLM_API_KEY: ${LLM_API_KEY:-}
-  LLM_CHAT_MODEL: ${LLM_CHAT_MODEL:-}
+  LLM_CHAT_MODEL: ${LLM_CHAT_MODEL:-qwen2.5:0.5b}
   EMBEDDING_MODEL: ${EMBEDDING_MODEL:-hashing-128}
   SESSION_TTL: ${SESSION_TTL:-3600}
   CACHE_TTL: ${CACHE_TTL:-900}
@@ -73,6 +73,33 @@ services:
     volumes:
       - onboarding-qdrant-data:/qdrant/storage
 
+  ollama:
+    image: ollama/ollama:latest
+    environment:
+      # Match the chat request so the warm-up runner can be reused immediately.
+      OLLAMA_CONTEXT_LENGTH: "768"
+      # This compact local model stays resident to avoid a 20-30 second cold load.
+      OLLAMA_KEEP_ALIVE: "-1"
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ollama-model:
+    image: ollama/ollama:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    # `run` pulls the model when needed and warms it before the API accepts traffic.
+    command: ["run", "${LLM_CHAT_MODEL:-qwen2.5:0.5b}", "Reponds uniquement par READY."]
+
   onboarding-ai-api:
     image: portail-rh-onboarding-ai:local
     build:
@@ -82,6 +109,8 @@ services:
         condition: service_healthy
       qdrant:
         condition: service_started
+      ollama-model:
+        condition: service_completed_successfully
     ports:
       - "127.0.0.1:8088:8000"
     environment: *onboarding-ai-environment
@@ -111,3 +140,4 @@ volumes:
   onboarding-redis-data:
   onboarding-qdrant-data:
   onboarding-ai-jobs:
+  ollama-data:

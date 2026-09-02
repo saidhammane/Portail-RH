@@ -2,6 +2,7 @@ import base64
 import hashlib
 
 from odoo import api, fields, models
+from odoo.tools import file_open
 
 
 class PortailRHCompanyDemo(models.AbstractModel):
@@ -9,31 +10,31 @@ class PortailRHCompanyDemo(models.AbstractModel):
     _description = "Jeu de donnees entreprise Portail RH"
 
     EMPLOYEES = (
-        ("1001", "Ahmed El Mansouri", "ahmed.elmansouri@local.test", "hr@local.test", "Ressources Humaines", "Responsable RH", "hr"),
-        ("1002", "Salma Alaoui", "salma.alaoui@local.test", "employee@local.test", "Informatique", "Developpeuse Full Stack", "employee"),
-        ("1003", "Youssef Benali", "youssef.benali@local.test", "manager@local.test", "Finance & Comptabilite", "Responsable Financier", "manager"),
-        ("1004", "Mariam Zahra", "mariam.zahra@local.test", "mariam.zahra@local.test", "Ressources Humaines", "Chargee de recrutement", "employee"),
-        ("1005", "Khalid Rachidi", "khalid.rachidi@local.test", "khalid.rachidi@local.test", "Ressources Humaines", "Gestionnaire RH", "employee"),
-        ("1006", "Hicham Kettani", "hicham.kettani@local.test", "hicham.kettani@local.test", "Informatique", "Responsable Infrastructure", "manager"),
-        ("1007", "Leila Fassi", "leila.fassi@local.test", "leila.fassi@local.test", "Informatique", "Analyste Support", "employee"),
-        ("1008", "Souad Idrissi", "souad.idrissi@local.test", "souad.idrissi@local.test", "Finance & Comptabilite", "Comptable", "employee"),
-        ("1009", "Reda Soussi", "reda.soussi@local.test", "reda.soussi@local.test", "Finance & Comptabilite", "Controleur de gestion", "employee"),
-        (False, "Nadia Amrani", "nadia.amrani@local.test", "nadia.amrani@local.test", "Commercial", "Responsable Commerciale", "manager"),
-        (False, "Omar Tazi", "omar.tazi@local.test", "omar.tazi@local.test", "Commercial", "Account Executive", "employee"),
-        (False, "Imane Berrada", "imane.berrada@local.test", "imane.berrada@local.test", "Operations", "Responsable Operations", "manager"),
-        (False, "Mehdi Alaoui", "mehdi.alaoui@local.test", "mehdi.alaoui@local.test", "Operations", "Coordinateur Operations", "employee"),
+        ("1001", "Said Hammane", "said.hammane@bravico.ma", "hr@local.test", "Direction", "Gerant", "hr", "201", "+212 6 61 20 10 01"),
+        ("1002", "Salma Alaoui", "salma.alaoui@bravico.ma", "employee@local.test", "Produit & IA", "Product Analyst", "employee", "202", "+212 6 61 20 10 02"),
+        ("1003", "Youssef Benali", "youssef.benali@bravico.ma", "manager@local.test", "Engineering", "Tech Lead", "manager", "203", "+212 6 61 20 10 03"),
+        ("1004", "Mariam Zahra", "mariam.zahra@bravico.ma", "mariam.zahra@bravico.ma", "Finance & Administration", "People Operations Specialist", "employee", "204", "+212 6 61 20 10 04"),
+        ("1005", "Khalid Rachidi", "khalid.rachidi@bravico.ma", "khalid.rachidi@bravico.ma", "Finance & Administration", "Responsable Finance & Administration", "manager", "205", "+212 6 61 20 10 05"),
+        ("1006", "Hicham Kettani", "hicham.kettani@bravico.ma", "hicham.kettani@bravico.ma", "Engineering", "DevOps Engineer", "employee", "206", "+212 6 61 20 10 06"),
+        ("1007", "Leila Fassi", "leila.fassi@bravico.ma", "leila.fassi@bravico.ma", "Customer Success", "Customer Success Manager", "manager", "207", "+212 6 61 20 10 07"),
+        ("1008", "Souad Idrissi", "souad.idrissi@bravico.ma", "souad.idrissi@bravico.ma", "Finance & Administration", "Comptable", "employee", "208", "+212 6 61 20 10 08"),
+        ("1009", "Reda Soussi", "reda.soussi@bravico.ma", "reda.soussi@bravico.ma", "Commercial & Marketing", "Sales Development Representative", "employee", "209", "+212 6 61 20 10 09"),
+        (False, "Nadia Amrani", "nadia.amrani@bravico.ma", "nadia.amrani@bravico.ma", "Commercial & Marketing", "Head of Sales & Marketing", "manager", "210", "+212 6 61 20 10 10"),
+        (False, "Omar Tazi", "omar.tazi@bravico.ma", "omar.tazi@bravico.ma", "Customer Success", "Customer Success Specialist", "employee", "211", "+212 6 61 20 10 11"),
+        (False, "Imane Berrada", "imane.berrada@bravico.ma", "imane.berrada@bravico.ma", "Produit & IA", "Product & AI Lead", "manager", "212", "+212 6 61 20 10 12"),
+        (False, "Mehdi Alaoui", "mehdi.alaoui@bravico.ma", "mehdi.alaoui@bravico.ma", "Engineering", "Software Engineer", "employee", "213", "+212 6 61 20 10 13"),
     )
 
     DOCUMENTS = (
         (
-            "Guide de l'employe Atlas Digital",
-            "guide-employe-atlas.txt",
+            "Guide de l'employe Bravico",
+            "guide-employe-bravico.txt",
             "welcome",
             "employee",
             False,
-            """ATLAS DIGITAL SERVICES - GUIDE DE L'EMPLOYE / EMPLOYEE HANDBOOK
+            """BRAVICO SARL AU - GUIDE DE L'EMPLOYE / EMPLOYEE HANDBOOK
 
-Bienvenue chez Atlas Digital Services, entreprise marocaine de services numeriques basee a Casablanca.
+Bienvenue chez Bravico, editeur marocain de logiciels SaaS simples et fiables pour les PME, base a Casablanca. Notre signature est: La simplicite qui paie.
 
 HORAIRES / WORKING HOURS
 La semaine de travail est du lundi au vendredi. Les horaires habituels sont 09:00-18:00 avec une pause dejeuner de 13:00 a 14:00. Une tolerance de dix minutes est admise. Tout retard doit etre signale au manager.
@@ -45,13 +46,50 @@ CONGES / LEAVE
 Chaque collaborateur dispose de 18 jours ouvrables de conge annuel. Une demande de moins de trois jours doit etre envoyee 7 jours a l'avance; au-dela, 15 jours a l'avance. Les absences maladie doivent etre signalees le jour meme et justifiees sous 48 heures.
 
 PAIE / PAYROLL
-Le salaire est verse le dernier jour ouvrable du mois. Les bulletins sont disponibles aupres de RH. Toute question de paie doit etre envoyee a rh@atlas-digital.local.
+Le salaire est verse le dernier jour ouvrable du mois. Les bulletins sont disponibles aupres de l'administration. Toute question de paie doit etre envoyee a contact@bravico.ma.
 
 PERIODE D'ESSAI / PROBATION
 La periode d'essai standard est de trois mois, renouvelable une fois selon le contrat. Un point est organise avec le manager apres 30, 60 et 90 jours.
 
 CONTACTS
-RH: rh@atlas-digital.local - poste 200. Support IT: support@atlas-digital.local - poste 300. Urgence securite: poste 100.
+Administration: contact@bravico.ma - poste 201. Support: support@bravico.ma - poste 207. Telephone principal: +212 6 39 26 99 45.
+""",
+        ),
+        (
+            "Identite et contacts officiels Bravico",
+            "identite-contacts-bravico.txt",
+            "welcome",
+            "employee",
+            False,
+            """FICHE ENTREPRISE BRAVICO
+
+Raison sociale: Bravico SARL AU.
+Activite: conception et exploitation de logiciels simples et fiables pour les PME marocaines.
+Localisation: Casablanca, Maroc.
+Site web: https://bravico.ma
+Contact officiel Bravico: email contact@bravico.ma et telephone/WhatsApp +212 6 39 26 99 45.
+Registre de commerce: RC 689915.
+Identifiant commun de l'entreprise: ICE 003790052000007.
+Taxe professionnelle: 32302012.
+
+Produits principaux: Bravico Pilotage, assistant de pilotage operationnel base sur les donnees et documents de l'entreprise, et EFacture Express, solution de facturation electronique pour les PME marocaines.
+""",
+        ),
+        (
+            "Produits et services Bravico",
+            "produits-services-bravico.txt",
+            "other",
+            "employee",
+            False,
+            """PRODUITS ET SERVICES BRAVICO
+
+Bravico Pilotage aide les managers a obtenir des reponses operationnelles sur la tresorerie, les relances, le stock, les clients, les reunions et les documents de l'entreprise.
+
+EFacture Express simplifie la creation, l'import, le stockage et la preparation des factures electroniques. Le produit est concu pour accompagner les PME marocaines dans leur conformite a la facturation electronique.
+
+Bravico propose egalement des logiciels sur mesure, de l'automatisation documentaire, du reporting operationnel et un accompagnement a la structuration des donnees d'entreprise.
+
+Pour une demonstration ou une question commerciale: contact@bravico.ma ou +212 6 39 26 99 45.
 """,
         ),
         (
@@ -104,7 +142,7 @@ Le compte professionnel est active le premier jour. Le mot de passe doit conteni
 
 Pour le Wi-Fi du bureau, utilisez le reseau ATLAS-STAFF avec vos identifiants professionnels. Le reseau ATLAS-GUEST est reserve aux visiteurs.
 
-Pour travailler a distance, ouvrez Atlas VPN puis connectez-vous avec le MFA. En cas de probleme de VPN, redemarrez le client et contactez support@atlas-digital.local ou le poste 300.
+Pour travailler a distance, ouvrez Bravico VPN puis connectez-vous avec le MFA. En cas de probleme de VPN, redemarrez le client et contactez support@bravico.ma ou le poste 207.
 
 Tout email suspect, demande urgente de paiement ou lien de connexion inhabituel doit etre signale avec le bouton Phishing dans Outlook. N'ouvrez pas la piece jointe.
 
@@ -112,12 +150,12 @@ Un ordinateur perdu ou vole doit etre signale immediatement au support IT et au 
 """,
         ),
         (
-            "Procedures equipe Informatique",
-            "procedures-it.txt",
+            "Procedures equipe Produit et IA",
+            "procedures-produit-ia.txt",
             "it",
             "department",
-            "Informatique",
-            """PROCEDURES DU DEPARTEMENT INFORMATIQUE
+            "Produit & IA",
+            """PROCEDURES DE L'EQUIPE PRODUIT ET IA
 
 Le daily meeting a lieu a 09:30. Les changements de production exigent une pull request approuvee, des tests verts et une fenetre de deploiement annoncee. Les incidents P1 sont signales dans le canal incident et au responsable infrastructure.
 
@@ -146,17 +184,46 @@ Les objectifs trimestriels sont definis avec des resultats mesurables. Les sujet
         env = self.sudo().env
         company = env.company
         country = env.ref("base.ma", raise_if_not_found=False)
-        company.write(
-            {
-                "name": "Atlas Digital Services",
-                "email": "contact@atlas-digital.local",
-                "phone": "+212 5 22 00 00 00",
-                "street": "120 Boulevard Zerktouni",
-                "city": "Casablanca",
-                "zip": "20000",
-                "country_id": country.id if country else False,
+        with file_open("portail_rh/static/src/img/bravico-horizontal.png", "rb") as logo_file:
+            company_logo = base64.b64encode(logo_file.read())
+        with file_open("portail_rh/static/src/img/bravico-square.png", "rb") as favicon_file:
+            website_favicon = base64.b64encode(favicon_file.read())
+        company_values = {
+            "name": "Bravico SARL AU",
+            "email": "contact@bravico.ma",
+            "phone": "+212 6 39 26 99 45",
+            "website": "https://bravico.ma",
+            "street": False,
+            "city": "Casablanca",
+            "zip": False,
+            "country_id": country.id if country else False,
+            "logo": company_logo,
+        }
+        if "company_registry" in company._fields:
+            company_values["company_registry"] = (
+                "RC 689915 | ICE 003790052000007 | TP 32302012"
+            )
+        company.write(company_values)
+        websites = env["website"].search([("company_id", "=", company.id)])
+        for website in websites:
+            website_values = {
+                "name": "Bravico",
+                "logo": company_logo,
+                "favicon": website_favicon,
             }
+            website.write(website_values)
+        header_contact_view = env.ref(
+            "website.header_text_element", raise_if_not_found=False
         )
+        if header_contact_view:
+            header_arch = header_contact_view.arch_db
+            header_arch = header_arch.replace(
+                "+1 555-555-5556", company.phone
+            ).replace(
+                "info@yourcompany.example.com", company.email
+            )
+            if header_arch != header_contact_view.arch_db:
+                header_contact_view.write({"arch_db": header_arch})
         departments = {}
         for name in {item[4] for item in self.EMPLOYEES}:
             department = env["hr.department"].search(
@@ -174,15 +241,28 @@ Les objectifs trimestriels sont definis avec des resultats mesurables. Les sujet
         portal_action = env.ref("portail_rh.action_employee_portal_home")
         employees = {}
         department_managers = {}
-        for device_id, name, work_email, login, department_name, job_name, role in self.EMPLOYEES:
+        for (
+            device_id,
+            name,
+            work_email,
+            login,
+            department_name,
+            job_name,
+            role,
+            extension,
+            mobile_phone,
+        ) in self.EMPLOYEES:
             job = env["hr.job"].search(
                 [("name", "=", job_name), ("company_id", "=", company.id)], limit=1
             )
             if not job:
                 job = env["hr.job"].create({"name": job_name, "company_id": company.id})
-            user = env["res.users"].search([("login", "=", login)], limit=1)
+            user = env["res.users"].search(
+                ["|", ("login", "=", login), ("name", "=", name)], limit=1
+            )
             user_values = {
                 "name": name,
+                "login": login,
                 "email": work_email,
                 "password": password,
                 "active": True,
@@ -194,10 +274,16 @@ Les objectifs trimestriels sont definis avec des resultats mesurables. Les sujet
             if user:
                 user.write(user_values)
             else:
-                user_values["login"] = login
                 user = env["res.users"].create(user_values)
             employee = env["hr.employee"].search(
-                ["|", ("user_id", "=", user.id), ("work_email", "=ilike", work_email)], limit=1
+                [
+                    "|",
+                    "|",
+                    ("user_id", "=", user.id),
+                    ("work_email", "=ilike", work_email),
+                    ("name", "=", name),
+                ],
+                limit=1,
             )
             employee_values = {
                 "name": name,
@@ -206,6 +292,8 @@ Les objectifs trimestriels sont definis avec des resultats mesurables. Les sujet
                 "department_id": departments[department_name].id,
                 "job_id": job.id,
                 "company_id": company.id,
+                "work_phone": "%s poste %s" % (company.phone, extension),
+                "mobile_phone": mobile_phone,
                 "zkteco_user_id": device_id or False,
             }
             if employee:
@@ -227,12 +315,24 @@ Les objectifs trimestriels sont definis avec des resultats mesurables. Les sujet
 
         documents_to_index = env["hr.onboarding.document"].browse()
         documents = {}
+        legacy_titles = {
+            "Guide de l'employe Bravico": "Guide de l'employe Atlas Digital",
+            "Procedures equipe Produit et IA": "Procedures equipe Informatique",
+        }
         for title, filename, category, visibility, department_name, content in self.DOCUMENTS:
             content_bytes = content.encode("utf-8")
             checksum = hashlib.sha256(content_bytes).hexdigest()
             document = env["hr.onboarding.document"].search(
                 [("name", "=", title), ("company_id", "=", company.id)], limit=1
             )
+            if not document and legacy_titles.get(title):
+                document = env["hr.onboarding.document"].search(
+                    [
+                        ("name", "=", legacy_titles[title]),
+                        ("company_id", "=", company.id),
+                    ],
+                    limit=1,
+                )
             values = {
                 "name": title,
                 "file_name": filename,
@@ -262,14 +362,18 @@ Les objectifs trimestriels sont definis avec des resultats mesurables. Les sujet
                 (40, "Terminer la sensibilisation securite", "Valider le module phishing et protection des donnees."),
                 (50, "Donner un feedback d'integration", "Partager les points clairs et les besoins restants avec RH."),
             )),
-            ("Parcours equipe Informatique", "Informatique", (
+            ("Parcours equipe Produit & IA", "Produit & IA", (
                 (10, "Installer les outils de developpement", "Configurer Git, VPN, environnement local et acces projets."),
                 (20, "Lire la procedure de mise en production", "Comprendre les revues, tests et fenetres de deploiement."),
-                (30, "Participer au daily IT", "Se presenter et partager son premier objectif d'equipe."),
+                (30, "Participer au daily Produit", "Se presenter et partager son premier objectif d'equipe."),
             )),
         )
         for plan_name, department_name, lines in plans:
             plan = env["hr.onboarding.plan"].search([("name", "=", plan_name)], limit=1)
+            if not plan and plan_name == "Parcours equipe Produit & IA":
+                plan = env["hr.onboarding.plan"].search(
+                    [("name", "=", "Parcours equipe Informatique")], limit=1
+                )
             plan_values = {
                 "name": plan_name,
                 "department_id": departments[department_name].id if department_name else False,
@@ -283,6 +387,14 @@ Les objectifs trimestriels sont definis avec des resultats mesurables. Les sujet
                 line = env["hr.onboarding.plan.line"].search(
                     [("plan_id", "=", plan.id), ("name", "=", line_name)], limit=1
                 )
+                if not line and line_name == "Participer au daily Produit":
+                    line = env["hr.onboarding.plan.line"].search(
+                        [
+                            ("plan_id", "=", plan.id),
+                            ("name", "=", "Participer au daily IT"),
+                        ],
+                        limit=1,
+                    )
                 line_values = {
                     "plan_id": plan.id,
                     "name": line_name,
@@ -292,7 +404,19 @@ Les objectifs trimestriels sont definis avec des resultats mesurables. Les sujet
                 }
                 line.write(line_values) if line else env["hr.onboarding.plan.line"].create(line_values)
 
-        for employee in employees.values():
+        demo_employees = env["hr.employee"].browse(
+            [employee.id for employee in employees.values()]
+        )
+        demo_tasks = env["hr.onboarding.employee.task"].search(
+            [("employee_id", "in", demo_employees.ids)]
+        )
+        stale_tasks = demo_tasks.filtered(
+            lambda task: task.plan_line_id.plan_id.department_id
+            and task.plan_line_id.plan_id.department_id != task.employee_id.department_id
+        )
+        stale_tasks.unlink()
+
+        for employee in demo_employees:
             tasks = env["hr.onboarding.employee.task"].ensure_for_employee(employee)
             if employee.user_id.login == "employee@local.test":
                 tasks[:2].write({"state": "done"})
@@ -303,19 +427,38 @@ Les objectifs trimestriels sont definis avec des resultats mesurables. Les sujet
         conversation = env["hr.onboarding.conversation"].search(
             [("user_id", "=", sample_employee.user_id.id), ("active", "=", True)], limit=1
         )
+        welcome_content = (
+            "Bonjour Salma ! Je suis Bravi, l'assistant RH de Bravico. Je peux "
+            "vous aider sur l'entreprise, les produits, les contacts, les horaires, "
+            "le teletravail, les avantages, le support et les demandes RH. Mes "
+            "reponses utilisent uniquement les documents autorises."
+        )
         if not conversation:
             conversation = env["hr.onboarding.conversation"].create(
                 {"user_id": sample_employee.user_id.id, "employee_id": sample_employee.id}
             )
-            env["hr.onboarding.message"].create(
-                {
-                    "conversation_id": conversation.id,
-                    "role": "assistant",
-                    "content": "Bonjour Salma ! Je peux vous aider sur les horaires, conges, teletravail, avantages, IT et demandes RH. Mes reponses utilisent uniquement les documents autorises.",
-                    "source_document_ids": [(6, 0, [documents["Guide de l'employe Atlas Digital"].id])],
-                    "source_payload": "[]",
-                }
-            )
+        welcome_message = env["hr.onboarding.message"].search(
+            [
+                ("conversation_id", "=", conversation.id),
+                ("role", "=", "assistant"),
+                ("content", "ilike", "Bonjour Salma"),
+            ],
+            order="id asc",
+            limit=1,
+        )
+        welcome_values = {
+            "conversation_id": conversation.id,
+            "role": "assistant",
+            "content": welcome_content,
+            "source_document_ids": [
+                (6, 0, [documents["Guide de l'employe Bravico"].id])
+            ],
+            "source_payload": "[]",
+        }
+        if welcome_message:
+            welcome_message.write(welcome_values)
+        else:
+            env["hr.onboarding.message"].create(welcome_values)
 
         log_model = env["hr.attendance.device.log"]
         mapped = log_model._map_unmatched_logs()
@@ -354,7 +497,7 @@ Les objectifs trimestriels sont definis avec des resultats mesurables. Les sujet
         attestation_values = (
             (sample_employee, "work", "Dossier de location", "approved"),
             (sample_employee, "salary", "Dossier bancaire", "submitted"),
-            (employees["khalid.rachidi@local.test"], "work", "Demarche administrative", "done"),
+            (employees["khalid.rachidi@bravico.ma"], "work", "Demarche administrative", "done"),
         )
         for employee, kind, reason, state in attestation_values:
             if not env["hr.attestation.request"].search_count([("employee_id", "=", employee.id), ("reason", "=", reason)]):

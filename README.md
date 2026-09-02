@@ -39,7 +39,7 @@ Odoo reste la source de verite pour les utilisateurs, roles, documents, conversa
 
 Voir [docs/ai-onboarding-architecture.md](docs/ai-onboarding-architecture.md) pour les flux et le modele de securite.
 
-Version du module : `17.0.2.0.0`.
+Version du module : `17.0.2.1.0`.
 
 ## Configuration locale
 
@@ -54,12 +54,14 @@ Renseigner au minimum dans `.env` :
 - `ONBOARDING_AI_SERVICE_TOKEN` (16 caracteres minimum)
 - `ODOO_DATABASE`
 
-Le fichier `.env` est ignore par Git. `PORTAIL_RH_DEMO_PASSWORD` est facultatif et permet de definir localement les mots de passe des utilisateurs de demonstration. Aucun mot de passe de demonstration n'est versionne.
+Le fichier `.env` est ignore par Git. `PORTAIL_RH_DEMO_PASSWORD` est facultatif. Lorsqu'il est defini, l'installation initialise automatiquement la demonstration Bravico complete : logo officiel, identite legale, 13 collaborateurs, coordonnees, departements, documents internes, checklists et comptes de test. Aucun mot de passe de demonstration n'est versionne.
 
-Le provider par defaut `extractive` fonctionne sans cle externe et ne formule que des extraits cites. Providers pris en charge :
+Le provider par defaut est maintenant le vrai modele generatif local `qwen2.5:0.5b`, execute par Ollama. Ce modele compact privilegie une reponse interactive sur CPU et ne demande aucune cle externe : les questions et documents restent dans la pile Docker locale. Le premier demarrage telecharge et precharge automatiquement le modele avant d'ouvrir l'API. Les reponses sont generees avec historique de conversation, contraintes par les documents autorises et accompagnees de citations.
 
-- `extractive` : embeddings locaux deterministes, utile pour developpement et tests ;
-- `ollama` : definir `LLM_PROVIDER=ollama`, `LLM_API_URL`, `LLM_CHAT_MODEL` et `EMBEDDING_MODEL` ;
+Providers pris en charge :
+
+- `ollama` (defaut) : generation locale avec Qwen et recherche locale `hashing-128` ;
+- `extractive` : ancien mode deterministe sans generation, conserve pour les tests et le diagnostic ;
 - `openai` compatible : definir `LLM_PROVIDER=openai`, l'URL, les modeles et `LLM_API_KEY`.
 
 Les cles ne sont jamais journalisees.
@@ -75,6 +77,7 @@ Services publies localement :
 
 - Odoo : `http://localhost:8069`
 - API onboarding : `http://127.0.0.1:8088`
+- Ollama : `http://127.0.0.1:11434`
 - PostgreSQL : `127.0.0.1:5432`
 - ZKTeco : `http://127.0.0.1:8090/demo`
 
@@ -148,8 +151,8 @@ Ces manifests ont ete rendus et valides syntaxiquement, mais pas testes sur un c
 ## Limites
 
 - Pas d'OCR : les PDF scannes sans couche texte sont refuses.
-- Le provider `extractive` exige un recouvrement lexical et peut refuser des paraphrases.
-- La qualite d'un provider LLM externe depend du modele, des documents et du seuil configure.
+- La recherche locale `hashing-128` exige un recouvrement lexical ; le modele generatif reformule ensuite naturellement les passages trouves.
+- La qualite des reponses depend du modele, des documents autorises et du seuil configure. En l'absence de source suffisante, l'assistant refuse et propose une escalade RH.
 - Qdrant est deploye en instance unique dans les exemples Docker/Kubernetes.
 - Le PVC de jobs Kubernetes exige une classe de stockage RWX compatible.
 - La retention des conversations reste geree dans PostgreSQL/Odoo et doit suivre la politique de confidentialite de l'organisation.

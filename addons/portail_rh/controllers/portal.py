@@ -223,7 +223,7 @@ class PortailRHPortal(CustomerPortal):
             method="POST",
         )
         try:
-            with urlopen(http_request, timeout=60) as response:
+            with urlopen(http_request, timeout=55) as response:
                 return json.loads(response.read().decode("utf-8"))
         except HTTPError as error:
             if error.code == 429:
@@ -269,9 +269,114 @@ class PortailRHPortal(CustomerPortal):
 
         return documents.filtered(is_allowed)
 
+    def _create_onboarding_answer(self, employee, conversation, question):
+        Message = request.env["hr.onboarding.message"].sudo()
+        user_message = Message.create(
+            {
+                "conversation_id": conversation.id,
+                "role": "user",
+                "content": question,
+            }
+        )
+        history_messages = Message.search(
+            [
+                ("conversation_id", "=", conversation.id),
+                ("id", "<", user_message.id),
+                ("role", "in", ["user", "assistant"]),
+            ],
+            order="id desc",
+            limit=6,
+        )
+        history = [
+            {"role": message.role, "content": message.content[:1000]}
+            for message in reversed(history_messages)
+        ]
+        scopes = self._onboarding_scopes()
+        try:
+            ai_response = self._call_onboarding_ai(
+                {
+                    "user_id": request.env.user.id,
+                    "employee_id": employee.id,
+                    "company_id": (employee.company_id or request.env.company).id,
+                    "department_id": employee.department_id.id or None,
+                    "group_scopes": scopes,
+                    "question": question,
+                    "conversation_id": conversation.id,
+                    "history": history,
+                }
+            )
+        except UserError as error:
+            ai_response = {
+                "answer": str(error),
+                "sources": [],
+                "confidence": 0.0,
+                "latency_ms": 0,
+                "cache_hit": False,
+                "needs_escalation": True,
+            }
+
+        response_sources = ai_response.get("sources") or []
+        source_ids = []
+        for source in response_sources:
+            try:
+                source_ids.append(int(source["document_id"]))
+            except (KeyError, TypeError, ValueError):
+                continue
+        allowed_documents = self._allowed_onboarding_documents(
+            employee, scopes, source_ids
+        )
+        is_smalltalk = bool(ai_response.get("smalltalk")) and not response_sources
+        if not is_smalltalk and (
+            not source_ids or set(source_ids) != set(allowed_documents.ids)
+        ):
+            ai_response.update(
+                {
+                    "answer": str(ONBOARDING_REFUSAL),
+                    "sources": [],
+                    "confidence": 0.0,
+                    "needs_escalation": True,
+                }
+            )
+            allowed_documents = request.env["hr.onboarding.document"].sudo().browse()
+        canonical_sources = []
+        document_by_id = {document.id: document for document in allowed_documents}
+        for source in ai_response.get("sources") or []:
+            try:
+                document = document_by_id.get(int(source["document_id"]))
+            except (KeyError, TypeError, ValueError):
+                document = False
+            if document:
+                canonical_sources.append(
+                    {
+                        "document_id": document.id,
+                        "title": document.name,
+                        "section": str(source.get("section") or "Section")[:255],
+                        "score": max(0.0, min(1.0, float(source.get("score") or 0.0))),
+                    }
+                )
+        assistant_message = Message.create(
+            {
+                "conversation_id": conversation.id,
+                "role": "assistant",
+                "content": str(ai_response.get("answer") or ONBOARDING_REFUSAL),
+                "source_document_ids": [(6, 0, allowed_documents.ids)],
+                "source_payload": json.dumps(canonical_sources),
+                "confidence_score": max(
+                    0.0, min(1.0, float(ai_response.get("confidence") or 0.0))
+                ),
+                "latency_ms": max(0, int(ai_response.get("latency_ms") or 0)),
+                "cache_hit": bool(ai_response.get("cache_hit")),
+                "needs_escalation": bool(ai_response.get("needs_escalation")),
+            }
+        )
+        conversation.sudo().write({"last_message_at": fields.Datetime.now()})
+        request.session["onboarding_last_message_id"] = assistant_message.id
+        return assistant_message, canonical_sources
+
     def _onboarding_values(self, employee, conversation, error=None, message=None):
         tasks = request.env["hr.onboarding.employee.task"].ensure_for_employee(employee)
         employee_profile = employee.sudo()
+        employee_company = employee_profile.company_id.sudo() or request.env.company.sudo()
         messages = conversation.message_ids.sudo()
         source_details = {}
         for chat_message in messages.filtered(lambda item: item.role == "assistant"):
@@ -282,12 +387,14 @@ class PortailRHPortal(CustomerPortal):
             except (TypeError, ValueError):
                 source_details[chat_message.id] = []
         suggested_questions = [
+            _("Que fait Bravico et quels sont ses produits ?"),
+            _("Quels sont les contacts officiels de Bravico ?"),
             _("Quels sont mes horaires de travail ?"),
             _("Comment demander un conge ou une attestation ?"),
             _("Quels avantages sont proposes aux employes ?"),
             _("Comment utiliser le VPN et contacter le support IT ?"),
         ]
-        if employee_profile.department_id.name == "Informatique":
+        if employee_profile.department_id.name in ("Produit & IA", "Engineering"):
             suggested_questions.insert(1, _("Quelle est la procedure de mise en production ?"))
         values = self._prepare_portal_layout_values()
         values.update(
@@ -295,7 +402,16 @@ class PortailRHPortal(CustomerPortal):
                 "page_name": "onboarding",
                 "employee": employee,
                 "employee_job_name": employee_profile.job_id.name or _("Collaborateur"),
-                "employee_department_name": employee_profile.department_id.name or _("Equipe Atlas"),
+                "employee_department_name": employee_profile.department_id.name or _("Equipe Bravico"),
+                "employee_work_email": employee_profile.work_email or "",
+                "employee_phone": employee_profile.mobile_phone
+                or employee_profile.work_phone
+                or "",
+                "company_name": employee_company.name,
+                "company_email": employee_company.email or "",
+                "company_phone": employee_company.phone or "",
+                "company_website": employee_company.website or "",
+                "company_registry": employee_company.company_registry or "",
                 "conversation": conversation,
                 "messages": messages,
                 "message_sources": source_details,
@@ -634,88 +750,37 @@ class PortailRHPortal(CustomerPortal):
                     error=_("La question doit contenir entre 2 et 2000 caracteres."),
                 ),
             )
-        Message = request.env["hr.onboarding.message"].sudo()
-        Message.create(
-            {
-                "conversation_id": conversation.id,
-                "role": "user",
-                "content": question,
-            }
-        )
-        scopes = self._onboarding_scopes()
-        try:
-            ai_response = self._call_onboarding_ai(
-                {
-                    "user_id": request.env.user.id,
-                    "employee_id": employee.id,
-                    "company_id": (employee.company_id or request.env.company).id,
-                    "department_id": employee.department_id.id or None,
-                    "group_scopes": scopes,
-                    "question": question,
-                    "conversation_id": conversation.id,
-                }
-            )
-        except UserError as error:
-            ai_response = {
-                "answer": str(error),
-                "sources": [],
-                "confidence": 0.0,
-                "latency_ms": 0,
-                "cache_hit": False,
-                "needs_escalation": True,
-            }
-
-        response_sources = ai_response.get("sources") or []
-        source_ids = []
-        for source in response_sources:
-            try:
-                source_ids.append(int(source["document_id"]))
-            except (KeyError, TypeError, ValueError):
-                continue
-        allowed_documents = self._allowed_onboarding_documents(
-            employee, scopes, source_ids
-        )
-        if not source_ids or set(source_ids) != set(allowed_documents.ids):
-            ai_response.update(
-                {
-                    "answer": str(ONBOARDING_REFUSAL),
-                    "sources": [],
-                    "confidence": 0.0,
-                    "needs_escalation": True,
-                }
-            )
-            allowed_documents = request.env["hr.onboarding.document"].sudo().browse()
-        canonical_sources = []
-        document_by_id = {document.id: document for document in allowed_documents}
-        for source in ai_response.get("sources") or []:
-            document = document_by_id.get(int(source["document_id"]))
-            if document:
-                canonical_sources.append(
-                    {
-                        "document_id": document.id,
-                        "title": document.name,
-                        "section": str(source.get("section") or "Section")[:255],
-                        "score": max(0.0, min(1.0, float(source.get("score") or 0.0))),
-                    }
-                )
-        assistant_message = Message.create(
-            {
-                "conversation_id": conversation.id,
-                "role": "assistant",
-                "content": str(ai_response.get("answer") or ONBOARDING_REFUSAL),
-                "source_document_ids": [(6, 0, allowed_documents.ids)],
-                "source_payload": json.dumps(canonical_sources),
-                "confidence_score": max(
-                    0.0, min(1.0, float(ai_response.get("confidence") or 0.0))
-                ),
-                "latency_ms": max(0, int(ai_response.get("latency_ms") or 0)),
-                "cache_hit": bool(ai_response.get("cache_hit")),
-                "needs_escalation": bool(ai_response.get("needs_escalation")),
-            }
-        )
-        conversation.sudo().write({"last_message_at": fields.Datetime.now()})
-        request.session["onboarding_last_message_id"] = assistant_message.id
+        self._create_onboarding_answer(employee, conversation, question)
         return request.redirect("/my/onboarding")
+
+    @http.route(
+        "/my/onboarding/ask_json",
+        type="http",
+        auth="user",
+        website=True,
+        methods=["POST"],
+    )
+    def portal_onboarding_ask_json(self, **post):
+        employee = self._current_employee()
+        conversation = self._onboarding_conversation(employee)
+        question = (post.get("question") or "").strip()
+        if len(question) < 2 or len(question) > 2000:
+            return request.make_json_response(
+                {"error": _("La question doit contenir entre 2 et 2000 caracteres.")},
+                status=400,
+            )
+        assistant_message, sources = self._create_onboarding_answer(
+            employee, conversation, question
+        )
+        return request.make_json_response(
+            {
+                "message_id": assistant_message.id,
+                "answer": assistant_message.content,
+                "sources": sources,
+                "confidence": assistant_message.confidence_score,
+                "needs_escalation": assistant_message.needs_escalation,
+            }
+        )
 
     @http.route(
         "/my/onboarding/checklist",

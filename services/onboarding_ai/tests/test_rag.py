@@ -1,11 +1,22 @@
 import asyncio
 from types import SimpleNamespace
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi import HTTPException
 
 from app.config import Settings
-from app.rag import REFUSAL_ANSWER, answer_chat, build_access_filter
+from app.providers import embed_texts
+from app.rag import (
+    REFUSAL_ANSWER,
+    answer_chat,
+    build_access_filter,
+    build_relevant_excerpt,
+    clean_generated_answer,
+    is_follow_up_question,
+    is_smalltalk_question,
+    resolve_generation_question,
+)
 from app.schemas import ChatRequest
 
 
@@ -101,6 +112,32 @@ def test_question_without_authorized_source_refuses_and_escalates():
     assert response.confidence == 0.0
 
 
+def test_smalltalk_is_generated_without_document_sources():
+    redis = FakeRedis()
+    qdrant = FakeQdrant([])
+    payload = request_payload(question="hello")
+    generated = AsyncMock(return_value="Bonjour ! Comment puis-je vous aider ?")
+    with patch("app.rag.generate_smalltalk_answer", generated):
+        response = asyncio.run(
+            answer_chat(
+                payload,
+                settings(
+                    llm_provider="ollama",
+                    llm_api_url="http://ollama:11434",
+                    llm_chat_model="qwen2.5:0.5b",
+                ),
+                redis,
+                qdrant,
+            )
+        )
+    assert is_smalltalk_question("hello")
+    assert response.answer == "Bonjour ! Comment puis-je vous aider ?"
+    assert response.smalltalk
+    assert not response.needs_escalation
+    assert response.sources == []
+    assert qdrant.calls == 0
+
+
 def test_extractive_fallback_rejects_vector_hash_collision():
     response = asyncio.run(
         answer_chat(
@@ -167,3 +204,116 @@ def test_cache_reuse_keeps_user_sessions_isolated():
     assert cached.cache_hit
     assert "onboarding:session:10:30" in redis.values
     assert "onboarding:session:11:31" in redis.values
+
+
+def test_ollama_generation_can_keep_the_existing_hashing_index():
+    configured = settings(
+        llm_provider="ollama",
+        llm_api_url="http://ollama:11434",
+        llm_chat_model="qwen2.5:1.5b",
+        embedding_model="hashing-128",
+    )
+    vectors = asyncio.run(embed_texts(["Produits Bravico"], configured))
+    assert len(vectors) == 1
+    assert len(vectors[0]) == 128
+
+
+def test_generative_answer_resolves_short_follow_up_without_trusting_old_answer():
+    configured = settings(
+        llm_provider="ollama",
+        llm_api_url="http://ollama:11434",
+        llm_chat_model="qwen2.5:1.5b",
+        embedding_model="hashing-128",
+    )
+    payload = request_payload(
+        question="Et le vendredi ?",
+        history=[
+            {"role": "user", "content": "Quels sont les horaires ?"},
+            {"role": "assistant", "content": "De 09:00 a 18:00 [1]."},
+        ],
+    )
+    generated = AsyncMock(return_value="Le vendredi suit le meme horaire [1].")
+    with patch("app.rag.generate_grounded_answer", generated):
+        response = asyncio.run(
+            answer_chat(payload, configured, FakeRedis(), FakeQdrant([source_point()]))
+        )
+    assert "[1]" in response.answer
+    assert generated.await_args.args[1].startswith(
+        "Question precedente: Quels sont les horaires ?"
+    )
+    assert generated.await_args.kwargs["history"] == []
+
+
+def test_generative_refusal_is_escalated_without_sources():
+    configured = settings(
+        llm_provider="ollama",
+        llm_api_url="http://ollama:11434",
+        llm_chat_model="qwen2.5:1.5b",
+        embedding_model="hashing-128",
+    )
+    generated = AsyncMock(
+        return_value="Information insuffisante dans les documents autorises."
+    )
+    with patch("app.rag.generate_grounded_answer", generated):
+        response = asyncio.run(
+            answer_chat(
+                request_payload(), configured, FakeRedis(), FakeQdrant([source_point()])
+            )
+        )
+    assert response.answer == REFUSAL_ANSWER
+    assert response.sources == []
+    assert response.needs_escalation
+
+
+def test_cache_is_conversation_aware_for_follow_up_questions():
+    redis = FakeRedis()
+    qdrant = FakeQdrant([source_point()])
+    first = request_payload(
+        question="Et le vendredi ?",
+        history=[{"role": "user", "content": "Parlons des horaires."}]
+    )
+    second = request_payload(
+        question="Et le vendredi ?",
+        history=[{"role": "user", "content": "Parlons des avantages."}]
+    )
+    asyncio.run(answer_chat(first, settings(), redis, qdrant))
+    asyncio.run(answer_chat(second, settings(), redis, qdrant))
+    assert qdrant.calls == 2
+
+
+def test_only_an_explicit_reference_is_treated_as_a_follow_up():
+    assert is_follow_up_question("Et lequel concerne la facturation ?")
+    assert is_follow_up_question("Cela concerne quel produit ?")
+    assert not is_follow_up_question("Que fait Bravico et quels sont ses produits ?")
+
+
+def test_follow_up_pronoun_is_resolved_from_the_previous_user_question():
+    payload = request_payload(
+        question="Et lequel concerne la facturation electronique ?",
+        history=[
+            {"role": "user", "content": "Quels sont les produits Bravico ?"},
+            {"role": "assistant", "content": "Une ancienne reponse non fiable."},
+        ],
+    )
+    assert resolve_generation_question(payload) == (
+        "quel produit concerne la facturation electronique ?"
+    )
+
+
+def test_relevant_excerpt_prioritizes_the_named_fact_over_an_orphan_reference():
+    text = (
+        "Bravico Pilotage aide les managers. "
+        "EFacture Express prepare les factures electroniques. "
+        "Le produit accompagne les PME pour la facturation electronique."
+    )
+    excerpt = build_relevant_excerpt(
+        text, "Quel produit concerne la facturation electronique ?"
+    )
+    assert excerpt.startswith("EFacture Express")
+
+
+def test_generated_answer_drops_an_unfinished_second_sentence():
+    assert clean_generated_answer("Reponse complete. Debut coupe") == "Reponse complete."
+    assert clean_generated_answer(
+        "Horaires : - 09:00 a 18:00 - fragment coupe"
+    ) == "Horaires : - 09:00 a 18:00"

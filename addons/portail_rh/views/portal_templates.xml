@@ -1,4 +1,34 @@
 <odoo>
+  <template id="website_layout_bravico" inherit_id="website.layout" priority="95">
+    <xpath expr="//div[@id='footer']" position="replace">
+      <div id="footer" class="bravico-website-footer">
+        <div class="container py-5">
+          <div class="row align-items-center g-4">
+            <div class="col-lg-5">
+              <img src="/portail_rh/static/src/img/bravico-horizontal-white.png" alt="Bravico" class="bravico-footer-logo mb-3"/>
+              <p class="mb-0">Logiciels simples, fiables et utiles pour les PME marocaines.</p>
+            </div>
+            <div class="col-lg-4">
+              <div class="fw-bold mb-2">Bravico SARL AU</div>
+              <div><i class="fa fa-map-marker fa-fw me-2"/>Casablanca, Maroc</div>
+              <div><i class="fa fa-phone fa-fw me-2"/><a t-att-href="'tel:%s' % (res_company.phone or '+212 6 39 26 99 45')"><t t-out="res_company.phone or '+212 6 39 26 99 45'"/></a></div>
+              <div><i class="fa fa-envelope fa-fw me-2"/><a t-att-href="'mailto:%s' % (res_company.email or 'contact@bravico.ma')"><t t-out="res_company.email or 'contact@bravico.ma'"/></a></div>
+            </div>
+            <div class="col-lg-3">
+              <div class="small">RC 689915</div>
+              <div class="small">ICE 003790052000007</div>
+              <div class="small">TP 32302012</div>
+              <a href="https://bravico.ma" class="btn btn-outline-light btn-sm mt-3">bravico.ma</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </xpath>
+    <xpath expr="//span[hasclass('o_footer_copyright_name')]" position="replace">
+      <span class="o_footer_copyright_name me-2">Copyright © <t t-out="res_company.name or 'Bravico SARL AU'"/></span>
+    </xpath>
+  </template>
+
   <template id="portal_breadcrumbs_portail_rh" inherit_id="portal.portal_breadcrumbs" priority="40">
     <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
       <li
@@ -42,6 +72,49 @@
     </xpath>
   </template>
 
+  <template id="portal_layout_bravico" inherit_id="portal.portal_layout" priority="35">
+    <xpath expr="//div[@id='wrap']/div[hasclass('container')]" position="before">
+      <nav class="bravico-portal-nav" aria-label="Navigation espace collaborateur">
+        <div class="container d-flex align-items-center justify-content-between gap-3 py-3">
+          <a href="/my/onboarding" class="bravico-brand-link" aria-label="Accueil Bravico">
+            <img src="/portail_rh/static/src/img/bravico-horizontal.png" alt="Bravico"/>
+            <span>Espace collaborateur</span>
+          </a>
+          <div class="d-none d-md-flex align-items-center gap-1">
+            <a href="/my/onboarding" class="bravico-nav-link">Assistant IA</a>
+            <a href="/my/travel_requests" class="bravico-nav-link">Deplacements</a>
+            <a href="/my/supply_requests" class="bravico-nav-link">Fournitures</a>
+            <a href="/my/attestation_requests" class="bravico-nav-link">Attestations</a>
+          </div>
+        </div>
+      </nav>
+    </xpath>
+    <xpath expr="//div[@id='wrap']" position="after">
+      <details t-if="request.httprequest.path != '/my/onboarding'" class="bravico-floating-assistant js-bravico-chat">
+        <summary>
+          <img class="bravico-assistant-avatar" src="/portail_rh/static/src/img/bravico-square.png" alt=""/>
+          <span>Bravi Assistant</span>
+        </summary>
+        <div class="bravico-floating-panel">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <img class="bravico-assistant-avatar" src="/portail_rh/static/src/img/bravico-square.png" alt=""/>
+            <div>
+              <strong>Bravi</strong>
+              <div class="small text-success"><span class="bravico-online-dot"/> En ligne</div>
+            </div>
+          </div>
+          <p class="small text-muted">Posez une question sur Bravico, vos avantages, les procedures ou vos demandes RH.</p>
+          <div class="bravico-floating-messages js-bravico-chat-messages d-none" aria-live="polite"/>
+          <form action="/my/onboarding/ask" method="post" class="js-bravico-chat-form" data-endpoint="/my/onboarding/ask_json">
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <textarea name="question" class="form-control mb-2" rows="3" maxlength="2000" required="required" placeholder="Ecrivez votre question..."/>
+            <button type="submit" class="btn bravico-btn-primary w-100" data-idle-label="Envoyer a l'assistant">Envoyer a l'assistant</button>
+          </form>
+        </div>
+      </details>
+    </xpath>
+  </template>
+
   <template id="portal_my_home_portail_rh" inherit_id="portal.portal_my_home" priority="40">
     <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
       <t t-set="portal_client_category_enable" t-value="True"/>
@@ -69,13 +142,24 @@
         <t t-set="placeholder_count" t-value="'attestation_request_count'"/>
       </t>
       <t t-call="portal.portal_docs_entry">
-        <t t-set="icon" t-value="'/portail_rh/static/description/icon.png'"/>
-        <t t-set="title">Assistant d'integration</t>
+        <t t-set="icon" t-value="'/portail_rh/static/src/img/bravico-horizontal.png'"/>
+        <t t-set="title">Bravi Assistant IA</t>
         <t t-set="url" t-value="'/my/onboarding'"/>
-        <t t-set="text">Posez vos questions avec des sources et suivez votre checklist</t>
+        <t t-set="text">Discutez avec l'assistant Bravico et obtenez des reponses sourcees</t>
         <t t-set="placeholder_count" t-value="'onboarding_task_count'"/>
       </t>
     </div>
+    <xpath expr="//div[hasclass('o_portal_my_home')]/div[hasclass('o_portal_docs')]" position="before">
+      <section class="bravico-home-hero mb-4">
+        <div>
+          <span class="bravico-eyebrow">Bienvenue chez Bravico</span>
+          <h1>Votre espace de travail, simplement.</h1>
+          <p>Demandez une information, suivez votre integration ou lancez une demande RH depuis un seul endroit.</p>
+          <a href="/my/onboarding" class="btn bravico-btn-light">Ouvrir Bravi Assistant</a>
+        </div>
+        <img src="/portail_rh/static/src/img/bravico-horizontal-white.png" alt="Bravico"/>
+      </section>
+    </xpath>
   </template>
 
   <template id="portal_request_badge" name="Statut demande RH">
@@ -424,19 +508,22 @@
 
   <template id="portal_my_onboarding" name="Assistant d'integration">
     <t t-call="portal.portal_layout">
-      <div class="rounded-4 bg-primary text-white p-4 p-lg-5 mb-4 shadow-sm">
+      <div class="bravico-assistant-hero mb-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
           <div>
-            <div class="text-white-50 small text-uppercase fw-bold mb-2">Atlas Digital Services</div>
-            <h1 class="h2 mb-2">Bonjour <t t-out="employee.name"/> 👋</h1>
+            <img class="bravico-hero-logo mb-4" src="/portail_rh/static/src/img/bravico-horizontal-white.png" alt="Bravico"/>
+            <div class="bravico-eyebrow text-white-50">Espace collaborateur</div>
+            <h1 class="h2 mb-2">Bonjour <t t-out="employee.name"/></h1>
             <p class="mb-0 opacity-75">
-              Votre assistant RH verifie les politiques internes avant de repondre.
-              Posez une question simplement, en francais ou en anglais.
+              Bravi repond a vos questions a partir des documents officiels Bravico et affiche ses sources.
             </p>
           </div>
-          <div class="text-lg-end">
+          <div class="bravico-profile-card text-lg-end">
             <div class="fw-bold"><t t-out="employee_job_name"/></div>
             <div class="opacity-75"><t t-out="employee_department_name"/></div>
+            <div t-if="employee_work_email" class="small mt-2"><i class="fa fa-envelope me-1"/><t t-out="employee_work_email"/></div>
+            <div t-if="employee_phone" class="small"><i class="fa fa-phone me-1"/><t t-out="employee_phone"/></div>
+            <div class="small mt-2"><span class="bravico-online-dot"/> Assistant disponible</div>
           </div>
         </div>
       </div>
@@ -445,21 +532,29 @@
 
       <div class="row g-4">
         <div class="col-lg-8">
-          <div class="card shadow-sm">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-              <strong>Demandez a Atlas Assistant</strong>
-              <span class="badge text-bg-success">Sources verifiees</span>
+          <div class="card bravico-chat-card js-bravico-chat">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-2">
+                <img class="bravico-assistant-avatar" src="/portail_rh/static/src/img/bravico-square.png" alt=""/>
+                <div>
+                  <strong>Bravi Assistant</strong>
+                  <div class="small text-muted">Assistant RH securise de Bravico</div>
+                </div>
+              </div>
+              <span class="badge bravico-source-badge">Sources verifiees</span>
             </div>
             <div class="card-body">
               <div t-if="not messages" class="alert alert-info mb-4">
                 Posez une question sur votre integration, les horaires, les outils ou les procedures internes.
               </div>
-              <div class="d-flex flex-column gap-3 mb-4">
+              <div class="bravico-chat-messages js-bravico-chat-messages d-flex flex-column gap-3 mb-4" aria-live="polite">
                 <t t-foreach="messages" t-as="chat_message">
-                  <div t-attf-class="p-3 rounded #{'bg-primary text-white ms-lg-5' if chat_message.role == 'user' else 'bg-light me-lg-5'}">
+                  <div t-attf-class="bravico-message-row #{'bravico-message-user' if chat_message.role == 'user' else 'bravico-message-assistant'}">
+                    <img t-if="chat_message.role == 'assistant'" class="bravico-assistant-avatar" src="/portail_rh/static/src/img/bravico-square.png" alt="Bravi"/>
+                    <div class="bravico-message-bubble">
                     <div class="small fw-bold mb-1">
                       <t t-if="chat_message.role == 'user'">Vous</t>
-                      <t t-else="">Assistant</t>
+                      <t t-else="">Bravi</t>
                     </div>
                     <div style="white-space: pre-wrap"><t t-out="chat_message.content"/></div>
                     <t t-if="chat_message.role == 'assistant'">
@@ -487,35 +582,47 @@
                         <span t-if="chat_message.escalation_activity_id" class="badge text-bg-info align-self-center">Transmis a RH</span>
                       </div>
                     </t>
+                    </div>
                   </div>
                 </t>
               </div>
               <div class="mb-3">
                 <div class="small text-muted fw-bold mb-2">Questions frequentes</div>
                 <div class="d-flex flex-wrap gap-2">
-                  <form t-foreach="suggested_questions" t-as="suggested_question" action="/my/onboarding/ask" method="post">
-                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                    <input type="hidden" name="question" t-att-value="suggested_question"/>
-                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill">
+                  <t t-foreach="suggested_questions" t-as="suggested_question">
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill js-bravico-suggestion" t-att-data-question="suggested_question">
                       <t t-out="suggested_question"/>
                     </button>
-                  </form>
+                  </t>
                 </div>
               </div>
-              <form action="/my/onboarding/ask" method="post">
+              <form action="/my/onboarding/ask" method="post" class="bravico-chat-composer js-bravico-chat-form" data-endpoint="/my/onboarding/ask_json">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                <label for="onboarding_question" class="form-label fw-bold">Que souhaitez-vous savoir ?</label>
-                <textarea id="onboarding_question" name="question" class="form-control form-control-lg" rows="3" maxlength="2000" required="required" placeholder="Ex. Puis-je teletravailler deux jours par semaine ?"></textarea>
-                <div class="d-flex justify-content-between align-items-center mt-2">
-                  <small class="text-muted">Si aucune source ne couvre le sujet, vous pourrez contacter RH en un clic.</small>
-                  <button type="submit" class="btn btn-primary px-4">Demander</button>
+                <label for="onboarding_question" class="visually-hidden">Votre message</label>
+                <div class="input-group input-group-lg">
+                  <textarea id="onboarding_question" name="question" class="form-control" rows="2" maxlength="2000" required="required" placeholder="Ecrivez votre message a Bravi..."/>
+                  <button type="submit" class="btn bravico-btn-primary px-4" aria-label="Envoyer le message" data-idle-label="Envoyer">
+                    <i class="fa fa-paper-plane me-2"/>Envoyer
+                  </button>
                 </div>
+                <small class="text-muted d-block mt-2">Reponses basees sur les documents autorises. Une question sans source peut etre transmise a l'administration.</small>
               </form>
             </div>
           </div>
         </div>
 
         <div class="col-lg-4">
+          <div class="card shadow-sm mb-4 bravico-company-card">
+            <div class="card-body">
+              <img src="/portail_rh/static/src/img/bravico-horizontal.png" alt="Bravico" class="mb-3"/>
+              <h5 class="mb-1"><t t-out="company_name"/></h5>
+              <div class="small text-muted mb-3">Logiciels simples pour les PME marocaines.</div>
+              <div t-if="company_email" class="small mb-1"><i class="fa fa-envelope-o me-2"/><t t-out="company_email"/></div>
+              <div t-if="company_phone" class="small mb-1"><i class="fa fa-phone me-2"/><t t-out="company_phone"/></div>
+              <div t-if="company_website" class="small mb-1"><i class="fa fa-globe me-2"/><t t-out="company_website"/></div>
+              <div t-if="company_registry" class="small text-muted mt-2"><t t-out="company_registry"/></div>
+            </div>
+          </div>
           <div class="card shadow-sm mb-4">
             <div class="card-header bg-white d-flex justify-content-between">
               <strong>Ma checklist</strong>

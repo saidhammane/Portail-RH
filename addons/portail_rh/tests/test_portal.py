@@ -120,6 +120,12 @@ class TestPortailRHHttp(HttpCase):
             response = self.url_open(url)
             self.assertEqual(response.status_code, 200, url)
             self.assertIn(expected_text, response.text, url)
+            if url == "/my/onboarding":
+                self.assertIn("Bravi Assistant", response.text)
+                self.assertIn("bravico-horizontal-white.png", response.text)
+                self.assertIn("bravico-chat-messages", response.text)
+                self.assertIn("js-bravico-chat-form", response.text)
+                self.assertIn("/my/onboarding/ask_json", response.text)
 
     def test_portal_creates_and_submits_travel_request(self):
         form_response = self.url_open("/my/travel_requests/new")
@@ -233,6 +239,78 @@ class TestPortailRHHttp(HttpCase):
         )
         self.assertEqual(feedback_response.status_code, 200)
         self.assertEqual(assistant.feedback, "helpful")
+
+    def test_onboarding_chat_json_returns_answer_without_redirect(self):
+        page = self.url_open("/my/onboarding")
+        ai_response = {
+            "answer": "Le support Bravico est disponible via le portail [1].",
+            "sources": [
+                {
+                    "document_id": self.onboarding_document.id,
+                    "section": "Support",
+                    "score": 0.91,
+                }
+            ],
+            "confidence": 0.91,
+            "latency_ms": 18,
+            "cache_hit": False,
+            "needs_escalation": False,
+        }
+        with patch(
+            "odoo.addons.portail_rh.controllers.portal.PortailRHPortal._call_onboarding_ai",
+            return_value=ai_response,
+        ) as mocked_ai:
+            response = self.url_open(
+                "/my/onboarding/ask_json",
+                data={
+                    "csrf_token": self._csrf_token(page),
+                    "question": "Comment contacter le support ?",
+                },
+            )
+            response = self.url_open(
+                "/my/onboarding/ask_json",
+                data={
+                    "csrf_token": self._csrf_token(page),
+                    "question": "Et pour une question de suivi ?",
+                },
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.headers["Content-Type"].startswith("application/json"))
+        payload = response.json()
+        self.assertIn("support Bravico", payload["answer"])
+        self.assertEqual(payload["sources"][0]["title"], "Guide portail HTTP")
+        self.assertFalse(payload["needs_escalation"])
+        follow_up_history = mocked_ai.call_args_list[1].args[0]["history"]
+        self.assertEqual([item["role"] for item in follow_up_history], ["user", "assistant"])
+        self.assertIn("contacter le support", follow_up_history[0]["content"])
+
+    def test_onboarding_chat_allows_generated_smalltalk_without_sources(self):
+        self.authenticate(self.portal_user.login, self.password)
+        page = self.url_open("/my/onboarding")
+        ai_response = {
+            "answer": "Bonjour ! Comment puis-je vous aider ?",
+            "sources": [],
+            "confidence": 1.0,
+            "latency_ms": 12,
+            "cache_hit": False,
+            "needs_escalation": False,
+            "smalltalk": True,
+        }
+        with patch(
+            "odoo.addons.portail_rh.controllers.portal.PortailRHPortal._call_onboarding_ai",
+            return_value=ai_response,
+        ):
+            response = self.url_open(
+                "/my/onboarding/ask_json",
+                data={
+                    "csrf_token": self._csrf_token(page),
+                    "question": "hello",
+                },
+            )
+        payload = response.json()
+        self.assertEqual(payload["answer"], ai_response["answer"])
+        self.assertEqual(payload["sources"], [])
+        self.assertFalse(payload["needs_escalation"])
 
     def test_onboarding_rechecks_sources_and_escalates_unknown_question(self):
         restricted_document = (

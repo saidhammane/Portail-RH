@@ -37,6 +37,11 @@ class IndexQueuedResponse(BaseModel):
     state: Literal["pending"] = "pending"
 
 
+class ChatHistoryMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=4000)
+
+
 class ChatRequest(BaseModel):
     user_id: int = Field(gt=0)
     employee_id: int = Field(gt=0)
@@ -48,6 +53,7 @@ class ChatRequest(BaseModel):
     )
     question: str = Field(min_length=2, max_length=2000)
     conversation_id: int = Field(gt=0)
+    history: list[ChatHistoryMessage] = Field(default_factory=list, max_length=12)
 
 
 class ChatSource(BaseModel):
@@ -64,3 +70,4 @@ class ChatResponse(BaseModel):
     latency_ms: int = Field(ge=0)
     cache_hit: bool = False
     needs_escalation: bool = False
+    smalltalk: bool = False

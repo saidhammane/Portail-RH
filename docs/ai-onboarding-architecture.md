@@ -77,9 +77,9 @@ Redis n'est pas une base principale. Sa perte supprime caches/sessions et peut i
 
 ## Providers
 
-`LLM_PROVIDER=extractive` utilise des embeddings de hashing normalises et un garde lexical. Il est deterministe et sans appel externe, mais comprend mal les paraphrases.
+La configuration Docker par defaut utilise `LLM_PROVIDER=ollama` avec `qwen2.5:0.5b` pour une vraie generation locale, conversationnelle, adaptee au CPU et sans cle externe. La recherche conserve les embeddings locaux `hashing-128` et son garde lexical ; le modele ne voit ensuite que les chunks autorises recuperes par cette recherche.
 
-`ollama` utilise `/api/embed` et `/api/chat`. `openai` compatible utilise `/v1/embeddings` et `/v1/chat/completions`. URLs, modeles et cles sont injectes par environnement. Les cles ne sont pas journalisees.
+Avec un modele d'embedding Ollama configure a la place de `hashing-128`, le service utilise `/api/embed`; la generation utilise `/api/chat`. Le provider `openai` compatible utilise `/v1/embeddings` et `/v1/chat/completions`. URLs, modeles et cles sont injectes par environnement. Les cles ne sont pas journalisees. Le mode `extractive` reste disponible pour les tests et le diagnostic.
 
 Le prompt exige des citations `[n]`. FastAPI refuse avant generation lorsque le retrieval est insuffisant et ajoute une reference si le provider omet toute citation.
 

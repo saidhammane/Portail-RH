@@ -22,7 +22,7 @@ from urllib.parse import parse_qs, urlparse
 from zoneinfo import ZoneInfo
 
 
-SEED_VERSION = "2"
+SEED_VERSION = "3"
 LOCAL_TIMEZONE = "Africa/Casablanca"
 DEFAULT_DB_PATH = "/data/zkteco_mock.db"
 DEFAULT_SEED_MONTH = "2026-07"
@@ -40,15 +40,15 @@ class Employee:
 
 
 EMPLOYEES = (
-    Employee("1001", "Ahmed El Mansouri", "ahmed.elmansouri@local.test", "Ressources Humaines", 8 * 60 + 35, 17 * 60 + 35, "face"),
-    Employee("1002", "Salma Alaoui", "salma.alaoui@local.test", "Informatique", 8 * 60 + 45, 17 * 60 + 50, "fingerprint"),
-    Employee("1003", "Youssef Benali", "youssef.benali@local.test", "Finance & Comptabilite", 8 * 60 + 40, 17 * 60 + 40, "face"),
-    Employee("1004", "Mariam Zahra", "mariam.zahra@local.test", "Ressources Humaines", 8 * 60 + 55, 17 * 60 + 45, "fingerprint"),
-    Employee("1005", "Khalid Rachidi", "khalid.rachidi@local.test", "Ressources Humaines", 8 * 60 + 50, 17 * 60 + 35, "card"),
-    Employee("1006", "Hicham Kettani", "hicham.kettani@local.test", "Informatique", 9 * 60, 18 * 60, "face"),
-    Employee("1007", "Leila Fassi", "leila.fassi@local.test", "Informatique", 8 * 60 + 50, 17 * 60 + 55, "fingerprint"),
-    Employee("1008", "Souad Idrissi", "souad.idrissi@local.test", "Finance & Comptabilite", 8 * 60 + 45, 17 * 60 + 35, "face"),
-    Employee("1009", "Reda Soussi", "reda.soussi@local.test", "Finance & Comptabilite", 9 * 60, 18 * 60, "card"),
+    Employee("1001", "Said Hammane", "said.hammane@bravico.ma", "Direction", 8 * 60 + 35, 17 * 60 + 35, "face"),
+    Employee("1002", "Salma Alaoui", "salma.alaoui@bravico.ma", "Produit & IA", 8 * 60 + 45, 17 * 60 + 50, "fingerprint"),
+    Employee("1003", "Youssef Benali", "youssef.benali@bravico.ma", "Engineering", 8 * 60 + 40, 17 * 60 + 40, "face"),
+    Employee("1004", "Mariam Zahra", "mariam.zahra@bravico.ma", "Finance & Administration", 8 * 60 + 55, 17 * 60 + 45, "fingerprint"),
+    Employee("1005", "Khalid Rachidi", "khalid.rachidi@bravico.ma", "Finance & Administration", 8 * 60 + 50, 17 * 60 + 35, "card"),
+    Employee("1006", "Hicham Kettani", "hicham.kettani@bravico.ma", "Engineering", 9 * 60, 18 * 60, "face"),
+    Employee("1007", "Leila Fassi", "leila.fassi@bravico.ma", "Customer Success", 8 * 60 + 50, 17 * 60 + 55, "fingerprint"),
+    Employee("1008", "Souad Idrissi", "souad.idrissi@bravico.ma", "Finance & Administration", 8 * 60 + 45, 17 * 60 + 35, "face"),
+    Employee("1009", "Reda Soussi", "reda.soussi@bravico.ma", "Commercial & Marketing", 9 * 60, 18 * 60, "card"),
 )
 
 

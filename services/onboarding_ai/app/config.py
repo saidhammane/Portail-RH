@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     session_ttl: int = 3600
     cache_ttl: int = 900
     rate_limit_per_minute: int = 20
-    rag_top_k: int = 5
+    rag_top_k: int = 2
     rag_min_score: float = 0.08
 
     @model_validator(mode="after")

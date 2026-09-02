@@ -18,7 +18,8 @@
     <t t-call="web.html_container">
       <t t-foreach="docs" t-as="o">
         <t t-call="web.external_layout">
-          <t t-set="company_name" t-value="o.employee_id.company_id.name or res_company.name"/>
+          <t t-set="company" t-value="o.employee_id.company_id or res_company"/>
+          <t t-set="company_name" t-value="company.name"/>
           <t t-if="o.attestation_type == 'work'" t-set="attestation_title">Attestation de travail</t>
           <t t-elif="o.attestation_type == 'salary'" t-set="attestation_title">Attestation de salaire</t>
           <t t-elif="o.attestation_type == 'internship'" t-set="attestation_title">Attestation de stage</t>
@@ -90,6 +91,10 @@
                 Fait le <span t-out="time.strftime('%d/%m/%Y')"/>
               </p>
               <p><strong><span t-out="company_name"/></strong></p>
+            </div>
+            <div style="margin-top: 70px; border-top: 2px solid #2f4175; padding-top: 12px; text-align: center; font-size: 10px; color: #53617c;">
+              <strong>Bravico SARL AU</strong> · Casablanca, Maroc · contact@bravico.ma · +212 6 39 26 99 45<br/>
+              RC 689915 · ICE 003790052000007 · Taxe professionnelle 32302012 · bravico.ma
             </div>
           </div>
         </t>
