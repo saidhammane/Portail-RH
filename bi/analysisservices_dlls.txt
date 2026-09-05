@@ -1,0 +1,17 @@
+﻿C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\ADO.NET Providers\Microsoft.AI.AdoDotNetProvider\Microsoft.AnalysisServices.Dax.ExtensionInterfaces.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\ADO.NET Providers\Microsoft.AI.AdoDotNetProvider\Microsoft.AnalysisServices.Dax.Extensions.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\AI\Microsoft.AnalysisServices.Dax.ExtensionInterfaces.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\AI\Microsoft.AnalysisServices.Dax.Extensions.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.AzureClient.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.DatasetSerializer.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.Dax.ExtensionInterfaces.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.Dax.Extensions.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.ExecEngine.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.ExecPlan.ExecPlanTypes.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.ExecPlan.MBuilder.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.MInterop.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.Server.Core.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.Server.Tabular.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.Server.Tabular.Json.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.Tracing.MEngineTraceReader.dll
+C:\Program Files\WindowsApps\Microsoft.MicrosoftPowerBIDesktop_2.157.879.0_x64__8wekyb3d8bbwe\bin\Microsoft.AnalysisServices.ZipLoadSaveHelper.dll

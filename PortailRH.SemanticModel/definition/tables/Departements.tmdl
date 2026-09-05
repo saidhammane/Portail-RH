@@ -1,0 +1,69 @@
+table Departements
+	lineageTag: 2eb673f9-87e0-495b-91cc-e151ddce49e7
+
+	column department_id
+		dataType: int64
+		lineageTag: f05bde10-6759-411d-ad21-adc310e630b6
+		summarizeBy: none
+		sourceColumn: department_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_name
+		dataType: string
+		lineageTag: ef4e93af-9051-4b4c-b360-bc0f1afcf41e
+		summarizeBy: none
+		sourceColumn: department_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column manager_id
+		dataType: int64
+		lineageTag: 73fd9ddf-9816-40ac-8005-d9d6817f000d
+		summarizeBy: none
+		sourceColumn: manager_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column manager_name
+		dataType: string
+		lineageTag: fa8b0e38-ecca-4084-953f-b14ba6f16594
+		summarizeBy: none
+		sourceColumn: manager_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_id
+		dataType: int64
+		lineageTag: e09ca158-487c-4937-8538-ac6605a694b3
+		summarizeBy: none
+		sourceColumn: company_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: f4c23c6e-7ff8-44cc-9764-ab278c7782c1
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column active
+		dataType: int64
+		lineageTag: 8399b275-d96d-4ff8-9e22-81ceccef63d8
+		summarizeBy: none
+		sourceColumn: active
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Departements = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "portail_rh_powerbi", [CreateNavigationProperties=false]),
+					View = Source{[Schema="bi", Item="dim_department"]}[Data]
+				in
+					View
+
+	annotation PBI_ResultType = Table

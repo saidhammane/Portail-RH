@@ -9,12 +9,15 @@ from app.config import Settings
 from app.providers import embed_texts
 from app.rag import (
     REFUSAL_ANSWER,
+    add_requested_contact_details,
+    add_requested_product_names,
     answer_chat,
     build_access_filter,
     build_relevant_excerpt,
     clean_generated_answer,
     is_follow_up_question,
     is_smalltalk_question,
+    meaningful_question_tokens,
     resolve_generation_question,
 )
 from app.schemas import ChatRequest
@@ -265,6 +268,38 @@ def test_generative_refusal_is_escalated_without_sources():
     assert response.needs_escalation
 
 
+def test_requested_contact_details_are_recovered_from_authorized_source():
+    point = source_point()
+    point.payload["text"] = (
+        "Ouvrez Bravico VPN et utilisez le MFA. "
+        "En cas de probleme, contactez support@bravico.ma ou le poste 207."
+    )
+    answer = add_requested_contact_details(
+        "Ouvrez Bravico VPN et utilisez le MFA [1].",
+        [point],
+        "Comment utiliser le VPN et contacter le support IT ?",
+    )
+    assert "support@bravico.ma" in answer
+    assert "poste 207" in answer
+    assert "[1]" in answer
+
+
+def test_requested_product_names_are_recovered_from_authorized_source():
+    point = source_point()
+    point.payload["text"] = (
+        "PRODUITS ET SERVICES BRAVICO Bravico Pilotage aide les managers. "
+        "EFacture Express simplifie les factures electroniques."
+    )
+    answer = add_requested_product_names(
+        "Bravico fournit des logiciels aux PME [1].",
+        [point],
+        "Que fait Bravico et quels sont ses produits ?",
+    )
+    assert "Bravico Pilotage" in answer
+    assert "EFacture Express" in answer
+    assert "[1]" in answer
+
+
 def test_cache_is_conversation_aware_for_follow_up_questions():
     redis = FakeRedis()
     qdrant = FakeQdrant([source_point()])
@@ -285,6 +320,14 @@ def test_only_an_explicit_reference_is_treated_as_a_follow_up():
     assert is_follow_up_question("Et lequel concerne la facturation ?")
     assert is_follow_up_question("Cela concerne quel produit ?")
     assert not is_follow_up_question("Que fait Bravico et quels sont ses produits ?")
+
+
+def test_possessive_pronouns_do_not_block_product_retrieval():
+    tokens = meaningful_question_tokens(
+        "Que fait Bravico et quels sont ses produits ?"
+    )
+    assert "ses" not in tokens
+    assert {"produit", "produits", "logiciel", "logiciels"} <= tokens
 
 
 def test_follow_up_pronoun_is_resolved_from_the_previous_user_question():

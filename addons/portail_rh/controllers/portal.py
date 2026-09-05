@@ -313,6 +313,7 @@ class PortailRHPortal(CustomerPortal):
                 "latency_ms": 0,
                 "cache_hit": False,
                 "needs_escalation": True,
+                "service_error": True,
             }
 
         response_sources = ai_response.get("sources") or []
@@ -326,7 +327,8 @@ class PortailRHPortal(CustomerPortal):
             employee, scopes, source_ids
         )
         is_smalltalk = bool(ai_response.get("smalltalk")) and not response_sources
-        if not is_smalltalk and (
+        is_service_error = bool(ai_response.get("service_error"))
+        if not is_smalltalk and not is_service_error and (
             not source_ids or set(source_ids) != set(allowed_documents.ids)
         ):
             ai_response.update(

@@ -1,0 +1,28 @@
+model Model
+	culture: fr-FR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: fr-FR
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_ProTooling = ["DevMode"]
+
+annotation PBI_QueryOrder = ["ActivitesRH","Deplacements","Fournitures","Attestations","Presences","LogsZKTeco","MessagesIA","DocumentsIA","Employes","Departements","Societes"]
+
+ref table ActivitesRH
+ref table Deplacements
+ref table Fournitures
+ref table Attestations
+ref table Presences
+ref table LogsZKTeco
+ref table MessagesIA
+ref table DocumentsIA
+ref table Employes
+ref table Departements
+ref table Societes
+
+ref cultureInfo fr-FR

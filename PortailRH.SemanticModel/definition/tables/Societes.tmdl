@@ -1,0 +1,29 @@
+table Societes
+	lineageTag: 195db735-c430-4072-a8ba-b6a62d3a51f0
+
+	column company_id
+		dataType: int64
+		lineageTag: 778110a6-1ba8-4cf2-a208-97bf138ad242
+		summarizeBy: none
+		sourceColumn: company_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: 49a02b57-2ae8-4b77-9d11-242258eacdf4
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Societes = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "portail_rh_powerbi", [CreateNavigationProperties=false]),
+					View = Source{[Schema="bi", Item="dim_company"]}[Data]
+				in
+					View
+
+	annotation PBI_ResultType = Table

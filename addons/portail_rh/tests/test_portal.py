@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from lxml import html
 
+from odoo.exceptions import UserError
 from odoo.tests import HttpCase, tagged
 from odoo.tests.common import new_test_user
 
@@ -311,6 +312,28 @@ class TestPortailRHHttp(HttpCase):
         self.assertEqual(payload["answer"], ai_response["answer"])
         self.assertEqual(payload["sources"], [])
         self.assertFalse(payload["needs_escalation"])
+
+    def test_onboarding_chat_preserves_temporary_service_error(self):
+        self.authenticate(self.portal_user.login, self.password)
+        page = self.url_open("/my/onboarding")
+        with patch(
+            "odoo.addons.portail_rh.controllers.portal.PortailRHPortal._call_onboarding_ai",
+            side_effect=UserError("Le service IA est temporairement indisponible."),
+        ):
+            response = self.url_open(
+                "/my/onboarding/ask_json",
+                data={
+                    "csrf_token": self._csrf_token(page),
+                    "question": "Bonjour",
+                },
+            )
+        payload = response.json()
+        self.assertEqual(
+            payload["answer"], "Le service IA est temporairement indisponible."
+        )
+        self.assertNotIn("Information insuffisante", payload["answer"])
+        self.assertEqual(payload["sources"], [])
+        self.assertTrue(payload["needs_escalation"])
 
     def test_onboarding_rechecks_sources_and_escalates_unknown_question(self):
         restricted_document = (

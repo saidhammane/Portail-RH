@@ -1,0 +1,165 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 290.55828892153721,
+            "y": 49.517626511363233
+          },
+          "nodeIndex": "ActivitesRH",
+          "nodeLineageTag": "cdf620a9-973e-4a7f-bcc5-39f585dca475",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 571.01203985651955,
+            "y": 1008.5441618204345
+          },
+          "nodeIndex": "Attestations",
+          "nodeLineageTag": "76ff33c9-9d04-4b75-92f1-19573e386325",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1147.6774883358685,
+            "y": 389.78712118463773
+          },
+          "nodeIndex": "Departements",
+          "nodeLineageTag": "2eb673f9-87e0-495b-91cc-e151ddce49e7",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1457.6872932604047,
+            "y": 925.43649617463041
+          },
+          "nodeIndex": "Deplacements",
+          "nodeLineageTag": "4ab72af0-bbc6-4171-9777-179607458981",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1265.5122268765517,
+            "y": 38.076608161428339
+          },
+          "nodeIndex": "DocumentsIA",
+          "nodeLineageTag": "014b009b-53f5-4fcf-b3e4-745b64d3566a",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 860.826591791086,
+            "y": 679.92805256285544
+          },
+          "nodeIndex": "Employes",
+          "nodeLineageTag": "6da77f79-18ec-4db9-b11e-c7a3f6a3245a",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 861.42825483750062,
+            "y": 109.85262456905434
+          },
+          "nodeIndex": "Fournitures",
+          "nodeLineageTag": "e761cf87-c952-4939-8cd5-3b49368bc64d",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 406.27151052506383
+          },
+          "nodeIndex": "LogsZKTeco",
+          "nodeLineageTag": "de24fc00-7a0d-4412-8f84-e52c22e2e610",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1147.3906303979243,
+            "y": 899.86985652622809
+          },
+          "nodeIndex": "MessagesIA",
+          "nodeLineageTag": "2829d909-2e5d-4df0-9954-58ec0a6ca054",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1434.1570657682269,
+            "y": 573.9819317604962
+          },
+          "nodeIndex": "Presences",
+          "nodeLineageTag": "e6a7acd8-e95b-4ea4-8e97-987cec562bc2",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 576.976229374367,
+            "y": -50
+          },
+          "nodeIndex": "Societes",
+          "nodeLineageTag": "195db735-c430-4072-a8ba-b6a62d3a51f0",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Toutes les tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Toutes les tables",
+  "defaultDiagram": "Toutes les tables"
+}

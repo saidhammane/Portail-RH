@@ -1,0 +1,91 @@
+relationship '01 ActivitesRH Employes'
+	fromColumn: ActivitesRH.employee_id
+	toColumn: Employes.employee_id
+
+relationship '02 ActivitesRH Departements'
+	fromColumn: ActivitesRH.department_id
+	toColumn: Departements.department_id
+
+relationship '03 ActivitesRH Societes'
+	fromColumn: ActivitesRH.company_id
+	toColumn: Societes.company_id
+
+relationship '04 Deplacements Employes'
+	fromColumn: Deplacements.employee_id
+	toColumn: Employes.employee_id
+
+relationship '05 Deplacements Departements'
+	fromColumn: Deplacements.department_id
+	toColumn: Departements.department_id
+
+relationship '06 Deplacements Societes'
+	fromColumn: Deplacements.company_id
+	toColumn: Societes.company_id
+
+relationship '07 Fournitures Employes'
+	fromColumn: Fournitures.employee_id
+	toColumn: Employes.employee_id
+
+relationship '08 Fournitures Departements'
+	fromColumn: Fournitures.department_id
+	toColumn: Departements.department_id
+
+relationship '09 Fournitures Societes'
+	fromColumn: Fournitures.company_id
+	toColumn: Societes.company_id
+
+relationship '10 Attestations Employes'
+	fromColumn: Attestations.employee_id
+	toColumn: Employes.employee_id
+
+relationship '11 Attestations Departements'
+	fromColumn: Attestations.department_id
+	toColumn: Departements.department_id
+
+relationship '12 Attestations Societes'
+	fromColumn: Attestations.company_id
+	toColumn: Societes.company_id
+
+relationship '13 Presences Employes'
+	fromColumn: Presences.employee_id
+	toColumn: Employes.employee_id
+
+relationship '14 Presences Departements'
+	fromColumn: Presences.department_id
+	toColumn: Departements.department_id
+
+relationship '15 Presences Societes'
+	fromColumn: Presences.company_id
+	toColumn: Societes.company_id
+
+relationship '16 LogsZKTeco Employes'
+	fromColumn: LogsZKTeco.employee_id
+	toColumn: Employes.employee_id
+
+relationship '17 LogsZKTeco Departements'
+	fromColumn: LogsZKTeco.department_id
+	toColumn: Departements.department_id
+
+relationship '18 LogsZKTeco Societes'
+	fromColumn: LogsZKTeco.company_id
+	toColumn: Societes.company_id
+
+relationship '19 MessagesIA Employes'
+	fromColumn: MessagesIA.employee_id
+	toColumn: Employes.employee_id
+
+relationship '20 MessagesIA Departements'
+	fromColumn: MessagesIA.department_id
+	toColumn: Departements.department_id
+
+relationship '21 MessagesIA Societes'
+	fromColumn: MessagesIA.company_id
+	toColumn: Societes.company_id
+
+relationship '22 DocumentsIA Departements'
+	fromColumn: DocumentsIA.department_id
+	toColumn: Departements.department_id
+
+relationship '23 DocumentsIA Societes'
+	fromColumn: DocumentsIA.company_id
+	toColumn: Societes.company_id

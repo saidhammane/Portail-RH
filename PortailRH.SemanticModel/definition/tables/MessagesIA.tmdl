@@ -1,0 +1,186 @@
+table MessagesIA
+	lineageTag: 2829d909-2e5d-4df0-9954-58ec0a6ca054
+
+	column message_id
+		dataType: int64
+		lineageTag: e43bbd1c-6d03-40f9-bb03-77c55e8bb4c5
+		summarizeBy: none
+		sourceColumn: message_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column conversation_id
+		dataType: int64
+		lineageTag: 29f183d6-dc82-435b-ac16-2793a34c19fa
+		summarizeBy: none
+		sourceColumn: conversation_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		lineageTag: c85c0951-a8a4-4268-88bc-7fff8275d628
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_id
+		dataType: int64
+		lineageTag: fce91afb-2f57-4a91-af9b-d5dcf30e311b
+		summarizeBy: none
+		sourceColumn: employee_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_name
+		dataType: string
+		lineageTag: f9838380-24e9-4f9c-bc2d-160b91e927b9
+		summarizeBy: none
+		sourceColumn: employee_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_id
+		dataType: int64
+		lineageTag: 4d331ada-6408-4507-b7b1-94b71a156422
+		summarizeBy: none
+		sourceColumn: department_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_name
+		dataType: string
+		lineageTag: c52fda50-3026-43e2-8204-94ad929fc725
+		summarizeBy: none
+		sourceColumn: department_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_id
+		dataType: int64
+		lineageTag: eb695634-0747-4b8c-9755-dbaef3b5cb45
+		summarizeBy: none
+		sourceColumn: company_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: ffacccfb-7ae8-4532-b2c6-afe52003528c
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column role
+		dataType: string
+		lineageTag: 6ceb31d5-e36f-42ab-af4f-42de0e262500
+		summarizeBy: none
+		sourceColumn: role
+
+		annotation SummarizationSetBy = Automatic
+
+	column role_label
+		dataType: string
+		lineageTag: 8c638f88-ba34-4885-9705-c81d34a0547b
+		summarizeBy: none
+		sourceColumn: role_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column confidence_score
+		dataType: double
+		formatString: 0.00
+		lineageTag: e3c983ab-692c-4acb-8f0c-22a3bfc3ea3a
+		summarizeBy: sum
+		sourceColumn: confidence_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column latency_ms
+		dataType: int64
+		lineageTag: b67a39c5-7108-4db6-8430-ea5a9a7d5cf7
+		summarizeBy: none
+		sourceColumn: latency_ms
+
+		annotation SummarizationSetBy = Automatic
+
+	column cache_hit
+		dataType: int64
+		lineageTag: e72bd5a1-b937-4edb-b126-09fce7ec59c6
+		summarizeBy: none
+		sourceColumn: cache_hit
+
+		annotation SummarizationSetBy = Automatic
+
+	column feedback
+		dataType: string
+		lineageTag: 01c6fc92-6e2d-4e9b-959f-322c44b7f9a7
+		summarizeBy: none
+		sourceColumn: feedback
+
+		annotation SummarizationSetBy = Automatic
+
+	column feedback_label
+		dataType: string
+		lineageTag: 0ecc04fc-6634-4b3a-8c28-03fd8bd85afb
+		summarizeBy: none
+		sourceColumn: feedback_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column needs_escalation
+		dataType: int64
+		lineageTag: 3479b03a-badc-4b03-9338-b4948d954d70
+		summarizeBy: none
+		sourceColumn: needs_escalation
+
+		annotation SummarizationSetBy = Automatic
+
+	column escalated_at
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 387fb510-b3e6-4d96-9f6b-a4ef3b8adb61
+		summarizeBy: none
+		sourceColumn: escalated_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column message_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: 1c380ef3-c316-4b65-9b4b-b5e94a8f0011
+		summarizeBy: none
+		sourceColumn: message_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_start
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: a90faf6b-982b-4c70-9ba8-bee31ee9ffcd
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column create_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 52f9b993-b18a-45a6-b419-c0f22aa0d4d6
+		summarizeBy: none
+		sourceColumn: create_date
+
+		annotation SummarizationSetBy = Automatic
+
+	partition MessagesIA = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "portail_rh_powerbi", [CreateNavigationProperties=false]),
+					View = Source{[Schema="bi", Item="fact_onboarding_message"]}[Data]
+				in
+					View
+
+	annotation PBI_ResultType = Table

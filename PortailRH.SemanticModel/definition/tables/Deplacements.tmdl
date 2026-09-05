@@ -1,0 +1,229 @@
+table Deplacements
+	lineageTag: 4ab72af0-bbc6-4171-9777-179607458981
+
+	column request_id
+		dataType: int64
+		lineageTag: 5426e2af-11e8-433e-9207-af2643448d02
+		summarizeBy: none
+		sourceColumn: request_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column reference
+		dataType: string
+		lineageTag: 458cd1f3-1c11-4def-849e-14d30ac1a583
+		summarizeBy: none
+		sourceColumn: reference
+
+		annotation SummarizationSetBy = Automatic
+
+	column request_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: db40aabe-71b3-4b2d-9efc-5e32b62cfec4
+		summarizeBy: none
+		sourceColumn: request_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_start
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: fee1f148-1be8-4e17-8b5c-df3afabade45
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		lineageTag: 3bb3fa7f-854e-4059-83bb-5551d48d416f
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_number
+		dataType: int64
+		lineageTag: c554b2f9-9fd4-41b9-875a-9b8863503bec
+		summarizeBy: none
+		sourceColumn: month_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_label
+		dataType: string
+		lineageTag: ad1c2ec1-0b7a-4b05-adcd-8b56c1630716
+		summarizeBy: none
+		sourceColumn: month_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_id
+		dataType: int64
+		lineageTag: a6aafaa5-af95-41fb-a5be-9f06947c2077
+		summarizeBy: none
+		sourceColumn: employee_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_name
+		dataType: string
+		lineageTag: 1c029537-915c-4f0e-91ce-58ad2ab12fa6
+		summarizeBy: none
+		sourceColumn: employee_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_id
+		dataType: int64
+		lineageTag: b4da185c-bdbd-4622-893d-f394541e4916
+		summarizeBy: none
+		sourceColumn: department_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_name
+		dataType: string
+		lineageTag: c8083e9c-bdd4-4627-ab0f-46a206697b52
+		summarizeBy: none
+		sourceColumn: department_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column manager_id
+		dataType: int64
+		lineageTag: 119a0df0-07f9-4f3a-933d-2a6b2cac95f6
+		summarizeBy: none
+		sourceColumn: manager_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column manager_name
+		dataType: string
+		lineageTag: 2eea6efe-d823-4e88-96f8-ae5289a91080
+		summarizeBy: none
+		sourceColumn: manager_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_id
+		dataType: int64
+		lineageTag: 759f06d1-358d-4564-a406-d69af76e46a2
+		summarizeBy: none
+		sourceColumn: company_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: 78591efc-4871-4fd0-baa3-e39cdc56304b
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column destination
+		dataType: string
+		lineageTag: 1bdac6ac-1f76-49e5-8b8c-0f1373bac7ca
+		summarizeBy: none
+		sourceColumn: destination
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_from
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: c35da98b-65d2-4d91-9368-18b1241791d8
+		summarizeBy: none
+		sourceColumn: date_from
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_to
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: 1ec18e28-c182-40c7-8484-f9134906e2e6
+		summarizeBy: none
+		sourceColumn: date_to
+
+		annotation SummarizationSetBy = Automatic
+
+	column duration_days
+		dataType: double
+		formatString: 0.00
+		lineageTag: 5e2fbfac-83f3-435f-bec2-907b213e26e8
+		summarizeBy: sum
+		sourceColumn: duration_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column estimated_cost
+		dataType: double
+		formatString: #,0.00
+		lineageTag: ea5213e8-6c1b-450a-88b1-6ecff761a78d
+		summarizeBy: sum
+		sourceColumn: estimated_cost
+
+		annotation SummarizationSetBy = Automatic
+
+	column state
+		dataType: string
+		lineageTag: 7647b979-5bef-4544-a74a-2d75950964d3
+		summarizeBy: none
+		sourceColumn: state
+
+		annotation SummarizationSetBy = Automatic
+
+	column state_label
+		dataType: string
+		lineageTag: b5cb052f-2554-4b2d-b2cb-2e6a1457ac8a
+		summarizeBy: none
+		sourceColumn: state_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_approved
+		dataType: int64
+		lineageTag: 022514ba-c074-496b-81a9-8d1c12780fb7
+		summarizeBy: none
+		sourceColumn: is_approved
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_pending
+		dataType: int64
+		lineageTag: 9e59cd94-a084-4855-bd87-4ad3a91eb27a
+		summarizeBy: none
+		sourceColumn: is_pending
+
+		annotation SummarizationSetBy = Automatic
+
+	column create_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: d5a840ef-87b9-46a8-a544-ae2298f984c1
+		summarizeBy: none
+		sourceColumn: create_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column write_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 6fe31f22-a322-42bb-a6dc-9fdb6fe530c3
+		summarizeBy: none
+		sourceColumn: write_date
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Deplacements = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "portail_rh_powerbi", [CreateNavigationProperties=false]),
+					View = Source{[Schema="bi", Item="fact_travel_request"]}[Data]
+				in
+					View
+
+	annotation PBI_ResultType = Table

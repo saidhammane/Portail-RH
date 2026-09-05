@@ -1,0 +1,229 @@
+table Presences
+	lineageTag: e6a7acd8-e95b-4ea4-8e97-987cec562bc2
+
+	column attendance_id
+		dataType: int64
+		lineageTag: 5b3798a7-7314-4486-b3f1-fe1d1fab3a78
+		summarizeBy: none
+		sourceColumn: attendance_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_id
+		dataType: int64
+		lineageTag: 88c88bb0-775c-4dc7-a75f-2740bd973c68
+		summarizeBy: none
+		sourceColumn: employee_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_name
+		dataType: string
+		lineageTag: e0bc39cb-a508-4f2d-bdb4-8d7931495edd
+		summarizeBy: none
+		sourceColumn: employee_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_id
+		dataType: int64
+		lineageTag: 1a93182e-c932-429b-a822-10fbd6ba7524
+		summarizeBy: none
+		sourceColumn: department_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_name
+		dataType: string
+		lineageTag: 716e4ae0-90cc-44e7-8e62-70ff8fe992b7
+		summarizeBy: none
+		sourceColumn: department_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_id
+		dataType: int64
+		lineageTag: ae044e04-8a54-4fe6-a284-3a9d307d8a6e
+		summarizeBy: none
+		sourceColumn: company_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: 2d3aa4f1-cb32-451a-a321-898e7148082e
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column attendance_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: 78e3ba9b-ba18-460f-8cdd-288c1addc0c0
+		summarizeBy: none
+		sourceColumn: attendance_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_start
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: 6d88d8a5-3499-45b9-a19a-62f119211303
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_label
+		dataType: string
+		lineageTag: 0310e220-8444-45e4-87d0-64e80da88f8a
+		summarizeBy: none
+		sourceColumn: month_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column check_in
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: ebb08ed6-1bea-422c-b5f4-134adf2df4b9
+		summarizeBy: none
+		sourceColumn: check_in
+
+		annotation SummarizationSetBy = Automatic
+
+	column check_out
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 8fb7a558-191c-467b-b63a-6c36f83c57d3
+		summarizeBy: none
+		sourceColumn: check_out
+
+		annotation SummarizationSetBy = Automatic
+
+	column worked_hours
+		dataType: double
+		formatString: 0.00
+		lineageTag: 74ced783-5a0a-4ceb-9997-e6f685de8668
+		summarizeBy: sum
+		sourceColumn: worked_hours
+
+		annotation SummarizationSetBy = Automatic
+
+	column overtime_hours
+		dataType: double
+		formatString: 0.00
+		lineageTag: 4428c3b2-f8b6-4595-8006-3a2da604a79a
+		summarizeBy: sum
+		sourceColumn: overtime_hours
+
+		annotation SummarizationSetBy = Automatic
+
+	column zkteco_managed
+		dataType: int64
+		lineageTag: abf25f6b-2726-4ef6-b71c-3ca5fb387fb0
+		summarizeBy: none
+		sourceColumn: zkteco_managed
+
+		annotation SummarizationSetBy = Automatic
+
+	column late_minutes
+		dataType: int64
+		lineageTag: dc94d5e0-f051-4ed2-95da-51ac07112c14
+		summarizeBy: none
+		sourceColumn: late_minutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column early_departure_minutes
+		dataType: int64
+		lineageTag: d77b4311-25de-4b10-ab59-80917423e44b
+		summarizeBy: none
+		sourceColumn: early_departure_minutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column zkteco_status
+		dataType: string
+		lineageTag: edf5aada-8b89-40f5-b997-56c4ec04d32b
+		summarizeBy: none
+		sourceColumn: zkteco_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column status_label
+		dataType: string
+		lineageTag: da3b4a7e-7e2b-446b-85b0-ab5429932861
+		summarizeBy: none
+		sourceColumn: status_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_late
+		dataType: int64
+		lineageTag: 6da71d18-a779-45dc-8d91-90459caa80fb
+		summarizeBy: none
+		sourceColumn: is_late
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_early
+		dataType: int64
+		lineageTag: 098d8cd7-f290-4352-b77a-fddb5778c837
+		summarizeBy: none
+		sourceColumn: is_early
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_short_day
+		dataType: int64
+		lineageTag: 09c4d569-ac8d-4355-a053-9cec4f462537
+		summarizeBy: none
+		sourceColumn: is_short_day
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_overtime
+		dataType: int64
+		lineageTag: ecd58a8b-2d78-4c3b-8ac3-6bdceb07ded5
+		summarizeBy: none
+		sourceColumn: is_overtime
+
+		annotation SummarizationSetBy = Automatic
+
+	column quality_label
+		dataType: string
+		lineageTag: 3243bd8b-d06c-4b18-915e-6438b990ed8e
+		summarizeBy: none
+		sourceColumn: quality_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column create_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: ddf547f2-a296-45e1-8cd1-e0767a42cc8e
+		summarizeBy: none
+		sourceColumn: create_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column write_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 44f99e9d-a8aa-45b3-bd01-6d483fce8b7e
+		summarizeBy: none
+		sourceColumn: write_date
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Presences = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "portail_rh_powerbi", [CreateNavigationProperties=false]),
+					View = Source{[Schema="bi", Item="fact_attendance"]}[Data]
+				in
+					View
+
+	annotation PBI_ResultType = Table

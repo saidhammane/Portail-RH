@@ -1,0 +1,101 @@
+table Employes
+	lineageTag: 6da77f79-18ec-4db9-b11e-c7a3f6a3245a
+
+	column employee_id
+		dataType: int64
+		lineageTag: 08292806-318f-452b-8df4-405f27d302b1
+		summarizeBy: none
+		sourceColumn: employee_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_name
+		dataType: string
+		lineageTag: efb40b51-2fbc-43ad-adc0-ced377246fb8
+		summarizeBy: none
+		sourceColumn: employee_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_id
+		dataType: int64
+		lineageTag: f94d3d6b-4ac6-427e-8a38-aa0f2db9d91d
+		summarizeBy: none
+		sourceColumn: department_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_name
+		dataType: string
+		lineageTag: 5e76d701-f087-42ad-97d8-363305c204b4
+		summarizeBy: none
+		sourceColumn: department_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column manager_id
+		dataType: int64
+		lineageTag: 4b22da22-9e4e-47df-b9a6-f6f7d3ccba46
+		summarizeBy: none
+		sourceColumn: manager_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column manager_name
+		dataType: string
+		lineageTag: 277809dd-8c1f-4d01-8b8f-641cb5812025
+		summarizeBy: none
+		sourceColumn: manager_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_id
+		dataType: int64
+		lineageTag: eda424ab-f7ff-4bee-a23c-2f162b5b2027
+		summarizeBy: none
+		sourceColumn: company_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: 32418fe4-c03d-4bf4-bbdc-dd16dcd76bb3
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		lineageTag: 28116120-de5f-4ff2-a3ed-5ef4d6a3ed12
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column zkteco_user_id
+		dataType: int64
+		lineageTag: 1af20862-47c0-4d44-ad33-bca1f27d9243
+		summarizeBy: none
+		sourceColumn: zkteco_user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column active
+		dataType: int64
+		lineageTag: 6684fb6c-5819-4acb-aefa-3b4e4cc6d212
+		summarizeBy: none
+		sourceColumn: active
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Employes = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "portail_rh_powerbi", [CreateNavigationProperties=false]),
+					View = Source{[Schema="bi", Item="dim_employee"]}[Data]
+				in
+					View
+
+	annotation PBI_ResultType = Table

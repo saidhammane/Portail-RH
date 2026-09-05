@@ -12,3 +12,10 @@ services/onboarding_ai/data/
 
 bi/local/
 bi/data/
+
+# Power BI Desktop project-local data (Microsoft PBIP defaults)
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
+# Local timestamped Power BI safety copies
+_backup_powerbi_*/

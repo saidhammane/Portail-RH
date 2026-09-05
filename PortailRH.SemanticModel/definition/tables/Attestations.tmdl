@@ -1,0 +1,177 @@
+table Attestations
+	lineageTag: 76ff33c9-9d04-4b75-92f1-19573e386325
+
+	column request_id
+		dataType: int64
+		lineageTag: 56f0f67b-f2a5-4550-8e56-8e52e98289e8
+		summarizeBy: none
+		sourceColumn: request_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column reference
+		dataType: string
+		lineageTag: f2c1268f-88e2-4cc1-9e48-62133d5e988c
+		summarizeBy: none
+		sourceColumn: reference
+
+		annotation SummarizationSetBy = Automatic
+
+	column request_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: c21ecf89-abc5-40bd-bc83-5c169b4f7b8f
+		summarizeBy: none
+		sourceColumn: request_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_start
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: dfd38995-03e8-417f-bd70-696c7547c758
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		lineageTag: 3eb65e16-ad58-4e33-8270-da90a9da22f6
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_number
+		dataType: int64
+		lineageTag: 6217ee3d-cc00-4434-aab2-77e507aa52cf
+		summarizeBy: none
+		sourceColumn: month_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_label
+		dataType: string
+		lineageTag: 7a1742ff-bc89-45d8-91a2-e6b1f0cbb4dd
+		summarizeBy: none
+		sourceColumn: month_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_id
+		dataType: int64
+		lineageTag: 1cd115d0-55c7-4b33-9d99-7c57fc71e3e6
+		summarizeBy: none
+		sourceColumn: employee_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_name
+		dataType: string
+		lineageTag: 9f0ef61e-c3ad-4d52-b619-566606f6e5af
+		summarizeBy: none
+		sourceColumn: employee_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_id
+		dataType: int64
+		lineageTag: d2c4ab6c-9ff4-40d9-a292-99c44711e112
+		summarizeBy: none
+		sourceColumn: department_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_name
+		dataType: string
+		lineageTag: fa45dc96-2909-4846-abc9-a178f70a7f85
+		summarizeBy: none
+		sourceColumn: department_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_id
+		dataType: int64
+		lineageTag: b4d58f17-19bc-4e01-8841-19c35c4028de
+		summarizeBy: none
+		sourceColumn: company_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: 8b1803e9-7148-422f-a7dc-33afe02ef97f
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column attestation_type
+		dataType: string
+		lineageTag: ea09f715-dc1c-4a14-9522-7bfe59501495
+		summarizeBy: none
+		sourceColumn: attestation_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column attestation_type_label
+		dataType: string
+		lineageTag: 1a25f364-41fc-4a6c-ad3e-ceeb16fe173a
+		summarizeBy: none
+		sourceColumn: attestation_type_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column state
+		dataType: string
+		lineageTag: fe873335-5d31-4d90-973a-47d577543005
+		summarizeBy: none
+		sourceColumn: state
+
+		annotation SummarizationSetBy = Automatic
+
+	column state_label
+		dataType: string
+		lineageTag: 8e868187-8398-4553-b8f6-d312f9c207ae
+		summarizeBy: none
+		sourceColumn: state_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_approved
+		dataType: int64
+		lineageTag: c0a49b28-0e0a-4eee-be91-56bbc6514631
+		summarizeBy: none
+		sourceColumn: is_approved
+
+		annotation SummarizationSetBy = Automatic
+
+	column create_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 85785eb3-55c0-44ae-8f53-81692bd03a3d
+		summarizeBy: none
+		sourceColumn: create_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column write_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 79647d7c-dca6-4561-9a63-79bd7adbc25e
+		summarizeBy: none
+		sourceColumn: write_date
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Attestations = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "portail_rh_powerbi", [CreateNavigationProperties=false]),
+					View = Source{[Schema="bi", Item="fact_attestation_request"]}[Data]
+				in
+					View
+
+	annotation PBI_ResultType = Table

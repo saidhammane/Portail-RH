@@ -17,6 +17,25 @@ from .providers import (
 from .schemas import ChatRequest, ChatResponse, ChatSource
 
 
+CACHE_VERSION = "rag-v5"
+CONTACT_QUERY_TOKENS = {
+    "contact",
+    "contacter",
+    "email",
+    "mail",
+    "poste",
+    "support",
+    "telephone",
+    "téléphone",
+}
+EMAIL_PATTERN = re.compile(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.I)
+EXTENSION_PATTERN = re.compile(r"\bposte\s+\d{2,6}\b", re.I)
+PRODUCT_QUERY_TOKENS = {"logiciel", "logiciels", "produit", "produits"}
+PRODUCT_NAME_TOKEN = r"[A-ZÉÈÀ][A-Za-zÀ-ÿ0-9]*[a-zà-ÿ][A-Za-zÀ-ÿ0-9]*"
+PRODUCT_NAME_PATTERN = re.compile(
+    r"\b(%s(?:\s+%s){1,3})\s+(?:aide|automatise|offre|permet|simplifie)\b"
+    % (PRODUCT_NAME_TOKEN, PRODUCT_NAME_TOKEN)
+)
 REFUSAL_ANSWER = (
     "Je n'ai pas trouve d'information verifiee sur ce sujet dans les documents "
     "auxquels vous avez acces. Reformulez la question ou transmettez-la a RH."
@@ -29,6 +48,10 @@ GENERIC_QUERY_TOKENS = {
     "jour",
     "jours",
     "mes",
+    "mon",
+    "ma",
+    "notre",
+    "nos",
     "possible",
     "puis",
     "quelle",
@@ -44,6 +67,12 @@ GENERIC_QUERY_TOKENS = {
     "ils",
     "lui",
     "leur",
+    "leurs",
+    "sa",
+    "ses",
+    "son",
+    "vos",
+    "votre",
     "lequel",
     "laquelle",
 }
@@ -55,6 +84,7 @@ SYNONYM_GROUPS = (
     {"attestation", "certificate", "certificat", "salaire"},
     {"informatique", "it", "support", "ordinateur", "laptop"},
     {"facture", "factures", "facturation", "electronique", "electroniques"},
+    {"logiciel", "logiciels", "produit", "produits", "service", "services"},
 )
 FOLLOW_UP_PREFIXES = ("et ", "mais ", "sinon ", "aussi ")
 FOLLOW_UP_REFERENCES = {
@@ -230,6 +260,54 @@ def clean_generated_answer(answer: str) -> str:
     return clean_answer
 
 
+def add_requested_contact_details(answer: str, points, question: str) -> str:
+    """Append exact contact details when the compact model omits a requested value."""
+    question_tokens = set(TOKEN_PATTERN.findall(question.lower()))
+    if not question_tokens & CONTACT_QUERY_TOKENS:
+        return answer
+    if EMAIL_PATTERN.search(answer) or EXTENSION_PATTERN.search(answer):
+        return answer
+    for source_index, point in enumerate(points, start=1):
+        text = str((point.payload or {}).get("text") or "")
+        details = []
+        for value in EMAIL_PATTERN.findall(text) + EXTENSION_PATTERN.findall(text):
+            if value.lower() not in {item.lower() for item in details}:
+                details.append(value)
+        if details:
+            base_answer = answer.rstrip().rstrip(".")
+            return "%s. Contact : %s [%s]." % (
+                base_answer,
+                " ou ".join(details),
+                source_index,
+            )
+    return answer
+
+
+def add_requested_product_names(answer: str, points, question: str) -> str:
+    """Append product names parsed from authorized sources when the model omits them."""
+    question_tokens = set(TOKEN_PATTERN.findall(question.lower()))
+    if not question_tokens & PRODUCT_QUERY_TOKENS:
+        return answer
+    products = []
+    citations = []
+    for source_index, point in enumerate(points, start=1):
+        text = str((point.payload or {}).get("text") or "")
+        for product in PRODUCT_NAME_PATTERN.findall(text):
+            if product.lower() not in {item.lower() for item in products}:
+                products.append(product)
+                citations.append(source_index)
+    missing = [product for product in products if product.lower() not in answer.lower()]
+    if not missing:
+        return answer
+    source_index = citations[products.index(missing[0])]
+    base_answer = answer.rstrip().rstrip(".")
+    return "%s. Produits : %s [%s]." % (
+        base_answer,
+        " et ".join(products),
+        source_index,
+    )
+
+
 def build_access_filter(payload: ChatRequest) -> models.Filter:
     visibility_conditions = [
         models.FieldCondition(
@@ -340,7 +418,8 @@ async def cache_key(payload: ChatRequest, settings: Settings, redis_client) -> s
     question_hash = hashlib.sha256(
         (normalized_history + "|" + normalized_question).encode("utf-8")
     ).hexdigest()
-    cache_context = "%s|%s|%s|%s|%s" % (
+    cache_context = "%s|%s|%s|%s|%s|%s" % (
+        CACHE_VERSION,
         ",".join(sorted(set(payload.group_scopes))),
         settings.llm_provider,
         settings.llm_chat_model or "",
@@ -526,6 +605,8 @@ async def answer_chat(payload: ChatRequest, settings: Settings, redis_client, qd
             answer = build_extractive_answer(points, payload.question)
         else:
             answer = clean_generated_answer(answer)
+        answer = add_requested_contact_details(answer, points, generation_question)
+        answer = add_requested_product_names(answer, points, generation_question)
         refused = answer.strip().lower().startswith("information insuffisante")
         if not refused and not any(
             "[%s]" % index in answer for index in range(1, len(sources) + 1)

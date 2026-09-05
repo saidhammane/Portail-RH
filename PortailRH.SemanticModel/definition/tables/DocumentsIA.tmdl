@@ -1,0 +1,159 @@
+table DocumentsIA
+	lineageTag: 014b009b-53f5-4fcf-b3e4-745b64d3566a
+
+	column document_id
+		dataType: int64
+		lineageTag: 778ae467-f970-4e1c-977d-01ea8abc1b2d
+		summarizeBy: none
+		sourceColumn: document_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column document_name
+		dataType: string
+		lineageTag: 3254604d-b42d-4588-a1ab-d9a4b17c1e7a
+		summarizeBy: none
+		sourceColumn: document_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 90c2126a-698e-45a6-a97c-824aa918fe3a
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_label
+		dataType: string
+		lineageTag: 21c6b32b-cbc2-448c-8cc7-f9211391b6b1
+		summarizeBy: none
+		sourceColumn: category_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column language
+		dataType: string
+		lineageTag: 7c421156-a8df-470a-b31c-ba3f1fc56096
+		summarizeBy: none
+		sourceColumn: language
+
+		annotation SummarizationSetBy = Automatic
+
+	column language_label
+		dataType: string
+		lineageTag: 77f1e0bd-71ee-45b7-b2f5-2463593dfb3a
+		summarizeBy: none
+		sourceColumn: language_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_id
+		dataType: int64
+		lineageTag: d473cbd8-766e-475d-bb8d-b236e0f31687
+		summarizeBy: none
+		sourceColumn: company_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: 8e0d93bb-c0bb-4784-a85d-e2a9033b571f
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_id
+		dataType: int64
+		lineageTag: d7e7129e-a127-4fb7-b7be-05eaf5257f87
+		summarizeBy: none
+		sourceColumn: department_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_name
+		dataType: string
+		lineageTag: 58f97915-fd25-4ee0-b09d-05ea73be1cad
+		summarizeBy: none
+		sourceColumn: department_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column visibility
+		dataType: string
+		lineageTag: df854cf6-ed49-4af9-a6d7-773a431a2762
+		summarizeBy: none
+		sourceColumn: visibility
+
+		annotation SummarizationSetBy = Automatic
+
+	column visibility_label
+		dataType: string
+		lineageTag: b730b5d8-a33b-4807-a955-9c145786c105
+		summarizeBy: none
+		sourceColumn: visibility_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column version
+		dataType: int64
+		lineageTag: 460976c6-afb9-4299-9007-60126a38cf9b
+		summarizeBy: none
+		sourceColumn: version
+
+		annotation SummarizationSetBy = Automatic
+
+	column indexing_state
+		dataType: string
+		lineageTag: c4cfd625-7705-4880-9f8b-c46a88ae3fe7
+		summarizeBy: none
+		sourceColumn: indexing_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column indexing_state_label
+		dataType: string
+		lineageTag: cb78c9c0-7fc2-4953-82e2-62cd49eb2a80
+		summarizeBy: none
+		sourceColumn: indexing_state_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column indexed_at
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: b57ce64e-6150-4cd6-bd42-688024e619cd
+		summarizeBy: none
+		sourceColumn: indexed_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column active
+		dataType: int64
+		lineageTag: 71901421-cab7-47ed-9841-82c923bb0b5d
+		summarizeBy: none
+		sourceColumn: active
+
+		annotation SummarizationSetBy = Automatic
+
+	column create_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: da19946e-b0b4-4423-a403-55a1a3888a9d
+		summarizeBy: none
+		sourceColumn: create_date
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DocumentsIA = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "portail_rh_powerbi", [CreateNavigationProperties=false]),
+					View = Source{[Schema="bi", Item="fact_onboarding_document"]}[Data]
+				in
+					View
+
+	annotation PBI_ResultType = Table

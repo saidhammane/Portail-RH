@@ -1,0 +1,403 @@
+table ActivitesRH
+	lineageTag: cdf620a9-973e-4a7f-bcc5-39f585dca475
+
+	measure 'Total demandes' = COUNTROWS(ActivitesRH)
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 5005b8bd-d1ff-46f5-8947-bb56d9f1895f
+
+	measure 'Demandes approuvees' = CALCULATE([Total demandes], ActivitesRH[state] IN {"approved","done"})
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 2c4ba067-6301-4f9b-80ba-77c94d9b4974
+
+	measure 'Demandes en attente' = CALCULATE([Total demandes], ActivitesRH[state] = "submitted")
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: fd68b0b5-950e-41e8-b71f-d9819217ed89
+
+	measure 'Demandes refusees' = CALCULATE([Total demandes], ActivitesRH[state] = "rejected")
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: b3e24d64-5cce-43a4-84b4-f236b0466471
+
+	measure 'Taux approbation' = DIVIDE([Demandes approuvees], [Total demandes], 0)
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: bbc8f27d-b4f8-4cc7-be1c-99cdbc566dd4
+
+	measure 'Cout total demandes' = SUM(ActivitesRH[amount])
+		formatString: #,0.00
+		displayFolder: Indicateurs
+		lineageTag: e6b77186-7252-44f8-99b1-621b6b737c77
+
+	measure 'Employes actifs' = DISTINCTCOUNT(ActivitesRH[employee_id])
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 3c4d98a1-858d-42a3-b63f-92d596c2bac5
+
+	measure 'Departements actifs' = DISTINCTCOUNT(ActivitesRH[department_id])
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: d679c019-ee4f-4901-811d-faf0604f8dcf
+
+	measure 'Total deplacements' = COUNTROWS(Deplacements)
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: f183dc7e-742b-48ee-b713-a13c96adf7ea
+
+	measure 'Cout deplacements' = SUM(Deplacements[estimated_cost])
+		formatString: #,0.00
+		displayFolder: Indicateurs
+		lineageTag: b1983323-ad8e-4ae1-ad35-6128c3c57f78
+
+	measure 'Cout moyen deplacement' = AVERAGE(Deplacements[estimated_cost])
+		formatString: #,0.00
+		displayFolder: Indicateurs
+		lineageTag: 0c23cdaa-b99f-43b6-bf1d-2c0d412260c0
+
+	measure 'Duree moyenne' = AVERAGE(Deplacements[duration_days])
+		formatString: 0.0
+		displayFolder: Indicateurs
+		lineageTag: 69b471b8-e5ec-4f01-9d6b-7b89a197f453
+
+	measure 'Taux approbation deplacements' = DIVIDE(CALCULATE([Total deplacements], Deplacements[state] IN {"approved","done"}), [Total deplacements], 0)
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: 978029af-daec-4287-b9e2-4d31464aebe0
+
+	measure 'Deplacements en attente' = CALCULATE([Total deplacements], Deplacements[state] = "submitted")
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: bdea9382-25b6-46e4-8bb5-cfd9e3daaae0
+
+	measure 'Total fournitures' = COUNTROWS(Fournitures)
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 39828c94-0eb2-41c2-a7d8-d7e81ed4b288
+
+	measure 'Quantite fournitures' = SUM(Fournitures[quantity])
+		formatString: #,0.0
+		displayFolder: Indicateurs
+		lineageTag: 700d7122-4c2c-461c-b1f9-40f0582e4428
+
+	measure 'Cout fournitures' = SUM(Fournitures[estimated_cost])
+		formatString: #,0.00
+		displayFolder: Indicateurs
+		lineageTag: e801251e-afad-480f-86e5-a520540e1a08
+
+	measure 'Cout moyen fourniture' = AVERAGE(Fournitures[estimated_cost])
+		formatString: #,0.00
+		displayFolder: Indicateurs
+		lineageTag: f0b91fe7-63f7-4745-af21-3d983d7891da
+
+	measure 'Taux approbation fournitures' = DIVIDE(CALCULATE([Total fournitures], Fournitures[state] IN {"approved","done"}), [Total fournitures], 0)
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: ef5f03d6-27c1-4187-b978-baa23638e80b
+
+	measure 'Prevision mensuelle quantite' = DIVIDE([Quantite fournitures], DISTINCTCOUNT(Fournitures[month_label]), 0)
+		formatString: #,0.0
+		displayFolder: Indicateurs
+		lineageTag: 3c9a620a-f4e9-40d3-96e2-1b6dda6becb5
+
+	measure 'Total attestations' = COUNTROWS(Attestations)
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: a77b9499-e890-4a78-915a-91f7eea6d071
+
+	measure 'Attestations approuvees' = CALCULATE([Total attestations], Attestations[state] IN {"approved","done"})
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 5d5b6505-22c3-47ef-94e4-1945c2b10868
+
+	measure 'Attestations soumises' = CALCULATE([Total attestations], Attestations[state] = "submitted")
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 341c2491-0fb7-4482-bcc2-46b968bdb04d
+
+	measure 'Attestations refusees' = CALCULATE([Total attestations], Attestations[state] = "rejected")
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 67df2b25-6e35-4e86-a53d-51ecb267d11b
+
+	measure 'Taux attestations approuvees' = DIVIDE([Attestations approuvees], [Total attestations], 0)
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: 508da981-1d71-427b-b715-3f4859274480
+
+	measure 'Total presences' = COUNTROWS(Presences)
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 6b35ae3f-45a8-4ee1-bfc8-f6c7be3b09a9
+
+	measure 'Heures travaillees' = SUM(Presences[worked_hours])
+		formatString: #,0.0
+		displayFolder: Indicateurs
+		lineageTag: 17616f19-ae35-44f4-a750-686eea1c4b7f
+
+	measure 'Heures moyennes' = AVERAGE(Presences[worked_hours])
+		formatString: 0.00
+		displayFolder: Indicateurs
+		lineageTag: 40273af6-a87e-4c66-b4c9-4b0f2344e8ba
+
+	measure Retards = SUM(Presences[is_late])
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 173f61ee-2c95-448f-acd9-e250b992ae58
+
+	measure 'Taux retard' = DIVIDE([Retards], [Total presences], 0)
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: 042c4288-7841-481d-bafa-bb7d462c7f4f
+
+	measure 'Departs anticipes' = SUM(Presences[is_early])
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 00ece695-433c-4135-9053-907dccd80dbc
+
+	measure 'Journees courtes' = SUM(Presences[is_short_day])
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 74eb2e46-3c2e-4f68-9a80-ddc2595566fc
+
+	measure 'Heures supplementaires' = SUM(Presences[overtime_hours])
+		formatString: #,0.0
+		displayFolder: Indicateurs
+		lineageTag: 9a3ba254-e6f0-4385-b029-50d23f287c68
+
+	measure 'Logs ZKTeco' = COUNTROWS(LogsZKTeco)
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: ceef52c2-7223-4427-80b7-f40ada5fe1ba
+
+	measure 'Logs en erreur' = SUM(LogsZKTeco[has_error])
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: bcb158b5-178b-4b26-8bfe-e721f0cfc006
+
+	measure 'Taux traitement logs' = DIVIDE(SUM(LogsZKTeco[is_processed]), [Logs ZKTeco], 0)
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: 86d15216-673b-4290-b2b7-1f32545b48d0
+
+	measure 'Questions IA' = CALCULATE(COUNTROWS(MessagesIA), MessagesIA[role] = "user")
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 1822b8fa-3236-4d8f-9535-d5dc4200e779
+
+	measure 'Reponses IA' = CALCULATE(COUNTROWS(MessagesIA), MessagesIA[role] = "assistant")
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 54f1f5ff-11bc-4c01-a3e5-cce80090d263
+
+	measure 'Confiance moyenne IA' = CALCULATE(AVERAGE(MessagesIA[confidence_score]), MessagesIA[role] = "assistant")
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: 0ec9f2dc-d72d-4167-b34e-b06f380a1675
+
+	measure 'Latence moyenne IA' = CALCULATE(AVERAGE(MessagesIA[latency_ms]), MessagesIA[role] = "assistant")
+		formatString: #,0 ms
+		displayFolder: Indicateurs
+		lineageTag: b71e010c-e1bb-4c99-bf82-288c8c26e09a
+
+	measure 'Taux cache IA' = DIVIDE(CALCULATE([Reponses IA], MessagesIA[cache_hit] = 1), [Reponses IA], 0)
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: ca37a2c8-1f6a-4235-89ac-da01aa76a789
+
+	measure 'Escalades RH' = CALCULATE([Reponses IA], MessagesIA[needs_escalation] = 1)
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 9cf38262-cfea-4202-86ee-7ac4150aca30
+
+	measure 'Taux escalade RH' = DIVIDE([Escalades RH], [Reponses IA], 0)
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: 2753d7b1-f543-4bbb-816f-3e7bdb95d0b8
+
+	measure 'Feedbacks utiles' = CALCULATE([Reponses IA], MessagesIA[feedback] = "helpful")
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 206b970c-60e4-49d6-81c8-60a554648992
+
+	measure 'Feedbacks collectes' = CALCULATE([Reponses IA], NOT ISBLANK(MessagesIA[feedback]))
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: 4d74ef5f-1498-498d-bc98-8e09e5e33b74
+
+	measure 'Taux feedback utile' = DIVIDE([Feedbacks utiles], [Feedbacks collectes], 0)
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: 251de55a-1be1-4fdf-a653-f5df2c40ec7c
+
+	measure 'Documents IA' = COUNTROWS(DocumentsIA)
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: bad70b5c-5976-4de4-a577-5dfcc947c452
+
+	measure 'Documents indexes' = CALCULATE([Documents IA], DocumentsIA[indexing_state] = "indexed")
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: fdda7688-25d9-4570-80ad-3dbdb357661f
+
+	measure 'Documents en erreur' = CALCULATE([Documents IA], DocumentsIA[indexing_state] = "error")
+		formatString: #,0
+		displayFolder: Indicateurs
+		lineageTag: c7e13040-9b27-4338-ba5d-e8195b4d4b2b
+
+	measure 'Taux indexation' = DIVIDE([Documents indexes], [Documents IA], 0)
+		formatString: 0.0%
+		displayFolder: Indicateurs
+		lineageTag: 3000fd95-5559-40b4-8bad-bcc7719807c0
+
+	column activity_key
+		dataType: string
+		lineageTag: 73609b0b-4982-46a9-8ab4-33a39a7bbdcd
+		summarizeBy: none
+		sourceColumn: activity_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column request_id
+		dataType: int64
+		lineageTag: 78c0106e-a052-43d4-aef9-67c2b499ea70
+		summarizeBy: none
+		sourceColumn: request_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column activity_type
+		dataType: string
+		lineageTag: 1035f321-e79b-4634-ab0a-e3db79995d43
+		summarizeBy: none
+		sourceColumn: activity_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column activity_type_label
+		dataType: string
+		lineageTag: 41fd021b-4457-4e35-950f-32f5e34db039
+		summarizeBy: none
+		sourceColumn: activity_type_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column reference
+		dataType: string
+		lineageTag: 69722b09-44bd-42bf-b35c-e5498982259b
+		summarizeBy: none
+		sourceColumn: reference
+
+		annotation SummarizationSetBy = Automatic
+
+	column request_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: cc18b532-80b4-4e42-9822-237865fec59c
+		summarizeBy: none
+		sourceColumn: request_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_start
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: 82df8bc0-9e1a-4938-9946-0d7c85f2527e
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_id
+		dataType: int64
+		lineageTag: 4e4491f0-e47e-499c-bdd5-1db2bba8c14f
+		summarizeBy: none
+		sourceColumn: employee_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_name
+		dataType: string
+		lineageTag: 58caa5a9-f8d6-4c5c-87b0-ae6e6e7bf651
+		summarizeBy: none
+		sourceColumn: employee_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_id
+		dataType: int64
+		lineageTag: 95480fb0-a9ea-4f92-a872-620a190c1895
+		summarizeBy: none
+		sourceColumn: department_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_name
+		dataType: string
+		lineageTag: 7184811e-3113-467f-b453-71175d702d26
+		summarizeBy: none
+		sourceColumn: department_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_id
+		dataType: int64
+		lineageTag: fd4ac033-6b46-4384-82c1-9673ba010c99
+		summarizeBy: none
+		sourceColumn: company_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: daa0cce2-4220-452f-9639-5ba28c035950
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column state
+		dataType: string
+		lineageTag: 424d93a4-8853-451e-88f4-4e38ecef29c5
+		summarizeBy: none
+		sourceColumn: state
+
+		annotation SummarizationSetBy = Automatic
+
+	column state_label
+		dataType: string
+		lineageTag: 039290a4-9dab-4de9-988c-9cdc5e4afe19
+		summarizeBy: none
+		sourceColumn: state_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 18889ddb-5845-47b4-9a47-c0080cfb30ef
+		summarizeBy: sum
+		sourceColumn: amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: double
+		formatString: 0.00
+		lineageTag: 20b7d322-3a31-445d-bf45-5c6d4dc65778
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ActivitesRH = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "portail_rh_powerbi", [CreateNavigationProperties=false]),
+					View = Source{[Schema="bi", Item="fact_hr_activity"]}[Data]
+				in
+					View
+
+	annotation PBI_ResultType = Table

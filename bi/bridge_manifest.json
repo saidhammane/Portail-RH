@@ -1,0 +1,143 @@
+﻿{
+    "jsonrpc":  "2.0",
+    "id":  1,
+    "result":  {
+                   "methods":  [
+                                   {
+                                       "name":  "application.state.get/v1",
+                                       "description":  "Returns the current application state including open file information.",
+                                       "params":  {
+                                                      "type":  "object",
+                                                      "additionalProperties":  false
+                                                  },
+                                       "result":  {
+                                                      "type":  "object",
+                                                      "additionalProperties":  false,
+                                                      "properties":  {
+                                                                         "currentFilePath":  {
+                                                                                                 "description":  "Full file path of the currently open artifact. Empty when no file is open.",
+                                                                                                 "type":  [
+                                                                                                              "string",
+                                                                                                              "null"
+                                                                                                          ]
+                                                                                             },
+                                                                         "hasUnsavedChanges":  {
+                                                                                                   "description":  "Whether the artifact has unsaved changes.",
+                                                                                                   "type":  "boolean"
+                                                                                               }
+                                                                     },
+                                                      "required":  [
+                                                                       "currentFilePath",
+                                                                       "hasUnsavedChanges"
+                                                                   ]
+                                                  }
+                                   },
+                                   {
+                                       "name":  "report.snapshot.capture/v1",
+                                       "description":  "Captures a PNG screenshot of the specified report page.",
+                                       "params":  {
+                                                      "type":  "object",
+                                                      "additionalProperties":  false,
+                                                      "properties":  {
+                                                                         "pageId":  {
+                                                                                        "description":  "Internal page ID from PBIR. Always required.",
+                                                                                        "type":  "string"
+                                                                                    },
+                                                                         "scale":  {
+                                                                                       "description":  "Capture scale factor (1.0-3.0). Defaults to 1.0.",
+                                                                                       "type":  [
+                                                                                                    "number",
+                                                                                                    "null"
+                                                                                                ]
+                                                                                   }
+                                                                     },
+                                                      "required":  [
+                                                                       "pageId",
+                                                                       "scale"
+                                                                   ]
+                                                  },
+                                       "result":  {
+                                                      "type":  "object",
+                                                      "additionalProperties":  false,
+                                                      "properties":  {
+                                                                         "payload":  {
+                                                                                         "description":  "Encoded image data of the captured snapshot.",
+                                                                                         "type":  [
+                                                                                                      "string",
+                                                                                                      "null"
+                                                                                                  ]
+                                                                                     },
+                                                                         "mimeType":  {
+                                                                                          "description":  "MIME type of the captured image (e.g. \u0027image/png\u0027).",
+                                                                                          "type":  [
+                                                                                                       "string",
+                                                                                                       "null"
+                                                                                                   ]
+                                                                                      },
+                                                                         "encoding":  {
+                                                                                          "description":  "Transfer encoding of the payload (e.g. \u0027Base64\u0027).",
+                                                                                          "type":  [
+                                                                                                       "string",
+                                                                                                       "null"
+                                                                                                   ]
+                                                                                      },
+                                                                         "pageId":  {
+                                                                                        "description":  "Internal page ID of the captured snapshot\u0027s source page.",
+                                                                                        "type":  [
+                                                                                                     "string",
+                                                                                                     "null"
+                                                                                                 ]
+                                                                                    },
+                                                                         "pageDisplayName":  {
+                                                                                                 "description":  "Human-readable display name of the captured snapshot\u0027s source page.",
+                                                                                                 "type":  [
+                                                                                                              "string",
+                                                                                                              "null"
+                                                                                                          ]
+                                                                                             }
+                                                                     },
+                                                      "required":  [
+                                                                       "payload",
+                                                                       "mimeType",
+                                                                       "encoding",
+                                                                       "pageId",
+                                                                       "pageDisplayName"
+                                                                   ]
+                                                  }
+                                   },
+                                   {
+                                       "name":  "file.reload/v1",
+                                       "description":  "Reloads the currently-open PBIP/PBIR file in place to pick up on-disk edits.",
+                                       "params":  {
+                                                      "type":  "object",
+                                                      "additionalProperties":  false,
+                                                      "properties":  {
+                                                                         "reloadModelDefinition":  {
+                                                                                                       "description":  "Whether to re-apply the model definition (TMSL/TMDL) on reload. Defaults to true.",
+                                                                                                       "type":  [
+                                                                                                                    "boolean",
+                                                                                                                    "null"
+                                                                                                                ]
+                                                                                                   }
+                                                                     },
+                                                      "required":  [
+                                                                       "reloadModelDefinition"
+                                                                   ]
+                                                  },
+                                       "result":  {
+                                                      "type":  "object",
+                                                      "additionalProperties":  false,
+                                                      "properties":  {
+                                                                         "success":  {
+                                                                                         "description":  "True when the reload completed successfully.",
+                                                                                         "type":  "boolean"
+                                                                                     }
+                                                                     },
+                                                      "required":  [
+                                                                       "success"
+                                                                   ]
+                                                  }
+                                   }
+                               ]
+               }
+}

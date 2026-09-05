@@ -1,0 +1,185 @@
+table LogsZKTeco
+	lineageTag: de24fc00-7a0d-4412-8f84-e52c22e2e610
+
+	column log_id
+		dataType: int64
+		lineageTag: f4a8ede3-374b-41de-be0d-bea6c6fbbc6f
+		summarizeBy: none
+		sourceColumn: log_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_id
+		dataType: int64
+		lineageTag: 0c4f896a-379b-43a6-bdb9-bf13dad39621
+		summarizeBy: none
+		sourceColumn: employee_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column employee_name
+		dataType: string
+		lineageTag: b84f28e9-3b2f-4aae-9b51-654ce76f5be7
+		summarizeBy: none
+		sourceColumn: employee_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_id
+		dataType: int64
+		lineageTag: 49559f46-081b-43f8-91d6-a6c0686bd19a
+		summarizeBy: none
+		sourceColumn: department_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column department_name
+		dataType: string
+		lineageTag: 7bb1f52c-5d86-4870-8be7-8f49bdaf2021
+		summarizeBy: none
+		sourceColumn: department_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_id
+		dataType: int64
+		lineageTag: 1a4c6691-c5d8-40a2-9394-aeea6e93161e
+		summarizeBy: none
+		sourceColumn: company_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: 47e0d394-9fbd-41c1-9da0-5100d95f0e27
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column device_user_id
+		dataType: int64
+		lineageTag: f5653cc1-792b-47c2-9daa-de0a6b2263e9
+		summarizeBy: none
+		sourceColumn: device_user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column punch_datetime
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 8a43abb4-6cb4-460e-a2c9-aa0e7596f38b
+		summarizeBy: none
+		sourceColumn: punch_datetime
+
+		annotation SummarizationSetBy = Automatic
+
+	column punch_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: 960cc48a-ffe5-42ce-a78d-34eb690de0eb
+		summarizeBy: none
+		sourceColumn: punch_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_start
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: b045db4f-9971-44aa-8638-7faa51d0d6fd
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column punch_type
+		dataType: string
+		lineageTag: 4829f7fb-a682-449f-9542-e9961b5e9555
+		summarizeBy: none
+		sourceColumn: punch_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column punch_type_label
+		dataType: string
+		lineageTag: f639476b-b303-4dfb-bf38-e43dc7649a60
+		summarizeBy: none
+		sourceColumn: punch_type_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column device_name
+		dataType: string
+		lineageTag: 19cb9d1a-56d4-48b3-a235-e02938d92bc2
+		summarizeBy: none
+		sourceColumn: device_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column device_serial
+		dataType: string
+		lineageTag: e0edcec4-8f6d-418c-8f41-db7eea53fb00
+		summarizeBy: none
+		sourceColumn: device_serial
+
+		annotation SummarizationSetBy = Automatic
+
+	column state
+		dataType: string
+		lineageTag: 9095fecd-88dd-4ccf-966f-e041b231a273
+		summarizeBy: none
+		sourceColumn: state
+
+		annotation SummarizationSetBy = Automatic
+
+	column state_label
+		dataType: string
+		lineageTag: b08f1a8b-bd12-4e60-87ba-16f54f08396f
+		summarizeBy: none
+		sourceColumn: state_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column has_error
+		dataType: int64
+		lineageTag: ced63743-1cb0-4912-9037-5bf8be41d52b
+		summarizeBy: none
+		sourceColumn: has_error
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_processed
+		dataType: int64
+		lineageTag: 9efcaf80-b394-4b6e-8715-f170ba9f7fdf
+		summarizeBy: none
+		sourceColumn: is_processed
+
+		annotation SummarizationSetBy = Automatic
+
+	column attendance_id
+		dataType: int64
+		lineageTag: ed129a6e-1fc5-432d-9294-8c44703591be
+		summarizeBy: none
+		sourceColumn: attendance_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column create_date
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 0c9baacc-e90e-401e-b5fa-57c9309fb855
+		summarizeBy: none
+		sourceColumn: create_date
+
+		annotation SummarizationSetBy = Automatic
+
+	partition LogsZKTeco = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("127.0.0.1:5432", "portail_rh_powerbi", [CreateNavigationProperties=false]),
+					View = Source{[Schema="bi", Item="fact_zkteco_log"]}[Data]
+				in
+					View
+
+	annotation PBI_ResultType = Table
