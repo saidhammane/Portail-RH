@@ -4,7 +4,7 @@ table LogsZKTeco
 	column log_id
 		dataType: int64
 		lineageTag: f4a8ede3-374b-41de-be0d-bea6c6fbbc6f
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: log_id
 
 		annotation SummarizationSetBy = Automatic
@@ -58,7 +58,7 @@ table LogsZKTeco
 		annotation SummarizationSetBy = Automatic
 
 	column device_user_id
-		dataType: int64
+		dataType: string
 		lineageTag: f5653cc1-792b-47c2-9daa-de0a6b2263e9
 		summarizeBy: none
 		sourceColumn: device_user_id
@@ -81,7 +81,14 @@ table LogsZKTeco
 		summarizeBy: none
 		sourceColumn: punch_date
 
+		variation Variation
+			isDefault
+			relationship: e8105bbd-4a34-4a23-9982-4efd3494c865
+			defaultHierarchy: LocalDateTable_7312ea12-8876-481f-8a7c-e420981e12da.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column month_start
 		dataType: dateTime
@@ -90,7 +97,14 @@ table LogsZKTeco
 		summarizeBy: none
 		sourceColumn: month_start
 
+		variation Variation
+			isDefault
+			relationship: ed14c1cd-0412-44a1-a44a-53574fadf6d6
+			defaultHierarchy: LocalDateTable_fe588a28-8b39-4797-8fb0-1ce253504c36.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column punch_type
 		dataType: string
@@ -143,7 +157,7 @@ table LogsZKTeco
 	column has_error
 		dataType: int64
 		lineageTag: ced63743-1cb0-4912-9037-5bf8be41d52b
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: has_error
 
 		annotation SummarizationSetBy = Automatic
@@ -151,7 +165,7 @@ table LogsZKTeco
 	column is_processed
 		dataType: int64
 		lineageTag: 9efcaf80-b394-4b6e-8715-f170ba9f7fdf
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: is_processed
 
 		annotation SummarizationSetBy = Automatic
@@ -159,7 +173,7 @@ table LogsZKTeco
 	column attendance_id
 		dataType: int64
 		lineageTag: ed129a6e-1fc5-432d-9294-8c44703591be
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: attendance_id
 
 		annotation SummarizationSetBy = Automatic

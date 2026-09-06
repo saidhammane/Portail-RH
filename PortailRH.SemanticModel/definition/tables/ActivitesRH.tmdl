@@ -262,7 +262,7 @@ table ActivitesRH
 	column request_id
 		dataType: int64
 		lineageTag: 78c0106e-a052-43d4-aef9-67c2b499ea70
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: request_id
 
 		annotation SummarizationSetBy = Automatic
@@ -298,7 +298,14 @@ table ActivitesRH
 		summarizeBy: none
 		sourceColumn: request_date
 
+		variation Variation
+			isDefault
+			relationship: d3ec2d5f-7c2e-47bb-a0db-7d461374d585
+			defaultHierarchy: LocalDateTable_7298152e-9c70-4b43-a182-88574b0d6e81.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column month_start
 		dataType: dateTime
@@ -307,7 +314,14 @@ table ActivitesRH
 		summarizeBy: none
 		sourceColumn: month_start
 
+		variation Variation
+			isDefault
+			relationship: 4d415811-b3cc-4bf3-85fc-8162f32a5c62
+			defaultHierarchy: LocalDateTable_04e24bff-15cd-420f-a680-98423c6e49a1.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column employee_id
 		dataType: int64

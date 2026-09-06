@@ -89,3 +89,83 @@ relationship '22 DocumentsIA Departements'
 relationship '23 DocumentsIA Societes'
 	fromColumn: DocumentsIA.company_id
 	toColumn: Societes.company_id
+
+relationship d3ec2d5f-7c2e-47bb-a0db-7d461374d585
+	joinOnDateBehavior: datePartOnly
+	fromColumn: ActivitesRH.request_date
+	toColumn: LocalDateTable_7298152e-9c70-4b43-a182-88574b0d6e81.Date
+
+relationship 4d415811-b3cc-4bf3-85fc-8162f32a5c62
+	joinOnDateBehavior: datePartOnly
+	fromColumn: ActivitesRH.month_start
+	toColumn: LocalDateTable_04e24bff-15cd-420f-a680-98423c6e49a1.Date
+
+relationship 6b957fab-2512-4d1a-ae7a-6bb44aac8364
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Deplacements.request_date
+	toColumn: LocalDateTable_0923131c-81a2-4b0b-b133-4798e0e2dbf6.Date
+
+relationship 660b313a-347f-483c-8010-5d57717b8eda
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Deplacements.month_start
+	toColumn: LocalDateTable_45233b18-7c57-474f-9095-85dbab0d6596.Date
+
+relationship 070ab178-a8e7-468f-99a9-62cb38f1186f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Deplacements.date_from
+	toColumn: LocalDateTable_1c28831a-cb9e-4668-ae28-fd14e6e9a127.Date
+
+relationship 6cba6156-4f74-4d33-b320-83f2a2fccf1a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Deplacements.date_to
+	toColumn: LocalDateTable_02c9b4e5-4bf7-4f15-9fd7-9fbe464b0488.Date
+
+relationship 3261e501-1829-4f4a-9ffb-cd222d628121
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Fournitures.request_date
+	toColumn: LocalDateTable_215e3f4f-e704-4b60-bda2-498b4cc8de92.Date
+
+relationship e32af917-d573-4205-8417-5cfe292c2016
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Fournitures.month_start
+	toColumn: LocalDateTable_f81424f4-07f3-4b4f-8e79-c551814f2e84.Date
+
+relationship 54e1fae2-c627-499a-8bf1-b8097e9811df
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Attestations.request_date
+	toColumn: LocalDateTable_a6b171ab-3c80-4577-885b-7fef7db59397.Date
+
+relationship 1032a836-0d90-44f4-ada5-3097658a1625
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Attestations.month_start
+	toColumn: LocalDateTable_d6b3531a-775f-4ada-91ff-b1965aa344ae.Date
+
+relationship ca2c7f61-df8c-43e0-8de3-c2b5f2384201
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Presences.attendance_date
+	toColumn: LocalDateTable_311fe511-94d9-4701-92ae-3ee395d72464.Date
+
+relationship 70226b68-38f4-4fda-9458-913199f41411
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Presences.month_start
+	toColumn: LocalDateTable_4b67bb76-b153-432e-8a9e-794d0e845c76.Date
+
+relationship e8105bbd-4a34-4a23-9982-4efd3494c865
+	joinOnDateBehavior: datePartOnly
+	fromColumn: LogsZKTeco.punch_date
+	toColumn: LocalDateTable_7312ea12-8876-481f-8a7c-e420981e12da.Date
+
+relationship ed14c1cd-0412-44a1-a44a-53574fadf6d6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: LogsZKTeco.month_start
+	toColumn: LocalDateTable_fe588a28-8b39-4797-8fb0-1ce253504c36.Date
+
+relationship 35b5bd2c-db96-407c-8ece-08e115008765
+	joinOnDateBehavior: datePartOnly
+	fromColumn: MessagesIA.message_date
+	toColumn: LocalDateTable_64420b6f-3e7a-495f-9c0b-8f87074c05ce.Date
+
+relationship 4a84e8db-0eca-4a8e-9c03-b5d5d880e576
+	joinOnDateBehavior: datePartOnly
+	fromColumn: MessagesIA.month_start
+	toColumn: LocalDateTable_afcca962-f706-4ea3-83c5-0b45df71df1d.Date

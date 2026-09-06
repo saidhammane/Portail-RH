@@ -4,7 +4,7 @@ table Presences
 	column attendance_id
 		dataType: int64
 		lineageTag: 5b3798a7-7314-4486-b3f1-fe1d1fab3a78
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: attendance_id
 
 		annotation SummarizationSetBy = Automatic
@@ -64,7 +64,14 @@ table Presences
 		summarizeBy: none
 		sourceColumn: attendance_date
 
+		variation Variation
+			isDefault
+			relationship: ca2c7f61-df8c-43e0-8de3-c2b5f2384201
+			defaultHierarchy: LocalDateTable_311fe511-94d9-4701-92ae-3ee395d72464.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column month_start
 		dataType: dateTime
@@ -73,7 +80,14 @@ table Presences
 		summarizeBy: none
 		sourceColumn: month_start
 
+		variation Variation
+			isDefault
+			relationship: 70226b68-38f4-4fda-9458-913199f41411
+			defaultHierarchy: LocalDateTable_4b67bb76-b153-432e-8a9e-794d0e845c76.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column month_label
 		dataType: string
@@ -122,7 +136,7 @@ table Presences
 	column zkteco_managed
 		dataType: int64
 		lineageTag: abf25f6b-2726-4ef6-b71c-3ca5fb387fb0
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: zkteco_managed
 
 		annotation SummarizationSetBy = Automatic
@@ -130,7 +144,7 @@ table Presences
 	column late_minutes
 		dataType: int64
 		lineageTag: dc94d5e0-f051-4ed2-95da-51ac07112c14
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: late_minutes
 
 		annotation SummarizationSetBy = Automatic
@@ -138,7 +152,7 @@ table Presences
 	column early_departure_minutes
 		dataType: int64
 		lineageTag: d77b4311-25de-4b10-ab59-80917423e44b
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: early_departure_minutes
 
 		annotation SummarizationSetBy = Automatic
@@ -162,7 +176,7 @@ table Presences
 	column is_late
 		dataType: int64
 		lineageTag: 6da71d18-a779-45dc-8d91-90459caa80fb
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: is_late
 
 		annotation SummarizationSetBy = Automatic
@@ -170,7 +184,7 @@ table Presences
 	column is_early
 		dataType: int64
 		lineageTag: 098d8cd7-f290-4352-b77a-fddb5778c837
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: is_early
 
 		annotation SummarizationSetBy = Automatic
@@ -178,7 +192,7 @@ table Presences
 	column is_short_day
 		dataType: int64
 		lineageTag: 09c4d569-ac8d-4355-a053-9cec4f462537
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: is_short_day
 
 		annotation SummarizationSetBy = Automatic
@@ -186,7 +200,7 @@ table Presences
 	column is_overtime
 		dataType: int64
 		lineageTag: ecd58a8b-2d78-4c3b-8ac3-6bdceb07ded5
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: is_overtime
 
 		annotation SummarizationSetBy = Automatic

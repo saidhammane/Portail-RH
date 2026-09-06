@@ -4,7 +4,7 @@ table Fournitures
 	column request_id
 		dataType: int64
 		lineageTag: 154d3aef-c2f7-4191-b839-86d2ced3123a
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: request_id
 
 		annotation SummarizationSetBy = Automatic
@@ -24,7 +24,14 @@ table Fournitures
 		summarizeBy: none
 		sourceColumn: request_date
 
+		variation Variation
+			isDefault
+			relationship: 3261e501-1829-4f4a-9ffb-cd222d628121
+			defaultHierarchy: LocalDateTable_215e3f4f-e704-4b60-bda2-498b4cc8de92.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column month_start
 		dataType: dateTime
@@ -33,12 +40,19 @@ table Fournitures
 		summarizeBy: none
 		sourceColumn: month_start
 
+		variation Variation
+			isDefault
+			relationship: e32af917-d573-4205-8417-5cfe292c2016
+			defaultHierarchy: LocalDateTable_f81424f4-07f3-4b4f-8e79-c551814f2e84.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column year
 		dataType: int64
 		lineageTag: 38b5ef83-8810-4e73-aac5-a58e3c7e452b
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: year
 
 		annotation SummarizationSetBy = Automatic
@@ -46,7 +60,7 @@ table Fournitures
 	column month_number
 		dataType: int64
 		lineageTag: 29ba4ccc-6902-4a1e-9c88-2d4b1350e6d1
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: month_number
 
 		annotation SummarizationSetBy = Automatic
@@ -94,7 +108,7 @@ table Fournitures
 	column manager_id
 		dataType: int64
 		lineageTag: e5ce7ca7-1c56-4c26-a894-4795cefbac00
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: manager_id
 
 		annotation SummarizationSetBy = Automatic
@@ -185,7 +199,7 @@ table Fournitures
 	column is_approved
 		dataType: int64
 		lineageTag: 8b122e62-93ec-42e7-84b2-43aaeab5f84c
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: is_approved
 
 		annotation SummarizationSetBy = Automatic
@@ -193,7 +207,7 @@ table Fournitures
 	column is_pending
 		dataType: int64
 		lineageTag: 556a6e62-76fb-4be5-819c-1a9cab29bd17
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: is_pending
 
 		annotation SummarizationSetBy = Automatic

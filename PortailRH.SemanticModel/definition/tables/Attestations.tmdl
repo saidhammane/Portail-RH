@@ -4,7 +4,7 @@ table Attestations
 	column request_id
 		dataType: int64
 		lineageTag: 56f0f67b-f2a5-4550-8e56-8e52e98289e8
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: request_id
 
 		annotation SummarizationSetBy = Automatic
@@ -24,7 +24,14 @@ table Attestations
 		summarizeBy: none
 		sourceColumn: request_date
 
+		variation Variation
+			isDefault
+			relationship: 54e1fae2-c627-499a-8bf1-b8097e9811df
+			defaultHierarchy: LocalDateTable_a6b171ab-3c80-4577-885b-7fef7db59397.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column month_start
 		dataType: dateTime
@@ -33,12 +40,19 @@ table Attestations
 		summarizeBy: none
 		sourceColumn: month_start
 
+		variation Variation
+			isDefault
+			relationship: 1032a836-0d90-44f4-ada5-3097658a1625
+			defaultHierarchy: LocalDateTable_d6b3531a-775f-4ada-91ff-b1965aa344ae.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column year
 		dataType: int64
 		lineageTag: 3eb65e16-ad58-4e33-8270-da90a9da22f6
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: year
 
 		annotation SummarizationSetBy = Automatic
@@ -46,7 +60,7 @@ table Attestations
 	column month_number
 		dataType: int64
 		lineageTag: 6217ee3d-cc00-4434-aab2-77e507aa52cf
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: month_number
 
 		annotation SummarizationSetBy = Automatic
@@ -142,7 +156,7 @@ table Attestations
 	column is_approved
 		dataType: int64
 		lineageTag: c0a49b28-0e0a-4eee-be91-56bbc6514631
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: is_approved
 
 		annotation SummarizationSetBy = Automatic

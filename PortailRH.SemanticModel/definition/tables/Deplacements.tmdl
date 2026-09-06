@@ -4,7 +4,7 @@ table Deplacements
 	column request_id
 		dataType: int64
 		lineageTag: 5426e2af-11e8-433e-9207-af2643448d02
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: request_id
 
 		annotation SummarizationSetBy = Automatic
@@ -24,7 +24,14 @@ table Deplacements
 		summarizeBy: none
 		sourceColumn: request_date
 
+		variation Variation
+			isDefault
+			relationship: 6b957fab-2512-4d1a-ae7a-6bb44aac8364
+			defaultHierarchy: LocalDateTable_0923131c-81a2-4b0b-b133-4798e0e2dbf6.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column month_start
 		dataType: dateTime
@@ -33,12 +40,19 @@ table Deplacements
 		summarizeBy: none
 		sourceColumn: month_start
 
+		variation Variation
+			isDefault
+			relationship: 660b313a-347f-483c-8010-5d57717b8eda
+			defaultHierarchy: LocalDateTable_45233b18-7c57-474f-9095-85dbab0d6596.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column year
 		dataType: int64
 		lineageTag: 3bb3fa7f-854e-4059-83bb-5551d48d416f
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: year
 
 		annotation SummarizationSetBy = Automatic
@@ -46,7 +60,7 @@ table Deplacements
 	column month_number
 		dataType: int64
 		lineageTag: c554b2f9-9fd4-41b9-875a-9b8863503bec
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: month_number
 
 		annotation SummarizationSetBy = Automatic
@@ -94,7 +108,7 @@ table Deplacements
 	column manager_id
 		dataType: int64
 		lineageTag: 119a0df0-07f9-4f3a-933d-2a6b2cac95f6
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: manager_id
 
 		annotation SummarizationSetBy = Automatic
@@ -138,7 +152,14 @@ table Deplacements
 		summarizeBy: none
 		sourceColumn: date_from
 
+		variation Variation
+			isDefault
+			relationship: 070ab178-a8e7-468f-99a9-62cb38f1186f
+			defaultHierarchy: LocalDateTable_1c28831a-cb9e-4668-ae28-fd14e6e9a127.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column date_to
 		dataType: dateTime
@@ -147,7 +168,14 @@ table Deplacements
 		summarizeBy: none
 		sourceColumn: date_to
 
+		variation Variation
+			isDefault
+			relationship: 6cba6156-4f74-4d33-b320-83f2a2fccf1a
+			defaultHierarchy: LocalDateTable_02c9b4e5-4bf7-4f15-9fd7-9fbe464b0488.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column duration_days
 		dataType: double
@@ -186,7 +214,7 @@ table Deplacements
 	column is_approved
 		dataType: int64
 		lineageTag: 022514ba-c074-496b-81a9-8d1c12780fb7
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: is_approved
 
 		annotation SummarizationSetBy = Automatic
@@ -194,7 +222,7 @@ table Deplacements
 	column is_pending
 		dataType: int64
 		lineageTag: 9e59cd94-a084-4855-bd87-4ad3a91eb27a
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: is_pending
 
 		annotation SummarizationSetBy = Automatic

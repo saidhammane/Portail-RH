@@ -74,7 +74,7 @@ table Employes
 		annotation SummarizationSetBy = Automatic
 
 	column zkteco_user_id
-		dataType: int64
+		dataType: string
 		lineageTag: 1af20862-47c0-4d44-ad33-bca1f27d9243
 		summarizeBy: none
 		sourceColumn: zkteco_user_id
@@ -82,7 +82,8 @@ table Employes
 		annotation SummarizationSetBy = Automatic
 
 	column active
-		dataType: int64
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 6684fb6c-5819-4acb-aefa-3b4e4cc6d212
 		summarizeBy: none
 		sourceColumn: active

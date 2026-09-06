@@ -4,7 +4,7 @@ table MessagesIA
 	column message_id
 		dataType: int64
 		lineageTag: e43bbd1c-6d03-40f9-bb03-77c55e8bb4c5
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: message_id
 
 		annotation SummarizationSetBy = Automatic
@@ -12,7 +12,7 @@ table MessagesIA
 	column conversation_id
 		dataType: int64
 		lineageTag: 29f183d6-dc82-435b-ac16-2793a34c19fa
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: conversation_id
 
 		annotation SummarizationSetBy = Automatic
@@ -20,7 +20,7 @@ table MessagesIA
 	column user_id
 		dataType: int64
 		lineageTag: c85c0951-a8a4-4268-88bc-7fff8275d628
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: user_id
 
 		annotation SummarizationSetBy = Automatic
@@ -101,7 +101,7 @@ table MessagesIA
 	column latency_ms
 		dataType: int64
 		lineageTag: b67a39c5-7108-4db6-8430-ea5a9a7d5cf7
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: latency_ms
 
 		annotation SummarizationSetBy = Automatic
@@ -109,7 +109,7 @@ table MessagesIA
 	column cache_hit
 		dataType: int64
 		lineageTag: e72bd5a1-b937-4edb-b126-09fce7ec59c6
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: cache_hit
 
 		annotation SummarizationSetBy = Automatic
@@ -133,7 +133,7 @@ table MessagesIA
 	column needs_escalation
 		dataType: int64
 		lineageTag: 3479b03a-badc-4b03-9338-b4948d954d70
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: needs_escalation
 
 		annotation SummarizationSetBy = Automatic
@@ -154,7 +154,14 @@ table MessagesIA
 		summarizeBy: none
 		sourceColumn: message_date
 
+		variation Variation
+			isDefault
+			relationship: 35b5bd2c-db96-407c-8ece-08e115008765
+			defaultHierarchy: LocalDateTable_64420b6f-3e7a-495f-9c0b-8f87074c05ce.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column month_start
 		dataType: dateTime
@@ -163,7 +170,14 @@ table MessagesIA
 		summarizeBy: none
 		sourceColumn: month_start
 
+		variation Variation
+			isDefault
+			relationship: 4a84e8db-0eca-4a8e-9c03-b5d5d880e576
+			defaultHierarchy: LocalDateTable_afcca962-f706-4ea3-83c5-0b45df71df1d.'Hiérarchie de dates'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column create_date
 		dataType: dateTime

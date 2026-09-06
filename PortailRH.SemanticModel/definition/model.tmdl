@@ -24,5 +24,22 @@ ref table DocumentsIA
 ref table Employes
 ref table Departements
 ref table Societes
+ref table DateTableTemplate_f73dd359-5620-4dc0-83a3-54836171128f
+ref table LocalDateTable_7298152e-9c70-4b43-a182-88574b0d6e81
+ref table LocalDateTable_04e24bff-15cd-420f-a680-98423c6e49a1
+ref table LocalDateTable_0923131c-81a2-4b0b-b133-4798e0e2dbf6
+ref table LocalDateTable_45233b18-7c57-474f-9095-85dbab0d6596
+ref table LocalDateTable_1c28831a-cb9e-4668-ae28-fd14e6e9a127
+ref table LocalDateTable_02c9b4e5-4bf7-4f15-9fd7-9fbe464b0488
+ref table LocalDateTable_215e3f4f-e704-4b60-bda2-498b4cc8de92
+ref table LocalDateTable_f81424f4-07f3-4b4f-8e79-c551814f2e84
+ref table LocalDateTable_a6b171ab-3c80-4577-885b-7fef7db59397
+ref table LocalDateTable_d6b3531a-775f-4ada-91ff-b1965aa344ae
+ref table LocalDateTable_311fe511-94d9-4701-92ae-3ee395d72464
+ref table LocalDateTable_4b67bb76-b153-432e-8a9e-794d0e845c76
+ref table LocalDateTable_7312ea12-8876-481f-8a7c-e420981e12da
+ref table LocalDateTable_fe588a28-8b39-4797-8fb0-1ce253504c36
+ref table LocalDateTable_64420b6f-3e7a-495f-9c0b-8f87074c05ce
+ref table LocalDateTable_afcca962-f706-4ea3-83c5-0b45df71df1d
 
 ref cultureInfo fr-FR
