@@ -241,3 +241,4 @@ table Presences
 					View
 
 	annotation PBI_ResultType = Table
+

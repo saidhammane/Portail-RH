@@ -113,3 +113,4 @@ table LocalDateTable_a6b171ab-3c80-4577-885b-7fef7db59397
 		source = Calendar(Date(Year(MIN('Attestations'[request_date])), 1, 1), Date(Year(MAX('Attestations'[request_date])), 12, 31))
 
 	annotation __PBI_LocalDateTable = true
+

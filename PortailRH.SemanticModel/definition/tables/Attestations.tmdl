@@ -189,3 +189,4 @@ table Attestations
 					View
 
 	annotation PBI_ResultType = Table
+

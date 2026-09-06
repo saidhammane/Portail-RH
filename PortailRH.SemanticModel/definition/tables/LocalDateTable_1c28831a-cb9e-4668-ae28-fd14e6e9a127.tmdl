@@ -113,3 +113,4 @@ table LocalDateTable_1c28831a-cb9e-4668-ae28-fd14e6e9a127
 		source = Calendar(Date(Year(MIN('Deplacements'[date_from])), 1, 1), Date(Year(MAX('Deplacements'[date_from])), 12, 31))
 
 	annotation __PBI_LocalDateTable = true
+

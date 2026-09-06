@@ -100,3 +100,4 @@ table Employes
 					View
 
 	annotation PBI_ResultType = Table
+

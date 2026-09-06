@@ -198,3 +198,4 @@ table MessagesIA
 					View
 
 	annotation PBI_ResultType = Table
+

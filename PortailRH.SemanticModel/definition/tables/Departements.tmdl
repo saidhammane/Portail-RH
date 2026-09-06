@@ -67,3 +67,4 @@ table Departements
 					View
 
 	annotation PBI_ResultType = Table
+

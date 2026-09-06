@@ -415,3 +415,4 @@ table ActivitesRH
 					View
 
 	annotation PBI_ResultType = Table
+

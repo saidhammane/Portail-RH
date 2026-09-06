@@ -197,3 +197,4 @@ table LogsZKTeco
 					View
 
 	annotation PBI_ResultType = Table
+
